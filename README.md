@@ -5,19 +5,20 @@ An independent replication of the five freqtrade strategies published in
 tested on 6.5 years of data the original author never saw.
 
 **Headline: all five degrade out of sample. Two retain under 10% of their
-edge, one turns negative.**
+edge, one turns negative — and four of the five were never statistically
+significant to begin with.**
 
 Measured with **freqtrade itself** — not a re-implementation — and reported as
 **expectancy per trade**, because "Total profit %" depends on `max_open_trades`
 and stake sizing, i.e. on a configuration the authors did not publish.
 
 ```
-                                in-sample   out-of-sample   survives
-EMAPriceCrossoverWithThreshold     1.63          0.90          55%
-DoubleEMACrossoverWithTrend        0.49          0.22          45%
-MACDCrossoverWithTrend             0.53          0.03           6%
-RSIDirectionalWithTrendSlow        1.13          0.06           5%
-RSIDirectionalWithTrend            0.42         -0.09       negative
+                                in-sample    p      out-of-sample    p     survives
+EMAPriceCrossoverWithThreshold     1.63    0.113        0.90       0.161     55%
+DoubleEMACrossoverWithTrend        0.49    0.049        0.22       0.290     45%
+MACDCrossoverWithTrend             0.53    0.128        0.03       0.883      6%
+RSIDirectionalWithTrendSlow        1.13    0.381        0.06       0.924      5%
+RSIDirectionalWithTrend            0.42    0.238       -0.09       0.556   negative
 ```
 
 In-sample window is the authors': 2018-03-01 … 2020-03-01, 1h, 8 USDT pairs.
@@ -25,11 +26,24 @@ Out-of-sample: 2020-03-01 … 2026-08-20, same code, same pairs, 0.1% fee per si
 
 ### And two findings that do not need the out-of-sample window at all
 
-**One of them is not statistically significant in its own author's window.**
-freqtrade prints `Mean profit p-value` in every backtest. For
-`MACDCrossoverWithTrend` it is **0.1283** in-sample — the average trade is not
-distinguishable from zero at any conventional threshold. The out-of-sample
-collapse is almost beside the point: the in-sample result was never established.
+**Four of the five are not statistically significant in their own author's
+window. None of the five is significant out of sample.**
+
+freqtrade prints `Mean profit p-value` in every backtest; the column is in the
+table above. Only `DoubleEMACrossoverWithTrend` clears 0.05 in-sample, and only
+just (0.049). The strongest performer of the set —
+`EMAPriceCrossoverWithThreshold`, expectancy 1.63 — sits at **p = 0.113**: its
+average trade is not distinguishable from zero in the window it was developed in.
+
+For most of these strategies the out-of-sample collapse is almost beside the
+point. The in-sample result was never established in the first place.
+
+> **A correction.** An earlier version of this README said *one* of them was not
+> significant, citing `MACDCrossoverWithTrend` at 0.1283. That was the p-value of
+> the strategy I happened to be writing about, reported as though it described
+> the set. Measuring all five gives four. The error is mine and it is the same
+> shape as the one documented at the bottom of this file: a statement about a
+> population, made from the one case actually looked at.
 
 **Three of five are negative in-sample once execution is priced honestly.**
 freqtrade fills at the candle open with no spread and no slippage. On XLM, DASH
@@ -67,7 +81,7 @@ what a reader takes from a results table — not what the author did.
 | Replication with freqtrade itself | trade counts land near the authors' (303 vs 300) |
 | Look-ahead bias (`lookahead-analysis`) | **none found** — the engine's own detector agrees |
 | Indicator warm-up (`recursive-analysis`) | engine **refuses to run**: `startup_candle_count` is 0 in 5/5 |
-| Statistical significance | `Mean profit p-value` reported per strategy; one is 0.13 in-sample |
+| Statistical significance | `Mean profit p-value` per strategy — **4 of 5 fail in-sample, 5 of 5 fail out** |
 | Baseline | `Market change` — buy-and-hold on the same pairs, reported alongside |
 | Reproducibility of the headline figure | **fails** — no config is published |
 | Filter interaction | one of two exits is unreachable by construction |
