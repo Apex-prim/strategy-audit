@@ -13,16 +13,24 @@ u"""Догрузка свечей ИЗ МЕСЯЧНЫХ АРХИВОВ Binance, 
 а не как короткий ряд.
 """
 from __future__ import print_function
+import os as _os
+_ROOT = _os.environ.get("AUDIT_ROOT") or _os.path.dirname(_os.path.abspath(__file__))
 import io, os, sys, time, urllib.error, urllib.request, zipfile
 
-sys.path.insert(0, "C:/tmp/audit")
+sys.path.insert(0, _ROOT)
 import pandas as pd
 
-OUT = "C:/tmp/audit/user_data/data/binance"
+OUT = _os.path.join(_ROOT, "user_data/data/binance")
 PAIRS = {"BTCUSDT": "BTC_USDT", "LTCUSDT": "LTC_USDT", "ETHUSDT": "ETH_USDT",
          "XRPUSDT": "XRP_USDT", "ADAUSDT": "ADA_USDT", "XLMUSDT": "XLM_USDT",
          "XMRUSDT": "XMR_USDT", "DASHUSDT": "DASH_USDT"}
 BASE = "https://data.binance.vision/data/spot/monthly/klines/%s/%s/%s-%s-%s.zip"
+DAILY = "https://data.binance.vision/data/spot/daily/klines/%s/%s/%s-%s-%s.zip"
+# Месячные архивы кончаются последним ПОЛНЫМ месяцем. Без дневного добора
+# 5m обрывались на 2026-07-31, а часовые шли до 2026-08-20 — разные окна у
+# разных таймфреймов, то есть несравнимые прогоны. Дыра в 20 дней меньше
+# процента, и именно поэтому её легко не заметить.
+TAIL_DAYS = ["2026-08-%02d" % d for d in range(1, 21)]
 TF = sys.argv[1] if len(sys.argv) > 1 else "5m"
 Y0, M0, Y1, M1 = 2018, 3, 2026, 7
 RETRY = 4
@@ -37,10 +45,9 @@ def months():
             y, m = y + 1, 1
 
 
-def grab(sym, tf, y, m):
+def grab(sym, tf, tag, daily=False):
     u"""(строки, статус). Статус: ok | нет в архиве | СЕТЬ."""
-    tag = "%04d-%02d" % (y, m)
-    url = BASE % (sym, tf, sym, tf, tag)
+    url = (DAILY if daily else BASE) % (sym, tf, sym, tf, tag)
     for attempt in range(RETRY):
         try:
             raw = urllib.request.urlopen(url, timeout=60).read()
@@ -76,20 +83,29 @@ def main():
     import atexit
     atexit.register(lambda: runlock.release("fetch"))
     os.makedirs(OUT, exist_ok=True)
+    force = "--refill" in sys.argv
     todo = [(s, f) for s, f in PAIRS.items()
-            if not (os.path.exists(os.path.join(OUT, "%s-%s.feather" % (f, TF)))
-                    and os.path.getsize(os.path.join(OUT, "%s-%s.feather" % (f, TF))) > 100000)]
+            if force or not (os.path.exists(os.path.join(OUT, "%s-%s.feather" % (f, TF)))
+                             and os.path.getsize(os.path.join(OUT, "%s-%s.feather" % (f, TF))) > 100000)]
     print(u"ТАЙМФРЕЙМ %s · пар к загрузке %d из %d" % (TF, len(todo), len(PAIRS)), flush=True)
     for sym, ft in todo:
         t0 = time.time()
         rows, gaps, neterr = [], [], 0
         for y, m in months():
-            r, st = grab(sym, TF, y, m)
+            r, st = grab(sym, TF, "%04d-%02d" % (y, m))
             if st == u"ok":
                 rows += r
             elif st == u"нет в архиве":
                 gaps.append("%04d-%02d" % (y, m))
             else:
+                neterr += 1
+        tail = 0
+        for day in TAIL_DAYS:                     # добор незакрытого месяца
+            r, st = grab(sym, TF, day, daily=True)
+            if st == u"ok":
+                rows += r
+                tail += len(r)
+            elif st != u"нет в архиве":
                 neterr += 1
         if not rows:
             print(u"  ✗ %-9s НИ ОДНОГО МЕСЯЦА (сетевых отказов %d)" % (sym, neterr), flush=True)
@@ -102,6 +118,7 @@ def main():
         note = u""
         if gaps:
             note += u" · месяцев без листинга %d (с %s)" % (len(gaps), gaps[0])
+        note += u" · добор дней %d" % tail
         if neterr:
             note += u" · СЕТЕВЫХ ОТКАЗОВ %d — ряд НЕПОЛОН" % neterr
         print(u"  ✓ %-9s %8d свечей  %s … %s  за %.0f с%s"

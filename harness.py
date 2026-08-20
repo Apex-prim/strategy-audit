@@ -46,7 +46,9 @@ try:
 except Exception:
     pass
 
-ROOT = "C:/tmp/audit"
+# Корень — от самого файла, а не от моего диска: README обещает, что
+# harness.py можно запустить у себя. Переопределяется AUDIT_ROOT.
+ROOT = os.environ.get("AUDIT_ROOT") or os.path.dirname(os.path.abspath(__file__))
 FT = os.path.join(ROOT, "ftenv", "Scripts", "freqtrade.exe")
 CFG = os.path.join(ROOT, "user_data", "config.json")
 STRAT_DIR = os.path.join(ROOT, "user_data", "strategies")
@@ -215,7 +217,13 @@ def engine_tf(out):
 def missing_pairs(out):
     u"""Пары, по которым движок НЕ НАШЁЛ истории. Он об этом предупреждает
     и ПРОДОЛЖАЕТ на остальных — результат выходит полным на вид, но по
-    меньшему числу инструментов. Сравнивать такой с полным нельзя."""
+    меньшему числу инструментов. Сравнивать такой с полным нельзя.
+
+    ГРАНИЦА ЭТОЙ ПРОВЕРКИ, названная прямо: видно ОТСУТСТВИЕ ФАЙЛА, а не
+    частичный охват внутри окна. XRP листился 2018-05-04, и в окне с
+    2018-03-01 первые два месяца по нему пусты — предупреждения не будет,
+    потому что файл есть. Это свойство рынка, а не дефект, но проверка о нём
+    НЕ ЗНАЕТ, и делать вид, что знает, нельзя."""
     return sorted(set(re.findall(r"No history for (\S+), \w+, \S+ found", out)))
 
 

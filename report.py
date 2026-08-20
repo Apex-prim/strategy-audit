@@ -19,7 +19,7 @@ try:
 except Exception:
     pass
 
-ROOT = "C:/tmp/audit"
+ROOT = os.environ.get("AUDIT_ROOT") or os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(ROOT, "results")
 OUT = os.path.join(ROOT, "repo", "results")
 
@@ -50,22 +50,44 @@ def card(r):
     out = r["runs"]["out_sample"]
     L.append(u"## Результат")
     L.append(u"")
+    def g(s, k):
+        return s.get(k) if isinstance(s, dict) else None
     if ins["level"] == u"ПРОШЛА" and ins["summary"]:
-        n1, p1, e1, w1 = ins["summary"]
-        L.append(u"```")
-        L.append(u"                  сделок   итог %    ожидание на сделку")
-        L.append(u"в выборке автора  %6s   %7s   %s" % (n1, p1, e1))
-        if out["level"] == u"ПРОШЛА" and out["summary"]:
-            n2, p2, e2, w2 = out["summary"]
-            L.append(u"ВНЕ выборки       %6s   %7s   %s" % (n2, p2, e2))
+        a = ins["summary"]; b = out["summary"] if out["level"] == u"ПРОШЛА" else None
+        L.append(u"| показатель | в выборке автора | вне выборки |")
+        L.append(u"|---|---|---|")
+        for key, lab in (("trades", u"сделок"), ("expectancy", u"ожидание на сделку"),
+                         ("p_value", u"p-значение средней"),
+                         ("market_change_pct", u"«купил и держи», %"),
+                         ("total_pct", u"итог стратегии, %"),
+                         ("sharpe", u"Шарп"), ("sortino", u"Сортино"),
+                         ("drawdown_pct", u"просадка, %"),
+                         ("profit_factor", u"фактор прибыли")):
+            L.append(u"| %s | %s | %s |" % (lab, g(a, key), g(b, key) if b else u"—"))
+        L.append(u"")
+        e1, e2 = g(a, "expectancy"), (g(b, "expectancy") if b else None)
+        L.append(u"**Осталось от ожидания вне выборки: %s**" % (survives(e1, e2) or u"—"))
+        pv = g(a, "p_value")
+        if pv is not None and pv > 0.05:
             L.append(u"")
-            L.append(u"осталось от ожидания: %s" % survives(e1, e2))
-        else:
-            L.append(u"ВНЕ выборки       %s — %s" % (out["level"], out["why"]))
-        L.append(u"```")
+            L.append(u"⚠ **В окне автора средняя доходность НЕ ЗНАЧИМА** "
+                     u"(p = %s > 0.05). То есть даже in-sample результат "
+                     u"неотличим от нуля." % pv)
+        mc = g(a, "market_change_pct")
+        if mc is not None and g(a, "total_pct") is not None:
+            L.append(u"")
+            L.append(u"Базовая линия: «купил и держи» на тех же парах дал "
+                     u"**%s%%**, стратегия — **%s%%**." % (mc, g(a, "total_pct")))
     else:
         L.append(u"**%s** — %s" % (ins["level"], ins["why"]))
     L.append(u"")
+
+    miss = g(ins.get("summary"), "missing_pairs") or []
+    if miss:
+        L.append(u"⚠ **Охват неполон:** движок не нашёл истории по парам %s и "
+                 u"посчитал по остальным. Такой результат НЕ сравним с полным."
+                 % u", ".join(miss))
+        L.append(u"")
 
     L.append(u"## Проверки")
     L.append(u"")
@@ -83,10 +105,15 @@ def card(r):
     L.append(u"")
     L.append(u"---")
     L.append(u"")
-    L.append(u"*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, "
-             u"1h. Окно автора 2018-03-01…2020-03-01, вне выборки "
+    # ⚠ Подвал РАНЬШЕ утверждал «1h» текстом — при том, что таймфрейм у каждой
+    # стратегии свой. Ровно тот дефект, который этот проект и ловит: проза
+    # называет предмет, которого не проверяла. Теперь печатается то, что сказал
+    # движок, а если он не сказал — так и пишется.
+    tfu = g(ins.get("summary"), "used_timeframe") or r.get("declared_timeframe")
+    L.append(u"*Прогон настоящим freqtrade, комиссия 0.1%% за сторону, 8 пар к USDT, "
+             u"таймфрейм **%s**. Окно автора 2018-03-01…2020-03-01, вне выборки "
              u"2020-03-01…2026-08-20. «Не смогли проверить» нигде не "
-             u"печатается как «чисто».*")
+             u"печатается как «чисто».*" % (tfu or u"НЕ ОПРЕДЕЛЁН"))
     return u"\n".join(L)
 
 
@@ -95,14 +122,16 @@ def index(rows):
          u"Мера — **ожидание на сделку**, а не итоговый процент: итог зависит "
          u"от `max_open_trades` и размера ставки, то есть от конфигурации, а "
          u"не от стратегии.", u"",
-         u"| стратегия | источник | в выборке | вне выборки | осталось | утечка | рекурсия |",
-         u"|---|---|---|---|---|---|---|"]
+         u"| стратегия | источник | ТФ | в выборке | вне выборки | осталось | утечка | рекурсия |",
+         u"|---|---|---|---|---|---|---|---|"]
     for r in rows:
         ins = r["runs"]["in_sample"]; out = r["runs"]["out_sample"]
-        e1 = ins["summary"][2] if ins["summary"] else None
-        e2 = out["summary"][2] if out["summary"] else None
-        L.append(u"| [%s](%s.md) | `%s` | %s | %s | **%s** | %s | %s |"
-                 % (r["strategy"], r["strategy"], r["repo"].split("/")[0],
+        e1 = ins["summary"].get("expectancy") if isinstance(ins["summary"], dict) else None
+        e2 = out["summary"].get("expectancy") if isinstance(out["summary"], dict) else None
+        tf = (ins["summary"].get("used_timeframe")
+              if isinstance(ins["summary"], dict) else None) or r.get("declared_timeframe")
+        L.append(u"| [%s](%s.md) | `%s` | %s | %s | %s | **%s** | %s | %s |"
+                 % (r["strategy"], r["strategy"], r["repo"].split("/")[0], tf or u"—",
                     e1 if e1 is not None else u"—",
                     e2 if e2 is not None else u"—",
                     survives(e1, e2) or u"—",

@@ -14,7 +14,7 @@ u"""Один писатель на общий ресурс. Замок с про
 from __future__ import print_function
 import io, os, sys
 
-LOCKDIR = "C:/tmp/audit"
+LOCKDIR = os.environ.get("AUDIT_ROOT") or os.path.dirname(os.path.abspath(__file__))
 
 
 def _alive(pid):

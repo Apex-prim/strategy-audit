@@ -57,17 +57,42 @@ where the attrition happened rather than trusting one number.
 - **No stopping when the number looks good.** The sweep ends when the corpus ends
   or when a stated cap is reached.
 
+## Compute, measured rather than estimated
+
+One 5-minute strategy, timed: **55 s** for the author's window, **149 s** for the
+out-of-sample window. With 351 strategies declaring 5m, a single-threaded sweep
+is about **26 hours**, and the 36 strategies declaring 1m are worse.
+
+The sweep therefore runs in **six disjoint shards** (`corpus.py --shard k/6`),
+partitioned by position in the strategy list. Two safeguards, because the reason
+for the original single-writer lock was mixed *code versions* in one output
+directory, not concurrency as such:
+
+- Each card is stamped with the **fingerprint of `harness.py`** that produced it.
+  The lock prevents mixing; the stamp makes mixing *detectable*. A prohibition
+  with no detector is a promise.
+- Shards partition by index, so every process must build the identical list.
+  Verified: three independent runs produced the same fingerprint over 571
+  strategies. That check ages, so **each shard prints its list fingerprint** —
+  divergence shows up in the logs instead of silently dropping strategies.
+
+Cards are written to a temporary file and renamed, so an interrupted run cannot
+leave a half-written card that the next run mistakes for finished work.
+
+**No reduction of scope is planned.** The full corpus is attempted.
+
 ## Declared caps
 
-A 5-minute strategy over 8.5 years is roughly 12× the candles of an hourly one,
-and 351 of the 571 declare 5m. If the full sweep does not fit in available
-compute, the cap will be **stated as a number in the results** — how many
-strategies ran, how many did not, and the rule that selected them. A silently
-truncated sweep reads as complete coverage; that is precisely the failure this
-repository documents in its own README.
+If the sweep is nonetheless cut short, the cap will be **stated as a number in
+the results** — how many strategies ran, how many did not, and the rule that
+selected them. A silently truncated sweep reads as complete coverage; that is
+precisely the failure this repository documents in its own README.
 
 Timeframes without downloaded data are a cap of the same kind: those strategies
-fail loudly, are counted, and are named.
+fail loudly, are counted, and are named. Data is being downloaded for every
+timeframe the corpus declares — 5m, 15m, 1m, 4h, 1d, 30m, 12h, 3m — so the
+expected residue is the 53 strategies that declare no timeframe at all and the
+two that declare one that does not exist (`1hr`, `5h`).
 
 ## What would embarrass this project
 
