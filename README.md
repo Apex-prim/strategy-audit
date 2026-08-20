@@ -79,8 +79,9 @@ what a reader takes from a results table — not what the author did.
 > re-fitting at each step. An earlier version of this README used the wrong
 > word; it is corrected here rather than quietly edited away.
 
-**Auditing your own strategy?** → **[CHECKLIST.md](CHECKLIST.md)** — nine
-mechanical questions, each tied to a defect actually found here.
+**Auditing your own strategy?** → **[CHECKLIST.md](CHECKLIST.md)** — ten
+mechanical questions, each tied to a defect actually found here — nine in the
+audited strategies, one in this pipeline.
 
 ## Reproduce it yourself
 
@@ -166,7 +167,7 @@ Or, in the open:
   that returned 5.896 for a probability, caught before publication because a
   value outside [0,1] means a broken instrument, not a surprising result.
 
-**What you get:** the nine checks in [CHECKLIST.md](CHECKLIST.md) run against
+**What you get:** the ten checks in [CHECKLIST.md](CHECKLIST.md) run against
 your code — in-sample and out-of-sample expectancy, p-value, buy-and-hold
 baseline, cost sensitivity, and freqtrade's own bias detectors — plus a written
 finding for anything that does not hold.
@@ -207,11 +208,36 @@ Removing `timeframe` from the config makes the engine say *"Strategy using
 timeframe: 5m"* and then refuse: *"No history for BTC/USDT, spot, 5m found."*
 Loud failure, which is what should have happened all along.
 
-**What was done:** the config no longer sets a timeframe, every corpus result
-computed under the old setting was deleted, and per-timeframe data is being
-downloaded. **The five published audits are unaffected** — those strategies
-declare `1h` themselves, and re-running them without the override reproduces
-303 trades and 0.53 expectancy exactly as published.
+**What was done, in two parts.** Removing the config key fixes *this* case:
+the engine now says *"Strategy using timeframe: 5m"* and refuses with *"No
+history found"*. But a fix that depends on nobody putting the key back is not a
+fix. So the harness now refuses any backtest result whose timeframe the engine
+did not confirm:
+
+```python
+used = engine_tf(out)                      # freqtrade's own words, not my assumption
+if want_tf and used and used != want_tf:
+    return (NA, "wrong subject: strategy declares %s, engine ran %s" % (want_tf, used))
+```
+
+That guard is verified by **restoring the defect**: a self-test writes the bad
+`timeframe` key back into a copy of the config, runs a 5-minute strategy through
+it, and requires the guard to reject the result — then requires the same guard to
+*pass* an honest run, because a check that always refuses has not checked
+anything. 7/7.
+
+Every corpus result computed under the old setting was deleted, and per-timeframe
+data is being re-downloaded from Binance's monthly archives. **The five published
+audits are unaffected** — those strategies declare `1h` themselves, and re-running
+them without the override reproduces 303 trades and 0.53 expectancy exactly as
+published.
+
+**A second silent failure, found while fixing the first.** When candle data for
+one pair is missing, freqtrade prints a warning and *continues on the remaining
+pairs*. The result looks complete; it is simply computed over fewer instruments,
+and comparing it to a full-coverage result is invalid. Every card now records
+which pairs the engine could not load, so coverage is a field rather than an
+assumption.
 
 The number to distrust was never the one that looked wrong. It was the one that
 looked fine.

@@ -1,14 +1,18 @@
-# Nine questions to ask your own backtest
+# Ten questions to ask your own backtest
 
 Each corresponds to a defect actually found in the public strategies audited
 here. None requires judgement, a guru, or a paid course.
 
-**Four are a single command. Five are a careful read of your own code.** They
-are marked, because claiming all nine are one-liners would be the same kind of
+**Five are a single command. Five are a careful read of your own code.** They
+are marked, because claiming all ten are one-liners would be the same kind of
 overstatement this repository exists to catch.
 
-    ⌨  one command      1, 2, 3, 4, 7
+    ⌨  one command      1, 2, 3, 4, 7, 10
     👁  read your code   5, 6, 8, 9
+
+Nine come from defects found in the public strategies audited here. **Number 10
+comes from a defect found in this project's own pipeline** — which is exactly
+why it is in the list.
 
 Commands assume freqtrade. The reasoning applies to any engine.
 
@@ -149,6 +153,37 @@ completely different totals.
 **Passing looks like:** your config is in the repository, or your headline
 metric is one that does not depend on it. Expectancy per trade does not.
 
+## ⌨ 10. Did the engine run the timeframe you think it ran?
+
+```bash
+freqtrade backtesting --strategy YourStrategy ... 2>&1 | grep "Strategy using timeframe"
+```
+
+A `timeframe` key in your **config** silently overrides the one your strategy
+declares in its own source. There is no warning. A 5-minute strategy will run on
+hourly candles and return a complete, plausible result — thousands of trades, a
+respectable equity curve, nothing amiss in the output.
+
+This is not hypothetical: it happened here, to this pipeline, across a
+corpus sweep, and was caught only by counting how many strategies declared which
+timeframe. The published audits were unaffected because those strategies happen
+to declare `1h`; everything else was invalid.
+
+While you are reading that log, also check for:
+
+```
+WARNING - No history for DASH/USDT, spot, 1h found
+```
+
+The engine warns and **keeps going on the remaining pairs**. Your result is then
+computed over fewer instruments than you think, and is not comparable to one that
+was not.
+
+**Passing looks like:** the timeframe in the engine's log matches the one in your
+strategy file, and there are no missing-history warnings — or you know exactly
+which pairs are missing and say so alongside the number.
+
+
 ---
 
 ## What this checklist cannot tell you
@@ -163,7 +198,7 @@ than dressed up.
 
 ---
 
-*Want these nine run against your strategy?*
+*Want these ten run against your strategy?*
 
 **📧 faxesuxan24@gmail.com** for a private audit, or open an issue to do it in
 the open. The harness in this repository — `harness.py` — is the same pipeline,

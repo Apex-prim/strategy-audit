@@ -196,6 +196,29 @@ def parse_summary(out):
     return d
 
 
+RX_TF_DECL = re.compile(r"""^\s*timeframe\s*[:=]\s*['"]([^'"]+)['"]""", re.M)
+
+
+def declared_tf(src):
+    u"""Таймфрейм, объявленный САМОЙ стратегией. None — не объявлен."""
+    m = RX_TF_DECL.search(src)
+    return m.group(1) if m else None
+
+
+def engine_tf(out):
+    u"""Таймфрейм, на котором движок ФАКТИЧЕСКИ считал — его собственными
+    словами (`Strategy using timeframe: 1h`), а не моим предположением."""
+    m = re.search(r"Strategy using timeframe:\s*(\S+)", out)
+    return m.group(1) if m else None
+
+
+def missing_pairs(out):
+    u"""Пары, по которым движок НЕ НАШЁЛ истории. Он об этом предупреждает
+    и ПРОДОЛЖАЕТ на остальных — результат выходит полным на вид, но по
+    меньшему числу инструментов. Сравнивать такой с полным нельзя."""
+    return sorted(set(re.findall(r"No history for (\S+), \w+, \S+ found", out)))
+
+
 def _sp(path):
     u"""--strategy-path: берём стратегию ТАМ, ГДЕ ОНА ЛЕЖИТ, не копируя.
     Копирование в общую папку смешало бы репозитории и дало бы дубли имён —
@@ -203,16 +226,30 @@ def _sp(path):
     return ["--strategy-path", os.path.dirname(path)] if path else []
 
 
-def backtest(name, timerange, fee="0.001", path=None):
+def backtest(name, timerange, fee="0.001", path=None, want_tf=None):
+    u"""⚠ СТОРОЖ ПРЕДМЕТА (20.08). Корпус считался НЕ НА ТЕХ СВЕЧАХ: в конфиге
+    стоял `timeframe`, а он ПЕРЕОПРЕДЕЛЯЕТ объявленный стратегией. Пятиминутки
+    шли по часовым и выдавали полноценные правдоподобные числа — 6014 сделок.
+    Ключ из конфига убран, но это чинит СЛУЧАЙ. Класс чинится здесь: результат
+    не принимается, пока движок своими словами не подтвердит, что считал на том
+    же таймфрейме, который объявила стратегия."""
     c, out = sh([FT, "backtesting", "--config", CFG, "--strategy", name,
                  "--timerange", timerange, "--fee", fee] + _sp(path),
                 timeout=1200)
+    used = engine_tf(out)
+    if c == 0 and want_tf and used and used != want_tf:
+        return (NA, u"ПРЕДМЕТ НЕ ТОТ: стратегия объявила %s, движок считал на %s"
+                % (want_tf, used), None)
     if c != 0:
         why = u"ПРЕВЫШЕНО ВРЕМЯ" if c == 124 else \
             (re.search(r"ERROR - (.+)", out).group(1)[:160]
              if re.search(r"ERROR - (.+)", out) else u"код %d" % c)
         return (NA, why, None)
-    return (PASS, u"", parse_summary(out))
+    d = parse_summary(out)
+    d["used_timeframe"] = used
+    d["declared_timeframe"] = want_tf
+    d["missing_pairs"] = missing_pairs(out)
+    return (PASS, u"", d)
 
 
 def lookahead(name, timerange="20190101-20190401", path=None):
@@ -253,10 +290,12 @@ def audit_one(repo, path, name):
     src = io.open(path, encoding="utf-8", errors="replace").read()
     r["static"] = [{"level": a, "what": b, "detail": c}
                    for a, b, c in static_checks(path, src)]
-    lvl, why, s = backtest(name, IN_RANGE, path=path)
+    tf = declared_tf(src)
+    r["declared_timeframe"] = tf
+    lvl, why, s = backtest(name, IN_RANGE, path=path, want_tf=tf)
     r["runs"]["in_sample"] = {"level": lvl, "why": why, "summary": s}
     if lvl == PASS:
-        lvl2, why2, s2 = backtest(name, OUT_RANGE, path=path)
+        lvl2, why2, s2 = backtest(name, OUT_RANGE, path=path, want_tf=tf)
         r["runs"]["out_sample"] = {"level": lvl2, "why": why2, "summary": s2}
     else:
         r["runs"]["out_sample"] = {"level": SKIP,
@@ -269,6 +308,14 @@ def audit_one(repo, path, name):
 
 
 if __name__ == "__main__":
+    # Прямой запуск harness.py пишет в ТУ ЖЕ папку карточек, что и corpus.py.
+    # Замок общий и по имени ресурса, а не по имени скрипта — иначе «у меня
+    # свой замок» вернуло бы ровно тот дефект, ради которого он заведён.
+    import runlock
+    if not runlock.acquire("corpus"):
+        raise SystemExit(2)
+    import atexit
+    atexit.register(lambda: runlock.release("corpus"))
     os.makedirs(RESULTS, exist_ok=True)
     repo = sys.argv[1] if len(sys.argv) > 1 else "paulcpk/freqtrade-strategies-that-work"
     names = sys.argv[2:]

@@ -13,37 +13,20 @@ from harness import find_strategies, audit_one, RESULTS
 REPOS = "C:/tmp/audit/repos"
 LOCK = "C:/tmp/audit/corpus.lock"
 
-# ⚠ ПРОЖИТЫЙ ДЕФЕКТ 20.08. Я трижды перезапускал прогон, ни разу не убив
-# предыдущий, и получил ЧЕТЫРЕ процесса, писавших в одну папку РАЗНЫМИ
-# версиями кода. По карточке стало невозможно сказать, чем она посчитана —
-# и сквозь старую версию пролезло p-значение 2.174, которого не бывает.
+# ⚠ ПРОЖИТЫЙ ДЕФЕКТ 20.08, ДВАЖДЫ. Сначала я трижды перезапустил прогон, ни
+# разу не убив предыдущий, и получил ЧЕТЫРЕ процесса, писавших в одну папку
+# РАЗНЫМИ версиями кода: по карточке стало невозможно сказать, чем она
+# посчитана. Починил здесь — и через час два ЗАГРУЗЧИКА свечей писали одни и
+# те же файлы. Тот же класс, второе место, потому что я чинил случай.
 #
-# Это не неряшливость, а класс: результат неизвестного происхождения хуже
-# отсутствующего, потому что выглядит как знание. Тот же класс, что
-# «две разные сборки под одной версией» в другом проекте.
-#
-# Лечение — не «не забывать убивать», а machine-enforced отказ.
-if os.path.exists(LOCK):
-    try:
-        pid = int(io.open(LOCK).read().strip())
-    except Exception:
-        pid = -1
-    alive = False
-    try:
-        import subprocess
-        r = subprocess.run(["tasklist", "/FI", "PID eq %d" % pid],
-                           capture_output=True, timeout=30)
-        alive = str(pid) in r.stdout.decode("utf-8", "replace")
-    except Exception:
-        alive = True
-    if alive:
-        print(u"ОТКАЗ: прогон уже идёт (PID %d). Два процесса на одну папку "
-              u"дают карточки неизвестного происхождения." % pid)
-        raise SystemExit(2)
-    print(u"замок от мёртвого процесса %d снят" % pid)
-io.open(LOCK, "w").write(str(os.getpid()))
+# Результат неизвестного происхождения хуже отсутствующего: он выглядит как
+# знание. Поэтому замок вынесен в runlock.py и берётся ВЕЗДЕ, где пишут в
+# общее, а не пересказывается в каждом файле заново.
+import runlock
+if not runlock.acquire("corpus"):
+    raise SystemExit(2)
 import atexit
-atexit.register(lambda: os.path.exists(LOCK) and os.remove(LOCK))
+atexit.register(lambda: runlock.release("corpus"))
 
 os.makedirs(RESULTS, exist_ok=True)
 seen, plan, dup = set(), [], 0
