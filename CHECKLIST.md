@@ -1,14 +1,20 @@
 # Nine questions to ask your own backtest
 
-Every one of these is mechanical. None requires judgement, a guru, or a paid
-course. Each is a question your own backtest can answer today, and each
-corresponds to a defect actually found in public strategies audited here.
+Each corresponds to a defect actually found in the public strategies audited
+here. None requires judgement, a guru, or a paid course.
+
+**Four are a single command. Five are a careful read of your own code.** They
+are marked, because claiming all nine are one-liners would be the same kind of
+overstatement this repository exists to catch.
+
+    ⌨  one command      1, 2, 3, 4, 7
+    👁  read your code   5, 6, 8, 9
 
 Commands assume freqtrade. The reasoning applies to any engine.
 
 ---
 
-## 1. Is `startup_candle_count` declared, and is it big enough?
+## ⌨ 1. Is `startup_candle_count` declared, and is it big enough?
 
 ```bash
 freqtrade recursive-analysis --strategy YourStrategy --timerange 20220101-20220401
@@ -25,7 +31,7 @@ indicator period, and a table of indicators with near-zero variation.
 
 *Found in 5 of the first 5 strategies audited.*
 
-## 2. Does the engine's own bias detector clear you?
+## ⌨ 2. Does the engine's own bias detector clear you?
 
 ```bash
 freqtrade lookahead-analysis --strategy YourStrategy --timerange 20220101-20220401
@@ -41,7 +47,7 @@ detector for it that almost nobody runs.
 saying when a check comes back clean — an audit that only ever reports problems
 is not measuring, it is campaigning.*
 
-## 3. Is the result significant, or is it noise?
+## ⌨ 3. Is the result significant, or is it noise?
 
 freqtrade prints `Mean profit p-value` in every backtest summary. Most people
 scroll past it.
@@ -53,7 +59,7 @@ of the strategies audited here shows p = 0.13 *in its own author's window*.
 **Passing looks like:** p below 0.05, and a trade count large enough that the
 test means something (a few dozen trades tells you almost nothing).
 
-## 4. Did you beat buying and holding?
+## ⌨ 4. Did you beat buying and holding?
 
 The same summary prints `Market change` — what the pairs themselves did over the
 window. This is your baseline, and it is free.
@@ -64,7 +70,7 @@ to underperform.
 
 **Passing looks like:** you know both numbers and can say which one you beat.
 
-## 5. Can every exit actually fire?
+## 👁 5. Can every exit actually fire?
 
 Read your entry and exit conditions side by side and ask whether each exit is
 reachable from the state the entry creates.
@@ -77,7 +83,7 @@ occurred first. The strategy has two exits on paper and one in practice.
 **Passing looks like:** for each exit, a sentence describing a path from entry to
 that exit.
 
-## 6. Are your trailing-stop settings actually on?
+## 👁 6. Are your trailing-stop settings actually on?
 
 ```python
 trailing_stop = False
@@ -89,7 +95,7 @@ means the stop trails at your **full** stoploss distance, not a few percent.
 
 **Passing looks like:** the settings you read match the behaviour you get.
 
-## 7. What happens when costs are 2× your assumption?
+## ⌨ 7. What happens when costs are 2× your assumption?
 
 ```bash
 freqtrade backtesting --strategy YourStrategy --fee 0.001   # then 0.002
@@ -100,10 +106,23 @@ slippage. Backtests fill at the candle open with none of the last two. On
 illiquid pairs in volatile periods, doubling the assumed cost is not pessimism —
 it is realism.
 
-**Passing looks like:** your edge survives 2× cost. If it does not, you do not
-have an edge, you have a fee arbitrage against your own optimism.
+**Passing looks like:** your edge survives 2-3× your assumed cost. If it does
+not, you do not have an edge — you have a fee arbitrage against your own
+optimism.
 
-## 8. Does the result hold outside the window you developed in?
+Measured on the five strategies audited here, raising cost from 0.1% to 0.3%
+per side turns **three of them negative inside their own author's window**:
+
+```
+                                0.1%     0.2%     0.3%  per side
+EMAPriceCrossoverWithThreshold  1.63     1.26     0.93
+RSIDirectionalWithTrendSlow     1.13     0.86     0.59
+MACDCrossoverWithTrend          0.53     0.25    -0.01
+DoubleEMACrossoverWithTrend     0.49     0.18    -0.08
+RSIDirectionalWithTrend         0.42     0.16    -0.09
+```
+
+## 👁 8. Does the result hold outside the window you developed in?
 
 Split your data. Develop on the first part; never look at the second until you
 are done. Then run once.
@@ -120,7 +139,7 @@ rolling or anchored windows with re-fitting at each step. Calling one the other
 is a terminology error worth avoiding — including by us: an earlier version of
 this repository used the wrong word.*
 
-## 9. Can someone else reproduce your number?
+## 👁 9. Can someone else reproduce your number?
 
 If your headline is "Total profit %", it depends on `max_open_trades`,
 `stake_amount` and `dry_run_wallet`. Without those published, the number is not

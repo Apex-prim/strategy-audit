@@ -23,6 +23,32 @@ RSIDirectionalWithTrend            0.42         -0.09       negative
 In-sample window is the authors': 2018-03-01 … 2020-03-01, 1h, 8 USDT pairs.
 Out-of-sample: 2020-03-01 … 2026-08-20, same code, same pairs, 0.1% fee per side.
 
+### And two findings that do not need the out-of-sample window at all
+
+**One of them is not statistically significant in its own author's window.**
+freqtrade prints `Mean profit p-value` in every backtest. For
+`MACDCrossoverWithTrend` it is **0.1283** in-sample — the average trade is not
+distinguishable from zero at any conventional threshold. The out-of-sample
+collapse is almost beside the point: the in-sample result was never established.
+
+**Three of five are negative in-sample once execution is priced honestly.**
+freqtrade fills at the candle open with no spread and no slippage. On XLM, DASH
+and ADA in 2018–2020, hourly spreads of 0.3–0.5% were routine. Raising the cost
+assumption to 0.3% per side — fee plus spread plus slippage:
+
+```
+                                0.1%     0.2%     0.3%  per side
+EMAPriceCrossoverWithThreshold  1.63     1.26     0.93
+RSIDirectionalWithTrendSlow     1.13     0.86     0.59
+MACDCrossoverWithTrend          0.53     0.25    -0.01   <- negative
+DoubleEMACrossoverWithTrend     0.49     0.18    -0.08   <- negative
+RSIDirectionalWithTrend         0.42     0.16    -0.09   <- negative
+```
+
+So the claim here is not "these strategies fail out of sample". It is narrower
+and harder to argue with: **under honest execution assumptions, three of the
+five never worked in the first place — in the window their own author chose.**
+
 Per-strategy cards: **[results/INDEX.md](results/INDEX.md)**
 Full write-up: **[ANALYSIS.md](ANALYSIS.md)** · [на русском](ANALYSIS.ru.md)
 
@@ -146,3 +172,19 @@ audited so far              see results/INDEX.md
 
 Nearly half of the public strategy ecosystem is copies of a few originals,
 propagated without anyone re-testing them. That is a finding in itself.
+
+### The corpus is biased, and that is the point
+
+Who publishes a strategy on GitHub? Someone whose in-sample curve looked good.
+Nobody uploads the version that lost money in backtest. **This corpus is
+selected by its own authors for best in-sample result** — the survivorship
+filter runs before we ever see the file.
+
+That is not a weakness in the sample; it is what makes the number meaningful.
+The question this corpus answers is not "how do random strategies perform" but:
+
+> Of the strategies people were confident enough to publish, how many hold up
+> when someone re-runs them on data the author never saw?
+
+A low survival rate in a sample pre-filtered for good results is a much stronger
+statement than the same rate in a random sample would be.
