@@ -82,7 +82,8 @@ for repo, f, n in plan:
              "runs": {k: {"level": u"НЕ ПРИМЕНИМА", "why": repr(ex)[:150],
                           "summary": None} for k in
                       ("in_sample", "out_sample", "lookahead", "recursive")}}
-    r["code_md5"], r["plan_md5"] = CODE_MD5, PLAN_MD5          # чем посчитано — свойство карточки, не памяти
+    r["code_md5"], r["plan_md5"] = CODE_MD5, PLAN_MD5
+    r["source"] = "corpus"          # чем посчитано — свойство карточки, не памяти
     # запись через временный файл: оборванный процесс не оставит полукарточку,
     # которую следующий прогон примет за готовую и пропустит
     tmp = out + ".tmp"

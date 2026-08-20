@@ -28,18 +28,29 @@ try:
 except Exception:
     pass
 
-RESULTS = "C:/tmp/audit/results"
+_ROOT = os.environ.get("AUDIT_ROOT") or os.path.dirname(os.path.abspath(__file__))
+RESULTS = os.path.join(_ROOT, "results")
 ALPHA = 0.05
 MIN_TRADES = 30          # объявлено ДО просмотра: меньше — тест бессмыслен
 
 
 def load():
-    out = []
+    u"""ТОЛЬКО карточки корпуса. Пять разборов paulcpk выбраны мной вручную и
+    в популяцию не входят: смешать их со случайной выборкой значило бы
+    посчитать долю выживших по знаменателю, куда я сам подложил слагаемые.
+    Признак — поле `source`, а не память о том, какие файлы «те самые»."""
+    out, other = [], 0
     for f in glob.glob(os.path.join(RESULTS, "*.json")):
         try:
-            out.append(json.load(io.open(f, encoding="utf-8")))
+            r = json.load(io.open(f, encoding="utf-8"))
         except Exception:
-            pass
+            continue
+        if r.get("source") == "corpus":
+            out.append(r)
+        else:
+            other += 1
+    if other:
+        print(u"  (вне корпуса, в статистику НЕ входят: %d)" % other)
     return out
 
 

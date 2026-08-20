@@ -53,6 +53,8 @@ FT = os.path.join(ROOT, "ftenv", "Scripts", "freqtrade.exe")
 CFG = os.path.join(ROOT, "user_data", "config.json")
 STRAT_DIR = os.path.join(ROOT, "user_data", "strategies")
 RESULTS = os.path.join(ROOT, "results")
+CODE_MD5 = __import__("hashlib").md5(
+    io.open(os.path.abspath(__file__), "rb").read()).hexdigest()[:12]
 IN_RANGE = "20180301-20200301"
 OUT_RANGE = "20200301-20260820"
 
@@ -312,6 +314,7 @@ def audit_one(repo, path, name):
     r["runs"]["lookahead"] = {"level": lvl3, "why": why3}
     lvl4, why4 = recursive(name, path=path)
     r["runs"]["recursive"] = {"level": lvl4, "why": why4}
+    r["code_md5"] = CODE_MD5      # чем посчитано — свойство карточки, не памяти
     return r
 
 
@@ -320,10 +323,10 @@ if __name__ == "__main__":
     # Замок общий и по имени ресурса, а не по имени скрипта — иначе «у меня
     # свой замок» вернуло бы ровно тот дефект, ради которого он заведён.
     import runlock
-    if not runlock.acquire("corpus"):
+    if not runlock.acquire("case_study"):
         raise SystemExit(2)
     import atexit
-    atexit.register(lambda: runlock.release("corpus"))
+    atexit.register(lambda: runlock.release("case_study"))
     os.makedirs(RESULTS, exist_ok=True)
     repo = sys.argv[1] if len(sys.argv) > 1 else "paulcpk/freqtrade-strategies-that-work"
     names = sys.argv[2:]
@@ -337,6 +340,11 @@ if __name__ == "__main__":
             continue
         print(u"  разбираю %s ..." % n, flush=True)
         res = audit_one(repo, p, n)
+        # ⚠ РАЗДЕЛЕНИЕ ЗНАМЕНАТЕЛЕЙ. Пять стратегий paulcpk — разбор, ВЫБРАННЫЙ
+        # мной; корпус — популяция. Они лежат в одной папке карточек, и без
+        # этого поля сводная статистика корпуса тихо включила бы пять отобранных
+        # вручную. Признак машинный, а не «я помню, какие из них какие».
+        res["source"] = "case_study"
         io.open(out, "w", encoding="utf-8").write(
             json.dumps(res, ensure_ascii=False, indent=2))
         ins = res["runs"]["in_sample"]["summary"]
