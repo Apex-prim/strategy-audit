@@ -4,21 +4,26 @@ An independent replication of the five freqtrade strategies published in
 [`paulcpk/freqtrade-strategies-that-work`](https://github.com/paulcpk/freqtrade-strategies-that-work),
 tested on 6.5 years of data the original author never saw.
 
-**Headline: all five degrade out of sample. On average about 15% of the reported
-per-trade edge survives. Two of the five go to zero or below.**
+**Headline: all five degrade out of sample. Two retain under 10% of their
+edge, one turns negative.**
+
+Measured with **freqtrade itself** — not a re-implementation — and reported as
+**expectancy per trade**, because "Total profit %" depends on `max_open_trades`
+and stake sizing, i.e. on a configuration the authors did not publish.
 
 ```
-                                in-sample     out-of-sample   trades    survives
-DoubleEMACrossoverWithTrend       +0.38%         +0.11%        4043        29%
-MACDCrossoverWithTrend            +0.36%         +0.01%        1436         3%
-RSIDirectionalWithTrend           +0.35%         -0.08%         757      negative
-RSIDirectionalWithTrendSlow       +1.01%         +0.19%         545        19%
-EMAPriceCrossoverWithThreshold    +1.17%         +0.51%        1812        44%
+                                in-sample   out-of-sample   survives
+EMAPriceCrossoverWithThreshold     1.63          0.90          55%
+DoubleEMACrossoverWithTrend        0.49          0.22          45%
+MACDCrossoverWithTrend             0.53          0.03           6%
+RSIDirectionalWithTrendSlow        1.13          0.06           5%
+RSIDirectionalWithTrend            0.42         -0.09       negative
 ```
 
-In-sample window is the author's: 2018-03-01 … 2020-03-01, 1h, 8 USDT pairs.
+In-sample window is the authors': 2018-03-01 … 2020-03-01, 1h, 8 USDT pairs.
 Out-of-sample: 2020-03-01 … 2026-08-20, same code, same pairs, 0.1% fee per side.
 
+Per-strategy cards: **[results/INDEX.md](results/INDEX.md)**
 Full write-up: **[ANALYSIS.md](ANALYSIS.md)** · [на русском](ANALYSIS.ru.md)
 
 ---
