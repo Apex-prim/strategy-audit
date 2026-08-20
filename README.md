@@ -4,22 +4,41 @@ An independent replication of the five freqtrade strategies published in
 [`paulcpk/freqtrade-strategies-that-work`](https://github.com/paulcpk/freqtrade-strategies-that-work),
 tested on 6.5 years of data the original author never saw.
 
-**Headline: all five degrade out of sample. Two retain under 10% of their
-edge, one turns negative — and four of the five were never statistically
+**Headline: all five degrade out of sample, the worst retaining 12% of its
+edge and one turning negative — and four of the five were never statistically
 significant to begin with.**
 
-Measured with **freqtrade itself** — not a re-implementation — and reported as
-**expectancy per trade**, because "Total profit %" depends on `max_open_trades`
-and stake sizing, i.e. on a configuration the authors did not publish.
+Measured with **freqtrade itself**, not a re-implementation, and reported as
+**average profit per trade in percent**. Not "Total profit %", which depends on
+`max_open_trades`, stake sizing and starting wallet — a configuration the
+authors did not publish.
 
 ```
-                                in-sample    p      out-of-sample    p     survives
-EMAPriceCrossoverWithThreshold     1.63    0.113        0.90       0.161     55%
-DoubleEMACrossoverWithTrend        0.49    0.049        0.22       0.290     45%
-MACDCrossoverWithTrend             0.53    0.128        0.03       0.883      6%
-RSIDirectionalWithTrendSlow        1.13    0.381        0.06       0.924      5%
-RSIDirectionalWithTrend            0.42    0.238       -0.09       0.556   negative
+                             avg trade %     p     avg trade %     p      survives
+                              (in-sample)             (out)
+EMAPriceCrossoverWithThreshold   1.39      0.113       0.65      0.161       47%
+DoubleEMACrossoverWithTrend      0.38      0.049       0.19      0.290       50%
+MACDCrossoverWithTrend           0.42      0.128       0.05      0.883       12%
+RSIDirectionalWithTrendSlow      1.03      0.381       0.27      0.924       26%
+RSIDirectionalWithTrend          0.34      0.238      -0.07      0.556    negative
 ```
+
+> **A correction, and a methodological one.** Earlier versions of this table
+> reported freqtrade's `Expectancy` in USDT and called it configuration-
+> independent, in contrast to `Total profit %`. That was wrong. The backtests
+> run with `stake_amount: "unlimited"`, under which freqtrade divides the wallet
+> across open slots and **compounds**: as the balance grows, later trades use
+> larger stakes, so an expectancy denominated in currency is inflated by
+> account growth. The scale-free quantity is average profit per trade in
+> percent, which is what the table now shows.
+>
+> The correction is not cosmetic. `RSIDirectionalWithTrendSlow` was published as
+> retaining **5%** of its edge; scale-free it retains **26%** — five times more.
+> `MACDCrossoverWithTrend` moves from 6% to 12%. The claim "two retain under 10%"
+> was an artifact of the metric and is withdrawn.
+>
+> Found because a reader asked what stake the numbers were computed at. It is a
+> good question to ask of any backtest, including this one.
 
 In-sample window is the authors': 2018-03-01 … 2020-03-01, 1h, 8 USDT pairs.
 Out-of-sample: 2020-03-01 … 2026-08-20, same code, same pairs, 0.1% fee per side.
@@ -32,7 +51,7 @@ window. None of the five is significant out of sample.**
 freqtrade prints `Mean profit p-value` in every backtest; the column is in the
 table above. Only `DoubleEMACrossoverWithTrend` clears 0.05 in-sample, and only
 just (0.049). The strongest performer of the set —
-`EMAPriceCrossoverWithThreshold`, expectancy 1.63 — sits at **p = 0.113**: its
+`EMAPriceCrossoverWithThreshold`, 1.39% per trade — sits at **p = 0.113**: its
 average trade is not distinguishable from zero in the window it was developed in.
 
 For most of these strategies the out-of-sample collapse is almost beside the
@@ -45,23 +64,34 @@ point. The in-sample result was never established in the first place.
 > shape as the one documented at the bottom of this file: a statement about a
 > population, made from the one case actually looked at.
 
-**Three of five are negative in-sample once execution is priced honestly.**
+**Two of five turn negative in-sample once execution is priced honestly, and a
+third lands on zero.**
 freqtrade fills at the candle open with no spread and no slippage. On XLM, DASH
 and ADA in 2018–2020, hourly spreads of 0.3–0.5% were routine. Raising the cost
 assumption to 0.3% per side — fee plus spread plus slippage:
 
 ```
-                                0.1%     0.2%     0.3%  per side
-EMAPriceCrossoverWithThreshold  1.63     1.26     0.93
-RSIDirectionalWithTrendSlow     1.13     0.86     0.59
-MACDCrossoverWithTrend          0.53     0.25    -0.01   <- negative
-DoubleEMACrossoverWithTrend     0.49     0.18    -0.08   <- negative
-RSIDirectionalWithTrend         0.42     0.16    -0.09   <- negative
+avg trade %                     0.1%     0.2%     0.3%  per side
+EMAPriceCrossoverWithThreshold  1.39     1.19     0.99
+RSIDirectionalWithTrendSlow     1.03     0.82     0.62
+MACDCrossoverWithTrend          0.42     0.21     0.01   <- indistinguishable from zero
+DoubleEMACrossoverWithTrend     0.38     0.18    -0.02   <- negative
+RSIDirectionalWithTrend         0.34     0.14    -0.06   <- negative
 ```
 
 So the claim here is not "these strategies fail out of sample". It is narrower
-and harder to argue with: **under honest execution assumptions, three of the
-five never worked in the first place — in the window their own author chose.**
+and harder to argue with: **under honest execution assumptions, three of the five
+have nothing left in the window their own author chose** — two negative, one at
++0.01% per trade, which is zero wearing a plus sign.
+
+*This table was also recomputed scale-free. Under the old currency-denominated
+metric `MACDCrossoverWithTrend` read −0.01 and the claim was "three of five turn
+negative". It is two, plus one at zero. The weaker version is the correct one.*
+
+**[BASELINE.md](BASELINE.md) — thirteen corpus strategies pass every statistical
+test in this repository, and none of them beats buy-and-hold.** Interim result
+from a quarter of the sweep; it is the clearest demonstration of why the baseline
+column exists at all.
 
 Per-strategy cards: **[results/INDEX.md](results/INDEX.md)**
 Full write-up: **[ANALYSIS.md](ANALYSIS.md)** · [на русском](ANALYSIS.ru.md)
@@ -84,6 +114,7 @@ what a reader takes from a results table — not what the author did.
 | Statistical significance | `Mean profit p-value` per strategy — **4 of 5 fail in-sample, 5 of 5 fail out** |
 | Baseline | `Market change` — buy-and-hold on the same pairs, reported alongside |
 | Reproducibility of the headline figure | **fails** — no config is published |
+| Metric is scale-free | corrected here: currency expectancy compounds under `stake_amount: unlimited` |
 | Filter interaction | one of two exits is unreachable by construction |
 | Cost sensitivity | fee 0.0 / 0.1 / 0.2% per side |
 | Out-of-sample test | 6.5 years the authors never saw |

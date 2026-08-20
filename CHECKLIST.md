@@ -115,15 +115,16 @@ not, you do not have an edge — you have a fee arbitrage against your own
 optimism.
 
 Measured on the five strategies audited here, raising cost from 0.1% to 0.3%
-per side turns **three of them negative inside their own author's window**:
+per side leaves **three of them with nothing inside their own author's window** —
+two negative and one at +0.01%, which is zero:
 
 ```
-                                0.1%     0.2%     0.3%  per side
-EMAPriceCrossoverWithThreshold  1.63     1.26     0.93
-RSIDirectionalWithTrendSlow     1.13     0.86     0.59
-MACDCrossoverWithTrend          0.53     0.25    -0.01
-DoubleEMACrossoverWithTrend     0.49     0.18    -0.08
-RSIDirectionalWithTrend         0.42     0.16    -0.09
+avg trade %                     0.1%     0.2%     0.3%  per side
+EMAPriceCrossoverWithThreshold  1.39     1.19     0.99
+RSIDirectionalWithTrendSlow     1.03     0.82     0.62
+MACDCrossoverWithTrend          0.42     0.21     0.01
+DoubleEMACrossoverWithTrend     0.38     0.18    -0.02
+RSIDirectionalWithTrend         0.34     0.14    -0.06
 ```
 
 ## 👁 8. Does the result hold outside the window you developed in?
@@ -143,15 +144,23 @@ rolling or anchored windows with re-fitting at each step. Calling one the other
 is a terminology error worth avoiding — including by us: an earlier version of
 this repository used the wrong word.*
 
-## 👁 9. Can someone else reproduce your number?
+## 👁 9. Can someone else reproduce your number — and is your metric scale-free?
 
 If your headline is "Total profit %", it depends on `max_open_trades`,
 `stake_amount` and `dry_run_wallet`. Without those published, the number is not
 wrong — it is **undefined**. The same trade list under different settings gives
 completely different totals.
 
-**Passing looks like:** your config is in the repository, or your headline
-metric is one that does not depend on it. Expectancy per trade does not.
+**And per-trade expectancy in currency is not the escape it looks like.** Under
+`stake_amount: "unlimited"` — the common default — freqtrade splits the wallet
+across open slots and compounds, so later trades are placed with larger stakes
+and an expectancy denominated in USDT is inflated by account growth rather than
+by skill. This repository published exactly that mistake and corrected it: one
+strategy's retained edge moved from 5% to 26% when measured scale-free.
+
+**Passing looks like:** your headline is **average profit per trade in percent**,
+or your full config is published alongside a currency figure. If you cannot say
+what stake produced a number, you do not yet know what the number means.
 
 ## ⌨ 10. Did the engine run the timeframe you think it ran?
 
