@@ -163,5 +163,8 @@ than dressed up.
 
 ---
 
-*Want these nine run against your strategy? The harness in this repository does
-it — `harness.py`. Or open an issue.*
+*Want these nine run against your strategy?*
+
+**📧 faxesuxan24@gmail.com** for a private audit, or open an issue to do it in
+the open. The harness in this repository — `harness.py` — is the same pipeline,
+so you can also just run it yourself and never talk to anyone.

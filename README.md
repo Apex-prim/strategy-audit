@@ -151,12 +151,30 @@ MIT for the code. The analysis text may be quoted freely with attribution.
 
 ## Get in touch
 
-- **Want your strategy audited the same way?** Open an issue in this repository
-  with a link to the code, or run `harness.py` yourself — it is the exact
-  pipeline used here, not a demo of one.
+**📧 faxesuxan24@gmail.com** — for a private audit of a strategy you would
+rather not post publicly. That is most of them, and it is a reasonable thing to
+want.
+
+Or, in the open:
+
+- **Want your strategy audited the same way?** Open an issue with a link to the
+  code — or run `harness.py` yourself. It is the exact pipeline used here, not a
+  demonstration of one.
 - **Found an error in this audit?** Open an issue. Errors found in this
-  repository get published in it, not quietly patched — one is already in
-  [ANALYSIS.md](ANALYSIS.md).
+  repository get published *in* it rather than quietly patched — two already
+  are: a wrong RSI threshold in [ANALYSIS.md](ANALYSIS.md), and a p-value parser
+  that returned 5.896 for a probability, caught before publication because a
+  value outside [0,1] means a broken instrument, not a surprising result.
+
+**What you get:** the nine checks in [CHECKLIST.md](CHECKLIST.md) run against
+your code — in-sample and out-of-sample expectancy, p-value, buy-and-hold
+baseline, cost sensitivity, and freqtrade's own bias detectors — plus a written
+finding for anything that does not hold.
+
+**What you will not get:** a verdict on whether your idea is good. Every check
+here is about whether your *measurement* can be trusted. A well-measured
+strategy with no edge is still a strategy with no edge; you will simply learn it
+sooner and cheaper.
 
 ## Status
 
