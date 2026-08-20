@@ -146,21 +146,67 @@ def static_checks(path, src):
 
 # ─────────────────────── прогоны freqtrade ───────────────────────
 
+# ⚠ ПОЙМАНО НА СЕБЕ 20.08, ДО ПУБЛИКАЦИИ. Разбор выдал p-значение 5.896,
+# чего не бывает: вероятность не превышает единицы. Причина — научная
+# запись: из "5.896e-05" шаблон `[\d.]+` брал "5.896" и останавливался на
+# букве. Опубликуй я это, критик был бы прав дважды.
+# Невозможное значение — не «странность», а сигнал сломанного прибора.
+NUM = r"(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)"
+
+
+def _num(out, pat, cast=float):
+    m = re.search(pat, out)
+    return cast(m.group(1)) if m else None
+
+
 def parse_summary(out):
-    u"""(сделок, средняя %, итог %) из вывода бэктеста."""
-    n = re.search(r"Total/Daily Avg Trades\s*│\s*(\d+)", out)
-    tot = re.search(r"Total profit %\s*│\s*(-?[\d.]+)%", out)
-    exp = re.search(r"Expectancy \(Ratio\)\s*│\s*(-?[\d.]+)", out)
-    win = re.search(r"Win%\s*│\s*(-?[\d.]+)", out)
-    return (int(n.group(1)) if n else None,
-            float(tot.group(1)) if tot else None,
-            float(exp.group(1)) if exp else None,
-            float(win.group(1)) if win else None)
+    u"""Словарь показателей из вывода бэктеста.
+
+    ⚠ ЧТО ИСПРАВЛЕНО 20.08 ПО ВНЕШНЕЙ АТАКЕ. Прежняя версия брала только
+    число сделок и итог. Критик указал на отсутствие базовой линии и
+    статистической значимости — и был прав, причём вдвойне: freqtrade
+    СЧИТАЕТ и то и другое, а я просто не выводил.
+
+        Market change        базовая линия «купил и держи» на тех же парах
+        Mean profit p-value  значимость средней доходности сделки
+
+    Это ровно наш собственный M-16 («базовая линия первой»), не применённый
+    к себе. Числа без базовой линии висят в воздухе — и мой первый разбор
+    так и висел.
+    """
+    d = {
+        "trades": _num(out, r"Total/Daily Avg Trades\s*│\s*(\d+)", int),
+        "total_pct": _num(out, r"Total profit %\s*│\s*" + NUM + r"%"),
+        "expectancy": _num(out, r"Expectancy \(Ratio\)\s*│\s*" + NUM),
+        "p_value": _num(out, r"Mean profit p-value\s*│\s*" + NUM),
+        "market_change_pct": _num(out, r"Market change\s*│\s*" + NUM + r"%"),
+        "sharpe": _num(out, r"Sharpe \(closed trades\)\s*│\s*" + NUM),
+        "sortino": _num(out, r"Sortino \(closed trades\)\s*│\s*" + NUM),
+        "profit_factor": _num(out, r"Profit factor\s*│\s*" + NUM),
+        "drawdown_pct": _num(out, r"Absolute drawdown\s*│\s*[\d.]+ \w+ \((-?[\d.]+)%\)"),
+        "cagr_pct": _num(out, r"CAGR %\s*│\s*" + NUM + r"%"),
+    }
+    # СТОРОЖ НЕВОЗМОЖНОГО. Вероятность вне [0,1] означает не удивительный
+    # результат, а сломанный прибор. Публиковать такое нельзя, молча
+    # чинить — тоже: значение помечается, чтобы его увидели.
+    pv = d.get("p_value")
+    if pv is not None and not (0.0 <= pv <= 1.0):
+        d["p_value"] = None
+        d["parse_warning"] = u"p-значение вне [0,1] (%r) — разбор вывода сломан" % pv
+    return d
 
 
-def backtest(name, timerange, fee="0.001"):
+def _sp(path):
+    u"""--strategy-path: берём стратегию ТАМ, ГДЕ ОНА ЛЕЖИТ, не копируя.
+    Копирование в общую папку смешало бы репозитории и дало бы дубли имён —
+    ровно то, чем корпус и болен (Schism встречается в 16 местах)."""
+    return ["--strategy-path", os.path.dirname(path)] if path else []
+
+
+def backtest(name, timerange, fee="0.001", path=None):
     c, out = sh([FT, "backtesting", "--config", CFG, "--strategy", name,
-                 "--timerange", timerange, "--fee", fee], timeout=1200)
+                 "--timerange", timerange, "--fee", fee] + _sp(path),
+                timeout=1200)
     if c != 0:
         why = u"ПРЕВЫШЕНО ВРЕМЯ" if c == 124 else \
             (re.search(r"ERROR - (.+)", out).group(1)[:160]
@@ -169,9 +215,9 @@ def backtest(name, timerange, fee="0.001"):
     return (PASS, u"", parse_summary(out))
 
 
-def lookahead(name, timerange="20190101-20190401"):
+def lookahead(name, timerange="20190101-20190401", path=None):
     c, out = sh([FT, "lookahead-analysis", "--config", CFG, "--strategy", name,
-                 "--timerange", timerange], timeout=1200)
+                 "--timerange", timerange] + _sp(path), timeout=1200)
     if c != 0:
         m = re.search(r"ERROR - (?:Configuration error: )?(.+)", out)
         return (NA, (m.group(1)[:160] if m else u"код %d" % c))
@@ -184,9 +230,9 @@ def lookahead(name, timerange="20190101-20190401"):
     return (NA, u"вывод не разобран")
 
 
-def recursive(name, timerange="20190101-20190401"):
+def recursive(name, timerange="20190101-20190401", path=None):
     c, out = sh([FT, "recursive-analysis", "--config", CFG, "--strategy", name,
-                 "--timerange", timerange], timeout=1200)
+                 "--timerange", timerange] + _sp(path), timeout=1200)
     if "invalid startup candle count of 0" in out:
         return (FOUND, u"freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, "
                        u"«приведёт к рекурсивным проблемам у части индикаторов»")
@@ -207,17 +253,17 @@ def audit_one(repo, path, name):
     src = io.open(path, encoding="utf-8", errors="replace").read()
     r["static"] = [{"level": a, "what": b, "detail": c}
                    for a, b, c in static_checks(path, src)]
-    lvl, why, s = backtest(name, IN_RANGE)
+    lvl, why, s = backtest(name, IN_RANGE, path=path)
     r["runs"]["in_sample"] = {"level": lvl, "why": why, "summary": s}
     if lvl == PASS:
-        lvl2, why2, s2 = backtest(name, OUT_RANGE)
+        lvl2, why2, s2 = backtest(name, OUT_RANGE, path=path)
         r["runs"]["out_sample"] = {"level": lvl2, "why": why2, "summary": s2}
     else:
         r["runs"]["out_sample"] = {"level": SKIP,
                                    "why": u"в выборке не отработала", "summary": None}
-    lvl3, why3 = lookahead(name)
+    lvl3, why3 = lookahead(name, path=path)
     r["runs"]["lookahead"] = {"level": lvl3, "why": why3}
-    lvl4, why4 = recursive(name)
+    lvl4, why4 = recursive(name, path=path)
     r["runs"]["recursive"] = {"level": lvl4, "why": why4}
     return r
 

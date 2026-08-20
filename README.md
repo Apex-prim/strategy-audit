@@ -188,6 +188,34 @@ unique after dedup          571   (484 are copies — Schism alone appears in 16
 audited so far              see results/INDEX.md
 ```
 
+### A methodological defect found in this project, before publication
+
+The corpus sweep was producing numbers that were **silently wrong**, and the
+mechanism is worth writing down because it is the exact failure this repository
+exists to catch.
+
+Only **52 of the 571 strategies declare `timeframe = '1h'`**. The largest group —
+**351** — declares `5m`. Only 1h data had been downloaded.
+
+A missing-data run should fail loudly. It did not, because the backtest config
+carried `"timeframe": "1h"`, and **freqtrade's config overrides the timeframe a
+strategy declares for itself**. Every 5-minute strategy was therefore executed on
+hourly candles and returned a full, plausible-looking result — 6,014 trades for
+one of them. Nothing in the output said anything was wrong.
+
+Removing `timeframe` from the config makes the engine say *"Strategy using
+timeframe: 5m"* and then refuse: *"No history for BTC/USDT, spot, 5m found."*
+Loud failure, which is what should have happened all along.
+
+**What was done:** the config no longer sets a timeframe, every corpus result
+computed under the old setting was deleted, and per-timeframe data is being
+downloaded. **The five published audits are unaffected** — those strategies
+declare `1h` themselves, and re-running them without the override reproduces
+303 trades and 0.53 expectancy exactly as published.
+
+The number to distrust was never the one that looked wrong. It was the one that
+looked fine.
+
 Nearly half of the public strategy ecosystem is copies of a few originals,
 propagated without anyone re-testing them. That is a finding in itself.
 
