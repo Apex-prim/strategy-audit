@@ -38,13 +38,23 @@ what a reader takes from a results table — not what the author did.
 
 | Check | Result |
 |---|---|
-| Replication of the published numbers | all five within an order of magnitude |
-| Look-ahead bias | **none found** — looked for it specifically |
+| Replication with freqtrade itself | trade counts land near the authors' (303 vs 300) |
+| Look-ahead bias (`lookahead-analysis`) | **none found** — the engine's own detector agrees |
+| Indicator warm-up (`recursive-analysis`) | engine **refuses to run**: `startup_candle_count` is 0 in 5/5 |
+| Statistical significance | `Mean profit p-value` reported per strategy; one is 0.13 in-sample |
+| Baseline | `Market change` — buy-and-hold on the same pairs, reported alongside |
 | Reproducibility of the headline figure | **fails** — no config is published |
-| Indicator warm-up declaration | `startup_candle_count` absent in 5/5 files |
 | Filter interaction | one of two exits is unreachable by construction |
-| Fee sensitivity | 0.1% per side = 0.20 pp of average trade |
-| Walk-forward | not performed by the author; performed here |
+| Cost sensitivity | fee 0.0 / 0.1 / 0.2% per side |
+| Out-of-sample test | 6.5 years the authors never saw |
+
+> **Terminology, stated precisely:** this is an *out-of-sample test*, not a
+> walk-forward analysis. Walk-forward means rolling or anchored windows with
+> re-fitting at each step. An earlier version of this README used the wrong
+> word; it is corrected here rather than quietly edited away.
+
+**Auditing your own strategy?** → **[CHECKLIST.md](CHECKLIST.md)** — nine
+mechanical questions, each tied to a defect actually found here.
 
 ## Reproduce it yourself
 
@@ -95,3 +105,29 @@ it is a thing to go and check, and more often than not it is yours.
 ## Licence
 
 MIT for the code. The analysis text may be quoted freely with attribution.
+
+---
+
+## Get in touch
+
+- **Want your strategy audited the same way?** Open an issue in this repository
+  with a link to the code, or run `harness.py` yourself — it is the exact
+  pipeline used here, not a demo of one.
+- **Found an error in this audit?** Open an issue. Errors found in this
+  repository get published in it, not quietly patched — one is already in
+  [ANALYSIS.md](ANALYSIS.md).
+
+## Status
+
+This is a growing corpus, not a one-off post. The same procedure is being run
+across every public freqtrade strategy that can be found and loaded.
+
+```
+repositories cloned          10
+strategy classes found     1055
+unique after dedup          571   (484 are copies — Schism alone appears in 16 repos)
+audited so far              see results/INDEX.md
+```
+
+Nearly half of the public strategy ecosystem is copies of a few originals,
+propagated without anyone re-testing them. That is a finding in itself.

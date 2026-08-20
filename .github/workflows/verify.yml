@@ -1,0 +1,75 @@
+name: verify
+
+# Точка: утверждение, которое нельзя перепроверить на чистой машине, есть
+# мнение. Этот прогон делает каждое утверждение репозитория исполняемым —
+# гейт секретов обязан пройти И обязан ПОЙМАТЬ подсаженные секреты, иначе
+# зелёная галочка ничего не значит.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Secret gate — self-test and deliberate sabotage
+        run: python tools/secret_gate.py --selftest
+
+      - name: Secret gate — scan the whole tree, not just a diff
+        run: |
+          python - <<'PY'
+          import io, os, sys
+          sys.path.insert(0, "tools")
+          from secret_gate import scan_text
+          bad = 0
+          for dp, dirs, files in os.walk("."):
+              dirs[:] = [d for d in dirs if d not in (".git", "__pycache__")]
+              for f in files:
+                  p = os.path.join(dp, f).replace("\\", "/").lstrip("./")
+                  try:
+                      t = io.open(p, encoding="utf-8", errors="replace").read()
+                  except Exception:
+                      continue
+                  for ln, what in scan_text(p, t):
+                      print("SECRET %s:%s %s" % (p, ln, what)); bad += 1
+          print("scanned tree, findings:", bad)
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Every strategy card must be backed by a result file
+        run: |
+          python - <<'PY'
+          import os, sys
+          cards = {f[:-3] for f in os.listdir("results")
+                   if f.endswith(".md") and f != "INDEX.md"}
+          idx = open("results/INDEX.md", encoding="utf-8").read()
+          missing = [c for c in sorted(cards) if "(%s.md)" % c not in idx]
+          print("cards: %d, missing from index: %d" % (len(cards), len(missing)))
+          for m in missing:
+              print("  NOT IN INDEX:", m)
+          sys.exit(1 if missing else 0)
+          PY
+
+      - name: Python files must parse
+        run: |
+          python - <<'PY'
+          import ast, io, os, sys
+          bad = []
+          for f in os.listdir("."):
+              if f.endswith(".py"):
+                  try:
+                      ast.parse(io.open(f, encoding="utf-8").read())
+                  except SyntaxError as e:
+                      bad.append("%s: %s" % (f, e))
+          for b in bad:
+              print(b)
+          print("checked python files:", len([f for f in os.listdir(".") if f.endswith(".py")]))
+          sys.exit(1 if bad else 0)
+          PY
