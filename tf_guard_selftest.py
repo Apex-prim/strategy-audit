@@ -10,19 +10,22 @@ M-17: контроль обязан УВИДЕТЬ и отказ, и норму.
 отказывает, ничего не проверяет.
 """
 from __future__ import print_function
+import os as _os
+_ROOT = _os.environ.get("AUDIT_ROOT") or _os.path.dirname(_os.path.abspath(__file__))
 import io, json, os, sys
 
-sys.path.insert(0, "C:/tmp/audit")
+sys.path.insert(0, _ROOT)
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
     pass
 import harness
+_ROOT = os.environ.get("AUDIT_ROOT") or os.path.dirname(os.path.abspath(__file__))
 
 REAL = harness.CFG
-SAB = "C:/tmp/audit/user_data/_config_sabotage.json"
-S5M = "C:/tmp/audit/repos/davidzr_freqtrade-strategies/strategies/ASDTSRockwellTrading/ASDTSRockwellTrading.py"
-S1H = "C:/tmp/audit/user_data/strategies/MACDCrossoverWithTrend.py"
+SAB = _os.path.join(_ROOT, "user_data/_config_sabotage.json")
+S5M = _os.path.join(_ROOT, "repos/davidzr_freqtrade-strategies/strategies/ASDTSRockwellTrading/ASDTSRockwellTrading.py")
+S1H = _os.path.join(_ROOT, "user_data/strategies/MACDCrossoverWithTrend.py")
 RANGE = "20190101-20190301"
 
 ok = fail = 0
@@ -70,6 +73,20 @@ case(u"№6 пропущенные пары перечислены полем",
 if s2:
     print(u"     считано на %s, пар без истории: %s"
           % (s2.get("used_timeframe"), s2.get("missing_pairs") or u"нет"))
+
+# ── №7-8: КОД 0 НЕ ЕСТЬ РЕЗУЛЬТАТ. freqtrade выходит С НУЛЁМ при ошибке
+# конфигурации. Случай прожит: ClucCrypROI без `stoploss` давал карточку
+# из одних None, помеченную как УСПЕШНЫЙ прогон.
+S_ERR = os.path.join(_ROOT, "repos", "PeetCrypto_freqtrade-stuff", "ClucCrypROI.py")
+if os.path.exists(S_ERR):
+    lvl3, why3, s3 = harness.backtest("ClucCrypROI", RANGE, path=S_ERR, want_tf=None)
+    case(u"№7 код 0 без чисел НЕ считается прогоном",
+         lvl3 == harness.NA and s3 is None, u"%s / %r" % (lvl3, s3))
+    case(u"№8 причина взята из ERROR движка",
+         u"stoploss" in (why3 or u""), why3)
+    print(u"     движок сказал: %s" % why3)
+else:
+    case(u"№7-8 случай ClucCrypROI доступен", False, S_ERR)
 
 try:
     os.remove(SAB)

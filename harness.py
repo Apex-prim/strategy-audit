@@ -250,12 +250,24 @@ def backtest(name, timerange, fee="0.001", path=None, want_tf=None):
     if c == 0 and want_tf and used and used != want_tf:
         return (NA, u"ПРЕДМЕТ НЕ ТОТ: стратегия объявила %s, движок считал на %s"
                 % (want_tf, used), None)
+    err = re.search(r"ERROR - (?:Configuration error: )?(.+)", out)
     if c != 0:
-        why = u"ПРЕВЫШЕНО ВРЕМЯ" if c == 124 else \
-            (re.search(r"ERROR - (.+)", out).group(1)[:160]
-             if re.search(r"ERROR - (.+)", out) else u"код %d" % c)
+        why = (u"ПРЕВЫШЕНО ВРЕМЯ" if c == 124
+               else (err.group(1)[:160] if err else u"код %d" % c))
         return (NA, why, None)
     d = parse_summary(out)
+    # ⚠ КОД 0 НЕ ЕСТЬ РЕЗУЛЬТАТ. freqtrade завершается УСПЕШНО при ошибке
+    # конфигурации: ClucCrypROI печатает "Configuration error: 'stoploss' is a
+    # required property" и выходит с нулём. Прежняя версия принимала это за
+    # прогон и записывала словарь из одних None — карточку, которая ВЫГЛЯДИТ
+    # как измерение. Это моё же запечатанное правило: наличие, нулевой код
+    # и существование файла означают «НЕ ЗНАЮ», а не «да».
+    #
+    # Прогон засчитывается только если в сводке ЕСТЬ ЧИСЛА.
+    if d.get("trades") is None:
+        return (NA, (err.group(1)[:160] if err
+                     else u"движок вышел с кодом 0, но сводки нет "
+                          u"(ни одной сделки либо вывод не разобран)"), None)
     d["used_timeframe"] = used
     d["declared_timeframe"] = want_tf
     d["missing_pairs"] = missing_pairs(out)

@@ -142,17 +142,68 @@ def index(rows):
     return u"\n".join(L)
 
 
+def corpus_index(rows):
+    u"""Указатель корпуса. Отдельный от разбора НАМЕРЕННО: пять стратегий
+    paulcpk выбраны мной, корпус — популяция. Свести их в одну таблицу значило
+    бы предложить читателю сравнивать выбранное со случайным."""
+    ran = [r for r in rows if isinstance(r["runs"]["in_sample"].get("summary"), dict)]
+    dead = [r for r in rows if not isinstance(r["runs"]["in_sample"].get("summary"), dict)]
+    L = [u"# Корпус: указатель", u"",
+         u"Разобрано карточек **%d**, отработали в окне автора **%d**, "
+         u"не удалось **%d**." % (len(rows), len(ran), len(dead)), u"",
+         u"Мера — **ожидание на сделку**. Сортировка по ожиданию в окне автора: "
+         u"сверху то, что выглядело лучше всего ДО проверки вне выборки.", u"",
+         u"| стратегия | репозиторий | ТФ | сделок | в выборке | p | вне | p | осталось |",
+         u"|---|---|---|---|---|---|---|---|---|"]
+
+    def key(r):
+        a = r["runs"]["in_sample"]["summary"]
+        e = a.get("expectancy")
+        return -(e if e is not None else -9)
+
+    for r in sorted(ran, key=key):
+        a = r["runs"]["in_sample"]["summary"]
+        b = r["runs"]["out_sample"].get("summary")
+        b = b if isinstance(b, dict) else {}
+        L.append(u"| [%s](%s.md) | `%s` | %s | %s | %s | %s | %s | %s | **%s** |"
+                 % (r["strategy"], r["strategy"], r["repo"].split("/")[0],
+                    a.get("used_timeframe") or u"—", a.get("trades"),
+                    a.get("expectancy"), a.get("p_value"),
+                    b.get("expectancy", u"—"), b.get("p_value", u"—"),
+                    survives(a.get("expectancy"), b.get("expectancy")) or u"—"))
+    if dead:
+        L += [u"", u"## Не удалось измерить — %d" % len(dead), u"",
+              u"Категория, а не молчание: «не смогли проверить» нигде не "
+              u"печатается как «чисто».", u"",
+              u"| стратегия | ТФ объявлен | причина |", u"|---|---|---|"]
+        for r in sorted(dead, key=lambda x: x["strategy"]):
+            L.append(u"| %s | %s | %s |"
+                     % (r["strategy"], r.get("declared_timeframe") or u"НЕ ОБЪЯВЛЕН",
+                        (r["runs"]["in_sample"].get("why") or u"")[:110]))
+    return chr(10).join(L)
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    rows = []
+    CORP = os.path.join(ROOT, "repo", "corpus")
+    os.makedirs(CORP, exist_ok=True)
+    rows, crows = [], []
     for f in sorted(os.listdir(RESULTS)):
         if not f.endswith(".json"):
             continue
         r = json.load(io.open(os.path.join(RESULTS, f), encoding="utf-8"))
-        rows.append(r)
-        io.open(os.path.join(OUT, r["strategy"] + ".md"), "w",
-                encoding="utf-8").write(card(r) + u"\n")
-    io.open(os.path.join(OUT, "INDEX.md"), "w",
-            encoding="utf-8").write(index(rows) + u"\n")
-    print(u"карточек записано: %d" % len(rows))
-    print(u"указатель: %s" % os.path.join(OUT, "INDEX.md"))
+        if r.get("source") == "corpus":
+            crows.append(r)
+            io.open(os.path.join(CORP, r["strategy"] + ".md"), "w",
+                    encoding="utf-8").write(card(r) + chr(10))
+        else:
+            rows.append(r)
+            io.open(os.path.join(OUT, r["strategy"] + ".md"), "w",
+                    encoding="utf-8").write(card(r) + chr(10))
+    if rows:
+        io.open(os.path.join(OUT, "INDEX.md"), "w",
+                encoding="utf-8").write(index(rows) + chr(10))
+    if crows:
+        io.open(os.path.join(CORP, "INDEX.md"), "w",
+                encoding="utf-8").write(corpus_index(crows) + chr(10))
+    print(u"разбор: %d карточек · корпус: %d карточек" % (len(rows), len(crows)))
