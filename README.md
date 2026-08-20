@@ -87,6 +87,7 @@ what a reader takes from a results table — not what the author did.
 | Filter interaction | one of two exits is unreachable by construction |
 | Cost sensitivity | fee 0.0 / 0.1 / 0.2% per side |
 | Out-of-sample test | 6.5 years the authors never saw |
+| Data coverage per pair | measured, not assumed — **3 of 8 pairs span the author's window** |
 
 > **Terminology, stated precisely:** this is an *out-of-sample test*, not a
 > walk-forward analysis. Walk-forward means rolling or anchored windows with
@@ -146,6 +147,31 @@ Remaining caveats, stated rather than omitted:
   is why the cost sensitivity table exists.
 - Trade counts still differ from the authors' because `max_open_trades` is not
   published; that is a property of the repository, not of the measurement.
+- **"Eight pairs" is the request list, not what traded throughout.** Measured
+  with `coverage.py`:
+
+```
+pair        first        last         author's window   out-of-sample
+BTC_USDT    2018-03-01   2026-08-20        100.0%           100.0%
+ETH_USDT    2018-03-01   2026-08-20        100.0%           100.0%
+LTC_USDT    2018-03-01   2026-08-20        100.0%           100.0%
+ADA_USDT    2018-04-17   2026-08-20         93.5%           100.0%
+XRP_USDT    2018-05-04   2026-08-20         91.2%           100.0%
+XLM_USDT    2018-05-31   2026-08-20         87.5%           100.0%
+XMR_USDT    2019-03-15   2024-02-20         48.1%            61.4%   <- delisted
+DASH_USDT   2019-03-28   2026-08-20         46.4%           100.0%   <- listed late
+```
+
+  Three of the eight span the author's window. DASH did not exist on Binance
+  until it was more than half over, and **XMR was delisted on 2024-02-20**, so
+  the basket's composition changes partway through both windows. This does not
+  corrupt the results — you cannot trade a pair that is not listed, and the
+  engine correctly does not — but a reader who sees "8 pairs" will assume eight
+  throughout, and that assumption is wrong.
+
+  Note also what this check does *not* see: it measures the first and last
+  candle inside each window, not gaps in the middle. A ragged series with intact
+  edges would report 100%.
 
 ## An error I made, and kept
 
