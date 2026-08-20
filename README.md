@@ -82,14 +82,29 @@ Expect roughly 15 minutes for the download and 2 minutes for the run.
 
 ## Method, briefly
 
-Strategies were re-implemented in pandas under freqtrade's execution model — a
-signal on candle `i` fills at the **open of candle `i+1`** — with TA-Lib-faithful
-indicators (SMA-seeded EMA, Wilder's RSI). Stops and trailing stops are checked
-intra-candle against the low. One open position per pair.
+**The original `.py` files are run by freqtrade 2026.7 itself** — same engine,
+same execution semantics, zero interpretation on my part. Fee 0.1% per side,
+eight USDT pairs, 1h.
 
-The replication is not freqtrade itself, so trade counts differ from the
-author's by +3% to +47%; the most likely cause is `max_open_trades`, which is
-not published. Every caveat is listed in the analysis rather than omitted.
+This replaced an earlier pandas re-implementation, and the difference matters:
+the hand-written version produced 334 trades for `MACDCrossoverWithTrend` where
+freqtrade produces 303 against the author's claimed 300. A re-implementation
+invites the perfectly fair reply *"you rewrote my logic wrong"*. The engine
+does not.
+
+Two of freqtrade's own analysers run on every strategy — `lookahead-analysis`
+and `recursive-analysis` — and both are reported whatever they say, including
+when they clear the strategy.
+
+Remaining caveats, stated rather than omitted:
+
+- `minimal_roi` is not applied, because it is commented out in the published
+  files. If the authors' config carried one, the numbers move.
+- Fee is a proxy for total round-trip cost. freqtrade fills at the candle open
+  with no spread and no slippage, so **every figure here is optimistic**, which
+  is why the cost sensitivity table exists.
+- Trade counts still differ from the authors' because `max_open_trades` is not
+  published; that is a property of the repository, not of the measurement.
 
 ## An error I made, and kept
 
