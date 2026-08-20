@@ -1,0 +1,20 @@
+# Downloaded market data — regenerate with fetch_data.py
+data/
+*.csv
+
+# Secrets — never commit. This list is convenience, not a control:
+# the control is tools/secret_gate.py, wired as a pre-commit hook.
+*.env
+*.pem
+*.key
+*.p12
+id_rsa*
+id_ed25519*
+secrets/
+**/secrets/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/

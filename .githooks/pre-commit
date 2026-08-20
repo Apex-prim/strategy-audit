@@ -1,0 +1,3 @@
+#!/bin/sh
+# Refuses any commit containing a credential. Not advice — a return code.
+python tools/secret_gate.py || exit 1
