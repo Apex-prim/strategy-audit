@@ -1,36 +1,41 @@
 # Babico_SMA5xBBmid
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `Babico_SMA5xBBmid.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `Babico_SMA5xBBmid.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 15 | 64 |
-| ожидание на сделку | -23.23 | 67.47 |
-| p-значение средней | 0.1316 | 0.2134 |
-| «купил и держи», % | -59.68 | 352.61 |
-| итог стратегии, % | -34.85 | 431.84 |
-| Шарп | -0.17 | 0.08 |
-| Сортино | -0.35 | 0.23 |
-| просадка, % | 45.22 | 52.46 |
-| фактор прибыли | 0.35 | 1.74 |
+| trades | 15 | 64 |
+| expectancy per trade (USDT) | -23.23 | 67.47 |
+| mean profit p-value | 0.1316 | 0.2134 |
+| market change % (baseline) | -59.68 | 352.61 |
+| strategy total % | -34.85 | 431.84 |
+| Sharpe | -0.17 | 0.08 |
+| Sortino | -0.35 | 0.23 |
+| max drawdown % | 45.22 | 52.46 |
+| profit factor | 0.35 | 1.74 |
 
-**Осталось от ожидания вне выборки: н/п**
+**Retained out of sample: n/a**
 
-⚠ **В окне автора средняя доходность НЕ ЗНАЧИМА** (p = 0.1316 > 0.05). То есть даже in-sample результат неотличим от нуля.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.68%**, стратегия — **-34.85%**.
+⚠ **Not statistically significant in its author's own window** (p = 0.1316 > 0.05): the average trade is not distinguishable from zero.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.68%**; the strategy returned **-34.85%**.
+Out of sample: buy-and-hold **352.61%** vs strategy **431.84%** — **beats the baseline**.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
-| мёртвые настройки трейлинга | ⚠ НАЙДЕНО | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
+| прогрев не объявлен | **found** | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
+| мёртвые настройки трейлинга | **found** | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1d**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1d** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

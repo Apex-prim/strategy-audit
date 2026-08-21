@@ -1,35 +1,40 @@
 # DoubleEMACrossoverWithTrend
 
-Источник: [`paulcpk/freqtrade-strategies-that-work`](https://github.com/paulcpk/freqtrade-strategies-that-work) · файл `DoubleEMACrossoverWithTrend.py`
+Source: [`paulcpk/freqtrade-strategies-that-work`](https://github.com/paulcpk/freqtrade-strategies-that-work) · file `DoubleEMACrossoverWithTrend.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 861 | 3617 |
-| ожидание на сделку | 0.49 | 0.22 |
-| p-значение средней | 0.04906 | 0.2898 |
-| «купил и держи», % | -58.4 | 348.67 |
-| итог стратегии, % | 42.43 | 81.08 |
-| Шарп | 1.51 | 0.51 |
-| Сортино | 6.56 | 1.97 |
-| просадка, % | 19.74 | 45.37 |
-| фактор прибыли | 1.31 | 1.08 |
+| trades | 861 | 3617 |
+| expectancy per trade (USDT) | 0.49 | 0.22 |
+| mean profit p-value | 0.04906 | 0.2898 |
+| market change % (baseline) | -58.4 | 348.67 |
+| strategy total % | 42.43 | 81.08 |
+| Sharpe | 1.51 | 0.51 |
+| Sortino | 6.56 | 1.97 |
+| max drawdown % | 19.74 | 45.37 |
+| profit factor | 1.31 | 1.08 |
 
-**Осталось от ожидания вне выборки: 45%**
+**Retained out of sample: 45%**
 
-Базовая линия: «купил и держи» на тех же парах дал **-58.4%**, стратегия — **42.43%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-58.4%**; the strategy returned **42.43%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **81.08%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
-| мёртвые настройки трейлинга | ⚠ НАЙДЕНО | trailing_stop=False, но trailing_stop_positive=0.03 задан — читается как работающая защита |
-| minimal_roi закомментирован | ⚠ НАЙДЕНО | правила выхода по прибыли берутся из неопубликованного конфига |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
+| прогрев не объявлен | **found** | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
+| мёртвые настройки трейлинга | **found** | trailing_stop=False, но trailing_stop_positive=0.03 задан — читается как работающая защита |
+| minimal_roi закомментирован | **found** | правила выхода по прибыли берутся из неопубликованного конфига |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `—`*

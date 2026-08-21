@@ -1,34 +1,39 @@
 # BBRSI2
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `BBRSI2.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `BBRSI2.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 6919 | 17503 |
-| ожидание на сделку | -0.14 | -0.06 |
-| p-значение средней | 2.144e-29 | 2.788e-13 |
-| «купил и держи», % | -55.54 | 347.94 |
-| итог стратегии, % | -96.64 | -96.8 |
-| Шарп | -24.59 | -7.82 |
-| Сортино | -20.37 | -5.9 |
-| просадка, % | 96.68 | 96.9 |
-| фактор прибыли | 0.54 | 0.76 |
+| trades | 6919 | 17503 |
+| expectancy per trade (USDT) | -0.14 | -0.06 |
+| mean profit p-value | 2.144e-29 | 2.788e-13 |
+| market change % (baseline) | -55.54 | 347.94 |
+| strategy total % | -96.64 | -96.8 |
+| Sharpe | -24.59 | -7.82 |
+| Sortino | -20.37 | -5.9 |
+| max drawdown % | 96.68 | 96.9 |
+| profit factor | 0.54 | 0.76 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-55.54%**, стратегия — **-96.64%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-55.54%**; the strategy returned **-96.64%**.
+Out of sample: buy-and-hold **347.94%** vs strategy **-96.8%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
-| трейлинг на полном стопе | ⚠ НАЙДЕНО | trailing_stop=True без trailing_stop_positive ⇒ стоп тащится на ВСЁ расстояние стоп-лосса |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
+| прогрев не объявлен | **found** | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
+| трейлинг на полном стопе | **found** | trailing_stop=True без trailing_stop_positive ⇒ стоп тащится на ВСЁ расстояние стоп-лосса |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

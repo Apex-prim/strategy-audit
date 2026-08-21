@@ -1,33 +1,38 @@
 # hansencandlepatternV1
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `hansencandlepatternV1.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `hansencandlepatternV1.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 3562 | 13603 |
-| ожидание на сделку | -0.19 | -0.07 |
-| p-значение средней | 1.713e-11 | 6.932e-07 |
-| «купил и держи», % | -58.4 | 348.67 |
-| итог стратегии, % | -68.87 | -95.94 |
-| Шарп | -10.53 | -4.68 |
-| Сортино | -18.09 | -8.53 |
-| просадка, % | 72.11 | 96.28 |
-| фактор прибыли | 0.67 | 0.8 |
+| trades | 3562 | 13603 |
+| expectancy per trade (USDT) | -0.19 | -0.07 |
+| mean profit p-value | 1.713e-11 | 6.932e-07 |
+| market change % (baseline) | -58.4 | 348.67 |
+| strategy total % | -68.87 | -95.94 |
+| Sharpe | -10.53 | -4.68 |
+| Sortino | -18.09 | -8.53 |
+| max drawdown % | 72.11 | 96.28 |
+| profit factor | 0.67 | 0.8 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-58.4%**, стратегия — **-68.87%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-58.4%**; the strategy returned **-68.87%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **-95.94%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ✅ ПРОШЛА | рекурсивных отклонений не найдено |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 6 свечей, startup_candle_count не задан (по умолчанию 0) |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
+| прогрев не объявлен | **found** | самый длинный индикатор 6 свечей, startup_candle_count не задан (по умолчанию 0) |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

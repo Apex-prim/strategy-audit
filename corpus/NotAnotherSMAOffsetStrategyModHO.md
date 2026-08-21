@@ -1,35 +1,40 @@
 # NotAnotherSMAOffsetStrategyModHO
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `NotAnotherSMAOffsetStrategyModHO.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `NotAnotherSMAOffsetStrategyModHO.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 159 | 985 |
-| ожидание на сделку | 0.12 | 0.51 |
-| p-значение средней | 0.5183 | 2.003e-05 |
-| «купил и держи», % | -59.05 | 346.34 |
-| итог стратегии, % | 1.98 | 50.12 |
-| Шарп | 0.21 | 1.09 |
-| Сортино | 0.21 | 1.03 |
-| просадка, % | 5.77 | 7.86 |
-| фактор прибыли | 1.15 | 1.5 |
+| trades | 159 | 985 |
+| expectancy per trade (USDT) | 0.12 | 0.51 |
+| mean profit p-value | 0.5183 | 2.003e-05 |
+| market change % (baseline) | -59.05 | 346.34 |
+| strategy total % | 1.98 | 50.12 |
+| Sharpe | 0.21 | 1.09 |
+| Sortino | 0.21 | 1.03 |
+| max drawdown % | 5.77 | 7.86 |
+| profit factor | 1.15 | 1.5 |
 
-**Осталось от ожидания вне выборки: 425%**
+**Retained out of sample: 425%**
 
-⚠ **В окне автора средняя доходность НЕ ЗНАЧИМА** (p = 0.5183 > 0.05). То есть даже in-sample результат неотличим от нуля.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.05%**, стратегия — **1.98%**.
+⚠ **Not statistically significant in its author's own window** (p = 0.5183 > 0.05): the average trade is not distinguishable from zero.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.05%**; the strategy returned **1.98%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **50.12%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: EWO -12.317% |
-| прогрев объявлен | ✅ ПРОШЛА | 200 при потребности 100 |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: EWO -12.317% |
+| прогрев объявлен | clean | 200 при потребности 100 |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

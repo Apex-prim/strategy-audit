@@ -1,34 +1,39 @@
 # RalliV1
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `RalliV1.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `RalliV1.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 146 | 511 |
-| ожидание на сделку | 1.0 | 1.83 |
-| p-значение средней | 8.89e-05 | 2.532e-17 |
-| «купил и держи», % | -59.05 | 346.34 |
-| итог стратегии, % | 14.54 | 93.38 |
-| Шарп | 1.28 | 1.61 |
-| Сортино | 1.57 | 1.42 |
-| просадка, % | 4.64 | 4.75 |
-| фактор прибыли | 2.32 | 2.83 |
+| trades | 146 | 511 |
+| expectancy per trade (USDT) | 1.0 | 1.83 |
+| mean profit p-value | 8.89e-05 | 2.532e-17 |
+| market change % (baseline) | -59.05 | 346.34 |
+| strategy total % | 14.54 | 93.38 |
+| Sharpe | 1.28 | 1.61 |
+| Sortino | 1.57 | 1.42 |
+| max drawdown % | 4.64 | 4.75 |
+| profit factor | 2.32 | 2.83 |
 
-**Осталось от ожидания вне выборки: 183%**
+**Retained out of sample: 183%**
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.05%**, стратегия — **14.54%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.05%**; the strategy returned **14.54%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **93.38%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: EWO -12.317% |
-| прогрев объявлен | ✅ ПРОШЛА | 200 при потребности 100 |
-| мёртвые настройки трейлинга | ⚠ НАЙДЕНО | trailing_stop=False, но trailing_stop_positive=0.005 задан — читается как работающая защита |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: EWO -12.317% |
+| прогрев объявлен | clean | 200 при потребности 100 |
+| мёртвые настройки трейлинга | **found** | trailing_stop=False, но trailing_stop_positive=0.005 задан — читается как работающая защита |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

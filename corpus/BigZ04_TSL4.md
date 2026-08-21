@@ -1,34 +1,39 @@
 # BigZ04_TSL4
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `BigZ04_TSL4.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `BigZ04_TSL4.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 479 | 1277 |
-| ожидание на сделку | -0.72 | -0.56 |
-| p-значение средней | 6.899e-05 | 2.162e-16 |
-| «купил и держи», % | -59.23 | 346.34 |
-| итог стратегии, % | -34.67 | -71.49 |
-| Шарп | -2.31 | -2.41 |
-| Сортино | -2.38 | -2.3 |
-| просадка, % | 39.93 | 72.01 |
-| фактор прибыли | 0.58 | 0.48 |
+| trades | 479 | 1277 |
+| expectancy per trade (USDT) | -0.72 | -0.56 |
+| mean profit p-value | 6.899e-05 | 2.162e-16 |
+| market change % (baseline) | -59.23 | 346.34 |
+| strategy total % | -34.67 | -71.49 |
+| Sharpe | -2.31 | -2.41 |
+| Sortino | -2.38 | -2.3 |
+| max drawdown % | 39.93 | 72.01 |
+| profit factor | 0.58 | 0.48 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.23%**, стратегия — **-34.67%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.23%**; the strategy returned **-34.67%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **-71.49%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ✅ ПРОШЛА | рекурсивных отклонений не найдено |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
-| мёртвые настройки трейлинга | ⚠ НАЙДЕНО | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
+| прогрев не объявлен | **found** | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
+| мёртвые настройки трейлинга | **found** | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

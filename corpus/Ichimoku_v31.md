@@ -1,32 +1,37 @@
 # Ichimoku_v31
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `Ichimoku_v31_Heikin.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `Ichimoku_v31_Heikin.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 238 | 1326 |
-| ожидание на сделку | 3.68 | 4.26 |
-| p-значение средней | 0.0115 | 0.07244 |
-| «купил и держи», % | -57.84 | 348.67 |
-| итог стратегии, % | 87.57 | 564.95 |
-| Шарп | 1.04 | 0.53 |
-| Сортино | 6.65 | 2.87 |
-| просадка, % | 14.48 | 26.11 |
-| фактор прибыли | 2.16 | 1.36 |
+| trades | 238 | 1326 |
+| expectancy per trade (USDT) | 3.68 | 4.26 |
+| mean profit p-value | 0.0115 | 0.07244 |
+| market change % (baseline) | -57.84 | 348.67 |
+| strategy total % | 87.57 | 564.95 |
+| Sharpe | 1.04 | 0.53 |
+| Sortino | 6.65 | 2.87 |
+| max drawdown % | 14.48 | 26.11 |
+| profit factor | 2.16 | 1.36 |
 
-**Осталось от ожидания вне выборки: 116%**
+**Retained out of sample: 116%**
 
-Базовая линия: «купил и держи» на тех же парах дал **-57.84%**, стратегия — **87.57%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-57.84%**; the strategy returned **87.57%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **564.95%** — **beats the baseline**.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ✅ ПРОШЛА | рекурсивных отклонений не найдено |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

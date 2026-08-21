@@ -1,36 +1,41 @@
 # NostalgiaForInfinityV5MultiOffsetAndHO2
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `NostalgiaForInfinityV5MultiOffsetAndHO2 (1).py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `NostalgiaForInfinityV5MultiOffsetAndHO2 (1).py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 297 | 1084 |
-| ожидание на сделку | 0.2 | 0.79 |
-| p-значение средней | 0.1424 | 7.511e-08 |
-| «купил и держи», % | -59.35 | 346.34 |
-| итог стратегии, % | 5.82 | 85.17 |
-| Шарп | 0.67 | 1.44 |
-| Сортино | 0.62 | 1.36 |
-| просадка, % | 6.1 | 7.35 |
-| фактор прибыли | 1.28 | 1.76 |
+| trades | 297 | 1084 |
+| expectancy per trade (USDT) | 0.2 | 0.79 |
+| mean profit p-value | 0.1424 | 7.511e-08 |
+| market change % (baseline) | -59.35 | 346.34 |
+| strategy total % | 5.82 | 85.17 |
+| Sharpe | 0.67 | 1.44 |
+| Sortino | 0.62 | 1.36 |
+| max drawdown % | 6.1 | 7.35 |
+| profit factor | 1.28 | 1.76 |
 
-**Осталось от ожидания вне выборки: 395%**
+**Retained out of sample: 395%**
 
-⚠ **В окне автора средняя доходность НЕ ЗНАЧИМА** (p = 0.1424 > 0.05). То есть даже in-sample результат неотличим от нуля.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.35%**, стратегия — **5.82%**.
+⚠ **Not statistically significant in its author's own window** (p = 0.1424 > 0.05): the average trade is not distinguishable from zero.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.35%**; the strategy returned **5.82%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **85.17%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: ema_100_1h -0.014%, ewo -12.317%, kama_offset_buy 0.047% |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
-| мёртвые настройки трейлинга | ⚠ НАЙДЕНО | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: ema_100_1h -0.014%, ewo -12.317%, kama_offset_buy 0.047% |
+| прогрев не объявлен | **found** | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
+| мёртвые настройки трейлинга | **found** | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

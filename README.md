@@ -93,7 +93,19 @@ statistical test in this repository, and none of them beats buy-and-hold.**
 Full sweep, 571 strategies. By the statistics most people use, 17% survive; by
 one free column they skip, 0% do.
 
-Per-strategy cards: **[results/INDEX.md](results/INDEX.md)**
+**[TRAPS.md](TRAPS.md) — 71% of the strategies that pass every statistical test
+carry at least one backtesting trap that no statistic can see.** Checks built
+from the freqtrade community's own
+[backtesting-traps](https://brookmiles.github.io/freqtrade-stuff/2021/04/12/backtesting-traps/)
+document, after a member pointed out that bias detectors are not enough.
+
+**Every strategy in the corpus, measured or explained:
+[corpus/INDEX.md](corpus/INDEX.md)** — one card each, including every strategy
+that failed to load, with the exception that killed it. Nothing is omitted for
+being inconvenient.
+
+The five hand-picked audits below are a case study, not the population:
+[results/INDEX.md](results/INDEX.md)
 Full write-up: **[ANALYSIS.md](ANALYSIS.md)** · [на русском](ANALYSIS.ru.md)
 
 ---

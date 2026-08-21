@@ -1,34 +1,39 @@
 # FSupertrendStrategy
 
-Источник: [`freqtrade/freqtrade-strategies`](https://github.com/freqtrade/freqtrade-strategies) · файл `FSupertrendStrategy.py`
+Source: [`freqtrade/freqtrade-strategies`](https://github.com/freqtrade/freqtrade-strategies) · file `FSupertrendStrategy.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 1760 | 6492 |
-| ожидание на сделку | -0.1 | -0.02 |
-| p-значение средней | 0.3202 | 0.763 |
-| «купил и держи», % | -59.19 | 348.67 |
-| итог стратегии, % | -17.89 | -14.49 |
-| Шарп | -1.09 | -0.2 |
-| Сортино | -1.51 | -0.24 |
-| просадка, % | 39.75 | 62.76 |
-| фактор прибыли | 0.95 | 0.99 |
+| trades | 1760 | 6492 |
+| expectancy per trade (USDT) | -0.1 | -0.02 |
+| mean profit p-value | 0.3202 | 0.763 |
+| market change % (baseline) | -59.19 | 348.67 |
+| strategy total % | -17.89 | -14.49 |
+| Sharpe | -1.09 | -0.2 |
+| Sortino | -1.51 | -0.24 |
+| max drawdown % | 39.75 | 62.76 |
+| profit factor | 0.95 | 0.99 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-⚠ **В окне автора средняя доходность НЕ ЗНАЧИМА** (p = 0.3202 > 0.05). То есть даже in-sample результат неотличим от нуля.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.19%**, стратегия — **-17.89%**.
+⚠ **Not statistically significant in its author's own window** (p = 0.3202 > 0.05): the average trade is not distinguishable from zero.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.19%**; the strategy returned **-17.89%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **-14.49%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ✅ ПРОШЛА | рекурсивных отклонений не найдено |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

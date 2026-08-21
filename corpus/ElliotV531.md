@@ -1,33 +1,38 @@
 # ElliotV531
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `ElliotV531.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `ElliotV531.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 164 | 723 |
-| ожидание на сделку | 0.92 | 0.33 |
-| p-значение средней | 2.72e-05 | 0.03872 |
-| «купил и держи», % | -59.05 | 346.34 |
-| итог стратегии, % | 15.01 | 24.12 |
-| Шарп | 1.45 | 0.45 |
-| Сортино | 1.07 | 0.36 |
-| просадка, % | 2.15 | 5.57 |
-| фактор прибыли | 2.5 | 1.3 |
+| trades | 164 | 723 |
+| expectancy per trade (USDT) | 0.92 | 0.33 |
+| mean profit p-value | 2.72e-05 | 0.03872 |
+| market change % (baseline) | -59.05 | 346.34 |
+| strategy total % | 15.01 | 24.12 |
+| Sharpe | 1.45 | 0.45 |
+| Sortino | 1.07 | 0.36 |
+| max drawdown % | 2.15 | 5.57 |
+| profit factor | 2.5 | 1.3 |
 
-**Осталось от ожидания вне выборки: 36%**
+**Retained out of sample: 36%**
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.05%**, стратегия — **15.01%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.05%**; the strategy returned **15.01%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **24.12%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: EWO -12.317% |
-| прогрев объявлен | ✅ ПРОШЛА | 200 при потребности 100 |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: EWO -12.317% |
+| прогрев объявлен | clean | 200 при потребности 100 |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

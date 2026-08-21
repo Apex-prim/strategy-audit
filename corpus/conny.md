@@ -1,32 +1,37 @@
 # conny
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `conny.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `conny.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 1484 | 4341 |
-| ожидание на сделку | -0.22 | -0.11 |
-| p-значение средней | 1.218e-08 | 5.475e-06 |
-| «купил и держи», % | -58.53 | 345.85 |
-| итог стратегии, % | -32.36 | -48.3 |
-| Шарп | -5.78 | -2.43 |
-| Сортино | -10.7 | -4.07 |
-| просадка, % | 33.33 | 49.73 |
-| фактор прибыли | 0.69 | 0.81 |
+| trades | 1484 | 4341 |
+| expectancy per trade (USDT) | -0.22 | -0.11 |
+| mean profit p-value | 1.218e-08 | 5.475e-06 |
+| market change % (baseline) | -58.53 | 345.85 |
+| strategy total % | -32.36 | -48.3 |
+| Sharpe | -5.78 | -2.43 |
+| Sortino | -10.7 | -4.07 |
+| max drawdown % | 33.33 | 49.73 |
+| profit factor | 0.69 | 0.81 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-58.53%**, стратегия — **-32.36%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-58.53%**; the strategy returned **-32.36%**.
+Out of sample: buy-and-hold **345.85%** vs strategy **-48.3%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: consensus_sell -42.857% |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: consensus_sell -42.857% |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **15m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **15m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

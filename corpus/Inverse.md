@@ -1,35 +1,40 @@
 # Inverse
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `Inverse.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `Inverse.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 449 | 2021 |
-| ожидание на сделку | 0.18 | 0.15 |
-| p-значение средней | 0.5077 | 0.4343 |
-| «купил и держи», % | -54.03 | 348.67 |
-| итог стратегии, % | 8.21 | 30.78 |
-| Шарп | 0.37 | 0.28 |
-| Сортино | 0.92 | 0.69 |
-| просадка, % | 15.21 | 37.39 |
-| фактор прибыли | 1.11 | 1.06 |
+| trades | 449 | 2021 |
+| expectancy per trade (USDT) | 0.18 | 0.15 |
+| mean profit p-value | 0.5077 | 0.4343 |
+| market change % (baseline) | -54.03 | 348.67 |
+| strategy total % | 8.21 | 30.78 |
+| Sharpe | 0.37 | 0.28 |
+| Sortino | 0.92 | 0.69 |
+| max drawdown % | 15.21 | 37.39 |
+| profit factor | 1.11 | 1.06 |
 
-**Осталось от ожидания вне выборки: 83%**
+**Retained out of sample: 83%**
 
-⚠ **В окне автора средняя доходность НЕ ЗНАЧИМА** (p = 0.5077 > 0.05). То есть даже in-sample результат неотличим от нуля.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-Базовая линия: «купил и держи» на тех же парах дал **-54.03%**, стратегия — **8.21%**.
+⚠ **Not statistically significant in its author's own window** (p = 0.5077 > 0.05): the average trade is not distinguishable from zero.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-54.03%**; the strategy returned **8.21%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **30.78%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: ema_100_4h -0.020%, ema_200 -0.448% |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: ema_100_4h -0.020%, ema_200 -0.448% |
+| прогрев не объявлен | **found** | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*

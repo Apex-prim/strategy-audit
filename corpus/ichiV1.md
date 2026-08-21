@@ -1,33 +1,38 @@
 # ichiV1
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `IchisV1.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `IchisV1.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 3208 | 10241 |
-| ожидание на сделку | 30.5 | 18260.99 |
-| p-значение средней | 8.266e-89 | 2.562e-152 |
-| «купил и держи», % | -58.84 | 346.34 |
-| итог стратегии, % | 9785.43 | 18701080.18 |
-| Шарп | 30.57 | 21.89 |
-| Сортино | 37.1 | 28.6 |
-| просадка, % | 1.45 | 1.03 |
-| фактор прибыли | 5.07 | 5.16 |
+| trades | 3208 | 10241 |
+| expectancy per trade (USDT) | 30.5 | 18260.99 |
+| mean profit p-value | 8.266e-89 | 2.562e-152 |
+| market change % (baseline) | -58.84 | 346.34 |
+| strategy total % | 9785.43 | 18701080.18 |
+| Sharpe | 30.57 | 21.89 |
+| Sortino | 37.1 | 28.6 |
+| max drawdown % | 1.45 | 1.03 |
+| profit factor | 5.07 | 5.16 |
 
-**Осталось от ожидания вне выборки: 59872%**
+**Retained out of sample: 59872%**
 
-Базовая линия: «купил и держи» на тех же парах дал **-58.84%**, стратегия — **9785.43%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-58.84%**; the strategy returned **9785.43%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **18701080.18%** — **beats the baseline**.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ⚠ НАЙДЕНО | ЕСТЬ СМЕЩЕНИЕ: входов 7, выходов 0 из 20 сигналов |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: trend_open_6h -0.013%, trend_open_8h -0.013% |
-| прогрев объявлен | ✅ ПРОШЛА | 96 при потребности 96 |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | **found** | ЕСТЬ СМЕЩЕНИЕ: входов 7, выходов 0 из 20 сигналов |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: trend_open_6h -0.013%, trend_open_8h -0.013% |
+| прогрев объявлен | clean | 96 при потребности 96 |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

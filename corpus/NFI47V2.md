@@ -1,34 +1,39 @@
 # NFI47V2
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `NFI47V2.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `NFI47V2.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 137 | 387 |
-| ожидание на сделку | 0.78 | 3.01 |
-| p-значение средней | 0.02804 | 5.393e-15 |
-| «купил и держи», % | -59.23 | 346.34 |
-| итог стратегии, % | 10.67 | 116.3 |
-| Шарп | 0.68 | 1.3 |
-| Сортино | 0.61 | 0.84 |
-| просадка, % | 8.08 | 4.58 |
-| фактор прибыли | 1.7 | 3.77 |
+| trades | 137 | 387 |
+| expectancy per trade (USDT) | 0.78 | 3.01 |
+| mean profit p-value | 0.02804 | 5.393e-15 |
+| market change % (baseline) | -59.23 | 346.34 |
+| strategy total % | 10.67 | 116.3 |
+| Sharpe | 0.68 | 1.3 |
+| Sortino | 0.61 | 0.84 |
+| max drawdown % | 8.08 | 4.58 |
+| profit factor | 1.7 | 3.77 |
 
-**Осталось от ожидания вне выборки: 386%**
+**Retained out of sample: 386%**
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.23%**, стратегия — **10.67%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.23%**; the strategy returned **10.67%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **116.3%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: ema_100_1h -0.014%, ewo -12.317% |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
-| мёртвые настройки трейлинга | ⚠ НАЙДЕНО | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: ema_100_1h -0.014%, ewo -12.317% |
+| прогрев не объявлен | **found** | самый длинный индикатор 200 свечей, startup_candle_count не задан (по умолчанию 0) |
+| мёртвые настройки трейлинга | **found** | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

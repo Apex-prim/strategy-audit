@@ -1,33 +1,38 @@
 # Cluc7werk
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `Cluc7werk.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `Cluc7werk.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 303 | 2018 |
-| ожидание на сделку | -0.71 | -0.44 |
-| p-значение средней | 5.648e-15 | 1.21e-106 |
-| «купил и держи», % | -55.61 | 347.94 |
-| итог стратегии, % | -21.39 | -89.79 |
-| Шарп | -3.76 | -8.47 |
-| Сортино | -6.85 | -11.9 |
-| просадка, % | 21.81 | 89.81 |
-| фактор прибыли | 0.33 | 0.19 |
+| trades | 303 | 2018 |
+| expectancy per trade (USDT) | -0.71 | -0.44 |
+| mean profit p-value | 5.648e-15 | 1.21e-106 |
+| market change % (baseline) | -55.61 | 347.94 |
+| strategy total % | -21.39 | -89.79 |
+| Sharpe | -3.76 | -8.47 |
+| Sortino | -6.85 | -11.9 |
+| max drawdown % | 21.81 | 89.81 |
+| profit factor | 0.33 | 0.19 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-55.61%**, стратегия — **-21.39%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-55.61%**; the strategy returned **-21.39%**.
+Out of sample: buy-and-hold **347.94%** vs strategy **-89.79%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | вывод не разобран |
-| рекурсия индикаторов (родной детектор freqtrade) | ✅ ПРОШЛА | рекурсивных отклонений не найдено |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 48 свечей, startup_candle_count не задан (по умолчанию 0) |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
+| прогрев не объявлен | **found** | самый длинный индикатор 48 свечей, startup_candle_count не задан (по умолчанию 0) |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

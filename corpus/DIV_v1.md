@@ -1,19 +1,25 @@
 # DIV_v1
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `DIV_v1.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `DIV_v1.py`
 
-## Результат
+## Could not be measured
 
-**НЕ ПРИМЕНИМА** — TypeError: NDFrame.fillna() got an unexpected keyword argument 'method'
+```
+TypeError: NDFrame.fillna() got an unexpected keyword argument 'method'
+```
 
-## Проверки
+Declared timeframe: `5m`. This is a named cause, not a verdict on the strategy — see the note on buckets in [../BASELINE.md](../BASELINE.md).
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | код 1 |
-| рекурсия индикаторов (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | код 1 |
-| прогрев объявлен | ✅ ПРОШЛА | 200 при потребности 14 |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | код 1 |
+| indicator recursion (freqtrade's own `recursive-analysis`) | could not run | код 1 |
+| прогрев объявлен | clean | 200 при потребности 14 |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*

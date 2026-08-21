@@ -1,32 +1,37 @@
 # PatternRecognition
 
-Источник: [`freqtrade/freqtrade-strategies`](https://github.com/freqtrade/freqtrade-strategies) · файл `PatternRecognition.py`
+Source: [`freqtrade/freqtrade-strategies`](https://github.com/freqtrade/freqtrade-strategies) · file `PatternRecognition.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 134 | 520 |
-| ожидание на сделку | -3.56 | -0.48 |
-| p-значение средней | 0.007559 | 0.6741 |
-| «купил и держи», % | -59.68 | 352.61 |
-| итог стратегии, % | -47.69 | -24.98 |
-| Шарп | -0.82 | -0.08 |
-| Сортино | -1.26 | -0.08 |
-| просадка, % | 53.11 | 67.94 |
-| фактор прибыли | 0.53 | 0.95 |
+| trades | 134 | 520 |
+| expectancy per trade (USDT) | -3.56 | -0.48 |
+| mean profit p-value | 0.007559 | 0.6741 |
+| market change % (baseline) | -59.68 | 352.61 |
+| strategy total % | -47.69 | -24.98 |
+| Sharpe | -0.82 | -0.08 |
+| Sortino | -1.26 | -0.08 |
+| max drawdown % | 53.11 | 67.94 |
+| profit factor | 0.53 | 0.95 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-59.68%**, стратегия — **-47.69%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-59.68%**; the strategy returned **-47.69%**.
+Out of sample: buy-and-hold **352.61%** vs strategy **-24.98%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Fatal exception! |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | Fatal exception! |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1d**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1d** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

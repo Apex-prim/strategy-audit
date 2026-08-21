@@ -1,19 +1,25 @@
 # AlmgrenChrissStrategy
 
-Источник: [`freqtrade/freqtrade-strategies`](https://github.com/freqtrade/freqtrade-strategies) · файл `AlmgrenChrissStrategy.py`
+Source: [`freqtrade/freqtrade-strategies`](https://github.com/freqtrade/freqtrade-strategies) · file `AlmgrenChrissStrategy.py`
 
-## Результат
+## Could not be measured
 
-**НЕ ПРИМЕНИМА** — ImportError: Short strategies cannot run in spot markets. Please make sure that this is the correct strategy and that your trading mode configuration is correct
+```
+ImportError: Short strategies cannot run in spot markets. Please make sure that this is the correct strategy and that your trading mode configuration is correct
+```
 
-## Проверки
+Declared timeframe: `15m`. This is a named cause, not a verdict on the strategy — see the note on buckets in [../BASELINE.md](../BASELINE.md).
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Fatal exception! |
-| рекурсия индикаторов (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Fatal exception! |
-| прогрев занижен | ⚠ НАЙДЕНО | объявлено 30, нужно не менее 96 |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | Fatal exception! |
+| indicator recursion (freqtrade's own `recursive-analysis`) | could not run | Fatal exception! |
+| прогрев занижен | **found** | объявлено 30, нужно не менее 96 |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **15m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **15m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*

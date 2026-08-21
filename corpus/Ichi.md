@@ -1,33 +1,38 @@
 # ichi
 
-Источник: [`werkkrew/freqtrade-strategies`](https://github.com/werkkrew/freqtrade-strategies) · файл `Ichis.py`
+Source: [`werkkrew/freqtrade-strategies`](https://github.com/werkkrew/freqtrade-strategies) · file `Ichis.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 1192 | 4733 |
-| ожидание на сделку | -0.17 | -0.15 |
-| p-значение средней | 0.001101 | 1.384e-17 |
-| «купил и держи», % | -58.4 | 348.67 |
-| итог стратегии, % | -20.1 | -71.5 |
-| Шарп | -2.95 | -4.77 |
-| Сортино | -41.89 | -19.88 |
-| просадка, % | 27.52 | 71.7 |
-| фактор прибыли | 0.82 | 0.75 |
+| trades | 1192 | 4733 |
+| expectancy per trade (USDT) | -0.17 | -0.15 |
+| mean profit p-value | 0.001101 | 1.384e-17 |
+| market change % (baseline) | -58.4 | 348.67 |
+| strategy total % | -20.1 | -71.5 |
+| Sharpe | -2.95 | -4.77 |
+| Sortino | -41.89 | -19.88 |
+| max drawdown % | 27.52 | 71.7 |
+| profit factor | 0.82 | 0.75 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-58.4%**, стратегия — **-20.1%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-58.4%**; the strategy returned **-20.1%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **-71.5%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 14 свечей, startup_candle_count не задан (по умолчанию 0) |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | freqtrade ОТКАЗАЛСЯ анализировать: startup_candle_count=0, «приведёт к рекурсивным проблемам у части индикаторов» |
+| прогрев не объявлен | **found** | самый длинный индикатор 14 свечей, startup_candle_count не задан (по умолчанию 0) |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*

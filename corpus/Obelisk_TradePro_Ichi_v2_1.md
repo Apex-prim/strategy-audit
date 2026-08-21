@@ -1,33 +1,38 @@
 # Obelisk_TradePro_Ichi_v2_1
 
-Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `Obelisk_TradePro_Ichi_v2_1.py`
+Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `Obelisk_TradePro_Ichi_v2_1.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 1303 | 5116 |
-| ожидание на сделку | 0.59 | 0.27 |
-| p-значение средней | 0.005324 | 0.1012 |
-| «купил и держи», % | -56.47 | 348.67 |
-| итог стратегии, % | 77.42 | 140.66 |
-| Шарп | 2.66 | 0.95 |
-| Сортино | 4.82 | 1.58 |
-| просадка, % | 21.71 | 35.05 |
-| фактор прибыли | 1.19 | 1.05 |
+| trades | 1303 | 5116 |
+| expectancy per trade (USDT) | 0.59 | 0.27 |
+| mean profit p-value | 0.005324 | 0.1012 |
+| market change % (baseline) | -56.47 | 348.67 |
+| strategy total % | 77.42 | 140.66 |
+| Sharpe | 2.66 | 0.95 |
+| Sortino | 4.82 | 1.58 |
+| max drawdown % | 21.71 | 35.05 |
+| profit factor | 1.19 | 1.05 |
 
-**Осталось от ожидания вне выборки: 46%**
+**Retained out of sample: 46%**
 
-Базовая линия: «купил и держи» на тех же парах дал **-56.47%**, стратегия — **77.42%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-56.47%**; the strategy returned **77.42%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **140.66%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ⚠ НАЙДЕНО | ЕСТЬ СМЕЩЕНИЕ: входов 0, выходов 0 из 20 сигналов |
-| рекурсия индикаторов (родной детектор freqtrade) | ✅ ПРОШЛА | рекурсивных отклонений не найдено |
-| прогрев объявлен | ✅ ПРОШЛА | 180 при потребности 28 |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | **found** | ЕСТЬ СМЕЩЕНИЕ: входов 0, выходов 0 из 20 сигналов |
+| indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
+| прогрев объявлен | clean | 180 при потребности 28 |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*

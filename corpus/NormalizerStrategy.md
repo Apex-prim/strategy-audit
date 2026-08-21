@@ -1,32 +1,37 @@
 # NormalizerStrategy
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `NormalizerStrategy.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `NormalizerStrategy.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 970 | 2777 |
-| ожидание на сделку | -0.65 | -0.33 |
-| p-значение средней | 8.168e-18 | 4.409e-24 |
-| «купил и держи», % | -51.25 | 348.67 |
-| итог стратегии, % | -63.39 | -92.16 |
-| Шарп | -7.4 | -4.35 |
-| Сортино | -8.66 | -4.48 |
-| просадка, % | 63.66 | 92.25 |
-| фактор прибыли | 0.44 | 0.4 |
+| trades | 970 | 2777 |
+| expectancy per trade (USDT) | -0.65 | -0.33 |
+| mean profit p-value | 8.168e-18 | 4.409e-24 |
+| market change % (baseline) | -51.25 | 348.67 |
+| strategy total % | -63.39 | -92.16 |
+| Sharpe | -7.4 | -4.35 |
+| Sortino | -8.66 | -4.48 |
+| max drawdown % | 63.66 | 92.25 |
+| profit factor | 0.44 | 0.4 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-51.25%**, стратегия — **-63.39%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-51.25%**; the strategy returned **-63.39%**.
+Out of sample: buy-and-hold **348.67%** vs strategy **-92.16%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: pct_sum -33.617% |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: pct_sum -33.617% |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1h**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*

@@ -1,19 +1,25 @@
 # bbrsi1_strategy
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `bbrsi1_strategy.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `bbrsi1_strategy.py`
 
-## Результат
+## Could not be measured
 
-**НЕ ПРИМЕНИМА** — Impossible to load Strategy 'bbrsi1_strategy'. This class does not exist or contains Python code errors.
+```
+Impossible to load Strategy 'bbrsi1_strategy'. This class does not exist or contains Python code errors.
+```
 
-## Проверки
+Declared timeframe: `5m`. This is a named cause, not a verdict on the strategy — see the note on buckets in [../BASELINE.md](../BASELINE.md).
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Impossible to load Strategy 'bbrsi1_strategy'. This class does not exist or contains Python code errors. |
-| рекурсия индикаторов (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Impossible to load Strategy 'bbrsi1_strategy'. This class does not exist or contains Python code errors. |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | Impossible to load Strategy 'bbrsi1_strategy'. This class does not exist or contains Python code errors. |
+| indicator recursion (freqtrade's own `recursive-analysis`) | could not run | Impossible to load Strategy 'bbrsi1_strategy'. This class does not exist or contains Python code errors. |
+| прогрев не объявлен | **found** | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*

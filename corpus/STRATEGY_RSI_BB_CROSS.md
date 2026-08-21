@@ -1,33 +1,38 @@
 # STRATEGY_RSI_BB_CROSS
 
-Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `STRATEGY_RSI_BB_CROSS.py`
+Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · file `STRATEGY_RSI_BB_CROSS.py`
 
-## Результат
+## Result
 
-| показатель | в выборке автора | вне выборки |
+| metric | author's window | out of sample |
 |---|---|---|
-| сделок | 4897 | 11930 |
-| ожидание на сделку | -0.15 | -0.08 |
-| p-значение средней | 2.992e-09 | 7.013e-12 |
-| «купил и держи», % | -58.41 | 346.34 |
-| итог стратегии, % | -71.63 | -96.66 |
-| Шарп | -10.89 | -6.06 |
-| Сортино | -8.21 | -4.23 |
-| просадка, % | 71.76 | 96.7 |
-| фактор прибыли | 0.74 | 0.75 |
+| trades | 4897 | 11930 |
+| expectancy per trade (USDT) | -0.15 | -0.08 |
+| mean profit p-value | 2.992e-09 | 7.013e-12 |
+| market change % (baseline) | -58.41 | 346.34 |
+| strategy total % | -71.63 | -96.66 |
+| Sharpe | -10.89 | -6.06 |
+| Sortino | -8.21 | -4.23 |
+| max drawdown % | 71.76 | 96.7 |
+| profit factor | 0.74 | 0.75 |
 
-**Осталось от ожидания вне выборки: отрицательное**
+**Retained out of sample: negative**
 
-Базовая линия: «купил и держи» на тех же парах дал **-58.41%**, стратегия — **-71.63%**.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-## Проверки
+Baseline: buy-and-hold on the same pairs returned **-58.41%**; the strategy returned **-71.63%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **-96.66%** — loses to it.
 
-| проверка | итог | подробности |
+## Checks
+
+| check | result | detail |
 |---|---|---|
-| заглядывание в будущее (родной детектор freqtrade) | ✅ ПРОШЛА | смещения не обнаружено |
-| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: rsi 12.447%, rsi_percent 63.577%, bb_minus_rsi_percent 53.196% |
-| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | clean | смещения не обнаружено |
+| indicator recursion (freqtrade's own `recursive-analysis`) | **found** | индикаторы меняются от объёма истории: rsi 12.447%, rsi_percent 63.577%, bb_minus_rsi_percent 53.196% |
+| прогрев не объявлен | **found** | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
 
 ---
 
-*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
+*Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
+
+*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*
