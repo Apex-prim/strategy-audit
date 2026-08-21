@@ -250,10 +250,29 @@ def backtest(name, timerange, fee="0.001", path=None, want_tf=None):
     if c == 0 and want_tf and used and used != want_tf:
         return (NA, u"ПРЕДМЕТ НЕ ТОТ: стратегия объявила %s, движок считал на %s"
                 % (want_tf, used), None)
+    # ⚠ ПРОЖИТЫЙ ДЕФЕКТ 21.08. `ERROR - Fatal exception!` — это ЯРЛЫК, а не
+    # причина: настоящая лежит ниже, в конце трассировки. Так 76 стратегий
+    # (13% корпуса) получили в отчёте пустое объяснение, и я чуть не
+    # опубликовал «не смогли проверить» там, где причина была МОЯ:
+    # `ImportError: Short strategies cannot run in spot markets` — они
+    # объявляют can_short, а корпус гнался в режиме spot.
+    #
+    # «Не проверено» обязано быть КАТЕГОРИЕЙ с названной причиной, иначе оно
+    # неотличимо от «проверено и чисто».
     err = re.search(r"ERROR - (?:Configuration error: )?(.+)", out)
+    # имя исключения может быть С ТОЧКАМИ (numpy.exceptions.DTypePromotionError) —
+    # первая версия требовала \w* и потому оставляла ярлык "Fatal exception!"
+    tail = re.findall(r"^([\w.]*(?:Error|Exception)): (.+)$", out, re.M)
+    if tail and (not err or "Fatal exception" in err.group(1)):
+        class _M(object):
+            def __init__(self, t):
+                self._t = t
+            def group(self, _):
+                return u"%s: %s" % self._t
+        err = _M(tail[-1])
     if c != 0:
         why = (u"ПРЕВЫШЕНО ВРЕМЯ" if c == 124
-               else (err.group(1)[:160] if err else u"код %d" % c))
+               else (err.group(1).strip()[:160] if err else u"код %d" % c))
         return (NA, why, None)
     d = parse_summary(out)
     # ⚠ КОД 0 НЕ ЕСТЬ РЕЗУЛЬТАТ. freqtrade завершается УСПЕШНО при ошибке
@@ -265,7 +284,7 @@ def backtest(name, timerange, fee="0.001", path=None, want_tf=None):
     #
     # Прогон засчитывается только если в сводке ЕСТЬ ЧИСЛА.
     if d.get("trades") is None:
-        return (NA, (err.group(1)[:160] if err
+        return (NA, (err.group(1).strip()[:160] if err
                      else u"движок вышел с кодом 0, но сводки нет "
                           u"(ни одной сделки либо вывод не разобран)"), None)
     d["used_timeframe"] = used

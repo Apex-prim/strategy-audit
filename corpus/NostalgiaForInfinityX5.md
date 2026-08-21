@@ -1,0 +1,20 @@
+# NostalgiaForInfinityX5
+
+Источник: [`iterativv/NostalgiaForInfinity`](https://github.com/iterativv/NostalgiaForInfinity) · файл `NostalgiaForInfinityX5.py`
+
+## Результат
+
+**НЕ ПРИМЕНИМА** — TypeError: Invalid value '[False False False ... False False False]' for dtype 'str'
+
+## Проверки
+
+| проверка | итог | подробности |
+|---|---|---|
+| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Fatal exception! |
+| рекурсия индикаторов (родной детектор freqtrade) | ⚠ НАЙДЕНО | индикаторы меняются от объёма истории: OBV_15m -99.658%, OBV_change_pct_15m 15751.239%, OBV_1h 179.534%, OBV_change_pct_1h -62.597%, OBV_4h 62.078% |
+| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 288 свечей, startup_candle_count не задан (по умолчанию 0) |
+| мёртвые настройки трейлинга | ⚠ НАЙДЕНО | trailing_stop=False, но trailing_stop_positive=0.01 задан — читается как работающая защита |
+
+---
+
+*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*

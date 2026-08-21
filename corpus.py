@@ -47,6 +47,26 @@ if not runlock.acquire("corpus-%d" % SHARD):
 import atexit
 atexit.register(lambda: runlock.release("corpus-%d" % SHARD))
 
+# ⚠ ПРОЖИТЫЙ ДЕФЕКТ 21.08. Шесть пар имён в корпусе различаются ТОЛЬКО
+# РЕГИСТРОМ (Ichi/ichi, SAR/Sar, BBRSI/bbrsi, HLHB/hlhb, mabStra/MabStra,
+# SuperTrend/Supertrend). Файловая система Windows регистр не различает, и
+# `os.path.exists(results/ichi.json)` отвечало ПРАВДУ про Ichi.json. Прогон
+# считал вторую стратегию пары уже посчитанной и МОЛЧА её пропускал.
+#
+# Потеряно 6 из 571 — 1%. Мало, но это ровно «тихое усечение, читающееся как
+# полный охват», запрещённое собственной пререгистрацией. Лечение — не
+# «помнить про регистр», а сделать имя файла однозначным.
+ALL_NAMES = []
+
+
+def card_path(name):
+    same = [x for x in ALL_NAMES if x.lower() == name.lower()]
+    if len(same) > 1:
+        h = hashlib.md5(name.encode("utf-8")).hexdigest()[:6]
+        return _os.path.join(RESULTS, "%s__%s.json" % (name, h))
+    return _os.path.join(RESULTS, "%s.json" % name)
+
+
 os.makedirs(RESULTS, exist_ok=True)
 seen, plan, dup = set(), [], 0
 for d in sorted(os.listdir(REPOS)):
@@ -65,6 +85,7 @@ for d in sorted(os.listdir(REPOS)):
 # (dac6309df791d209, 571). Но проверка «однажды» стареет, поэтому отпечаток
 # ПЕЧАТАЕТСЯ каждой долей: разойдутся списки — это будет видно в логах, а не
 # останется тихой потерей стратегий.
+ALL_NAMES.extend(n for _, _, n in plan)
 PLAN_MD5 = hashlib.md5(u"|".join(n for _, _, n in plan).encode("utf-8")).hexdigest()[:16]
 mine = [x for i, x in enumerate(plan) if i % SHARDS == SHARD]
 print(u"уникальных стратегий: %d · копий пропущено: %d · доля %d/%d = %d шт · код %s · список %s"
@@ -72,7 +93,7 @@ print(u"уникальных стратегий: %d · копий пропуще
 plan = mine
 done = 0
 for repo, f, n in plan:
-    out = os.path.join(RESULTS, n + ".json")
+    out = card_path(n)
     if os.path.exists(out):
         continue
     try:

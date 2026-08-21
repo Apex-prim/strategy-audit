@@ -1,0 +1,19 @@
+# NASOSRv6_private_Reinuvader_20211121
+
+Источник: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-strategies) · файл `NASOSRv6_private_Reinuvader_20211121.py`
+
+## Результат
+
+**НЕ ПРИМЕНИМА** — numpy.exceptions.DTypePromotionError: The DType <class 'numpy.dtypes.StrDType'> could not be promoted by <class 'numpy.dtypes._PyFloatDType'>. This means that n
+
+## Проверки
+
+| проверка | итог | подробности |
+|---|---|---|
+| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Fatal exception! |
+| рекурсия индикаторов (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | Fatal exception! |
+| прогрев занижен | ⚠ НАЙДЕНО | объявлено 400, нужно не менее 1440 |
+
+---
+
+*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **5m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*

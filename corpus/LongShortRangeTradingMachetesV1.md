@@ -1,0 +1,19 @@
+# LongShortRangeTradingMachetesV1
+
+Источник: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · файл `LongShortRangeTradingMachetesV1-1.py`
+
+## Результат
+
+**НЕ ПРИМЕНИМА** — TypeError: NDFrame.replace() got an unexpected keyword argument 'method'
+
+## Проверки
+
+| проверка | итог | подробности |
+|---|---|---|
+| заглядывание в будущее (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | код 1 |
+| рекурсия индикаторов (родной детектор freqtrade) | · НЕ ПРИМЕНИМА | код 1 |
+| прогрев не объявлен | ⚠ НАЙДЕНО | самый длинный индикатор 14 свечей, startup_candle_count не задан (по умолчанию 0) |
+
+---
+
+*Прогон настоящим freqtrade, комиссия 0.1% за сторону, 8 пар к USDT, таймфрейм **1m**. Окно автора 2018-03-01…2020-03-01, вне выборки 2020-03-01…2026-08-20. «Не смогли проверить» нигде не печатается как «чисто».*
