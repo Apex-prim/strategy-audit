@@ -88,10 +88,10 @@ have nothing left in the window their own author chose** — two negative, one a
 metric `MACDCrossoverWithTrend` read −0.01 and the claim was "three of five turn
 negative". It is two, plus one at zero. The weaker version is the correct one.*
 
-**[BASELINE.md](BASELINE.md) — thirteen corpus strategies pass every statistical
-test in this repository, and none of them beats buy-and-hold.** Interim result
-from a quarter of the sweep; it is the clearest demonstration of why the baseline
-column exists at all.
+**[BASELINE.md](BASELINE.md) — forty-four corpus strategies pass every
+statistical test in this repository, and none of them beats buy-and-hold.**
+Full sweep, 571 strategies. By the statistics most people use, 14.8% survive; by
+one free column they skip, 0% do.
 
 Per-strategy cards: **[results/INDEX.md](results/INDEX.md)**
 Full write-up: **[ANALYSIS.md](ANALYSIS.md)** · [на русском](ANALYSIS.ru.md)
@@ -257,7 +257,10 @@ across every public freqtrade strategy that can be found and loaded.
 repositories cloned          10
 strategy classes found     1055
 unique after dedup          571   (484 are copies — Schism alone appears in 16 repos)
-audited so far              see results/INDEX.md
+swept                       571   complete
+produced numbers            319   the other 246 are categorised by cause
+passed every stat test       46   of which 2 have look-ahead bias
+beat buy-and-hold             0   see BASELINE.md
 ```
 
 ### A methodological defect found in this project, before publication
