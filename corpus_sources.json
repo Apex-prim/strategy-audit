@@ -1,0 +1,271 @@
+{
+ "repos": [
+  {
+   "repo": "PeetCrypto/freqtrade-stuff",
+   "classes": 346,
+   "first": 312
+  },
+  {
+   "repo": "davidzr/freqtrade-strategies",
+   "classes": 464,
+   "first": 166
+  },
+  {
+   "repo": "TheoBrigitte/freqtrade",
+   "classes": 220,
+   "first": 117
+  },
+  {
+   "repo": "jaredrsommer/freqtradestrategies",
+   "classes": 558,
+   "first": 77
+  },
+  {
+   "repo": "mlsys-io/PortfolioBench",
+   "classes": 67,
+   "first": 66
+  },
+  {
+   "repo": "Foxel05/freqtrade-stuff",
+   "classes": 31,
+   "first": 31
+  },
+  {
+   "repo": "markdregan/FreqAI-Marcos-Lopez-De-Prado",
+   "classes": 27,
+   "first": 25
+  },
+  {
+   "repo": "MelvynClark/Freqtrade-Strategy",
+   "classes": 21,
+   "first": 21
+  },
+  {
+   "repo": "werkkrew/freqtrade-strategies",
+   "classes": 50,
+   "first": 8
+  },
+  {
+   "repo": "freqtrade/freqtrade-strategies",
+   "classes": 68,
+   "first": 7
+  },
+  {
+   "repo": "flaviosiotto/freqtrade-strategy",
+   "classes": 8,
+   "first": 7
+  },
+  {
+   "repo": "mikedigriz/freqtrade-strategy-mikedigriz",
+   "classes": 7,
+   "first": 7
+  },
+  {
+   "repo": "eovie/freqtrade_strs",
+   "classes": 11,
+   "first": 6
+  },
+  {
+   "repo": "iterativv/NostalgiaForInfinity",
+   "classes": 10,
+   "first": 6
+  },
+  {
+   "repo": "nateemma/strategies",
+   "classes": 9,
+   "first": 6
+  },
+  {
+   "repo": "MMR-19/freqtrade-strategies",
+   "classes": 7,
+   "first": 6
+  },
+  {
+   "repo": "ShahAnuj2610/my-freqtrade",
+   "classes": 54,
+   "first": 5
+  },
+  {
+   "repo": "DutchCryptoDad/FreqtradeBotStrategyDevelopmentForBeginners",
+   "classes": 4,
+   "first": 4
+  },
+  {
+   "repo": "phuchust/freqtrade_strategy",
+   "classes": 24,
+   "first": 2
+  },
+  {
+   "repo": "bustillo/freqtrade-strategies",
+   "classes": 3,
+   "first": 2
+  },
+  {
+   "repo": "DonaldSimpson/remora-freqtrade",
+   "classes": 2,
+   "first": 2
+  },
+  {
+   "repo": "anakein/beastbotXB",
+   "classes": 2,
+   "first": 2
+  },
+  {
+   "repo": "ingpawat/freqtrade-strategy-with-backtest",
+   "classes": 2,
+   "first": 2
+  },
+  {
+   "repo": "ShahAnuj2610/my-freqtrade-nfi-nextgen",
+   "classes": 4,
+   "first": 1
+  },
+  {
+   "repo": "Juusseli/Trade",
+   "classes": 3,
+   "first": 1
+  },
+  {
+   "repo": "botenesp/freqtrade_strategies",
+   "classes": 2,
+   "first": 1
+  },
+  {
+   "repo": "jerome-benoit/freqai-strategies",
+   "classes": 2,
+   "first": 1
+  },
+  {
+   "repo": "obseries/freqtrade-strategy-ichiv1",
+   "classes": 2,
+   "first": 1
+  },
+  {
+   "repo": "Bananajoexxc/RegimeFilterStrategy-Freqtrade",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "HeyMrRobot/Freqtrade-Adaptive-Renko-Strategy",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "Lijunnan0113/Lijunnan0113-Lijunnan_Freqtrade_Strategy",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "Mohamed-sm/Freqtrade-RLStrategy-IA",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "TomtomEh/freqtrade-websocket",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "djienne/COPY_WALLET_HYPERLIQUID",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "keithorange/FreqTradeCustomOrders",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "seannowotny/FlawlessVictoryPort",
+   "classes": 1,
+   "first": 1
+  },
+  {
+   "repo": "keithorange/HUGE_FreqTrade_Strategy_Collection",
+   "classes": 477,
+   "first": 0
+  },
+  {
+   "repo": "p-zombie/freqtrade",
+   "classes": 35,
+   "first": 0
+  },
+  {
+   "repo": "i1ya/freqtrade-strategies",
+   "classes": 8,
+   "first": 0
+  },
+  {
+   "repo": "devbootstrap/optimize-trading-strategy-using-freqtrade",
+   "classes": 5,
+   "first": 0
+  },
+  {
+   "repo": "hansen1015/freqtrade_strategy",
+   "classes": 5,
+   "first": 0
+  },
+  {
+   "repo": "nancyjimenezbnoewowo/NostalgiaForInfinity",
+   "classes": 5,
+   "first": 0
+  },
+  {
+   "repo": "cyberjunky/freqtrade_strategy",
+   "classes": 3,
+   "first": 0
+  },
+  {
+   "repo": "jilv220/BB_RPB_TSL",
+   "classes": 3,
+   "first": 0
+  },
+  {
+   "repo": "devbootstrap/freqtrade-hyperopt-running-in-cloud-example",
+   "classes": 2,
+   "first": 0
+  },
+  {
+   "repo": "imsatoshi/GeneTrader",
+   "classes": 2,
+   "first": 0
+  },
+  {
+   "repo": "keryc/crypto-bot",
+   "classes": 2,
+   "first": 0
+  },
+  {
+   "repo": "mohammadmoth/Freqtrade-Strategy",
+   "classes": 2,
+   "first": 0
+  },
+  {
+   "repo": "Rikj000/MoniGoMani",
+   "classes": 1,
+   "first": 0
+  },
+  {
+   "repo": "froggleston/cryptofrog-strategies",
+   "classes": 1,
+   "first": 0
+  },
+  {
+   "repo": "freqtrade/berlinguyinca-trading-strategies",
+   "classes": 0,
+   "first": 0
+  },
+  {
+   "repo": "raphant/lazyft",
+   "classes": 0,
+   "first": 0
+  },
+  {
+   "repo": "yalcin/freqtrade-mcp",
+   "classes": 0,
+   "first": 0
+  }
+ ],
+ "unique": 900,
+ "occurrences": 2567
+}
