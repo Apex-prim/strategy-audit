@@ -41,6 +41,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # КОНВЕЙЕР — ровно эти модули считают опубликованные числа.
 PIPELINE = [
+    "totality.py",
     "harness.py",        # измерение: движок, оба окна, оба прибора
     "corpus.py",         # свип корпуса долями
     "ledger.py",         # реестр: строка на стратегию, эпохи решений

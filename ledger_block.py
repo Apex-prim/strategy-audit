@@ -41,6 +41,43 @@ LADDER = [
 ]
 EPOCHS = ["E0", "E1", "E2", "E3", "E4", "E5", "E6"]
 GATE_EPOCH = dict((k, e) for k, e, _d in LADDER)
+
+def beats(r):
+    u"""Обошла ли «купил и держал»: True / False / None.
+
+    ⚠ 22.08, свойство ТОТАЛЬНОСТИ (totality.py). Раньше здесь стояло
+    `r.get("beats_bh")` прямо в условии: у 399 строк из 895 поле ПУСТО —
+    стратегия не измерялась, — и пустое молча читалось как «НЕ обошла».
+    «Не знаю» схлопывалось в «нет». Ни одна из 399 не доходит до места
+    подсчёта, поэтому опубликованные числа не менялись, но частичная
+    функция здесь БЫЛА. Теперь неизвестность — отдельное значение.
+    """
+    v = r.get("beats_bh")
+    # ⚠ вход приходит ДВУХ видов: из CSV — строкой, из ledger.py в памяти —
+    # настоящим bool. Первая версия знала только строку и падала на bool:
+    # чиня частичность, я ввёл новую. Тотальность = определённый ответ на
+    # КАЖДЫЙ вид входа, а не только на ожидаемый.
+    if isinstance(v, bool):
+        return v
+    if v is None:
+        return None
+    v = ("%s" % v).strip()
+    if v in (u"True", u"1", u"true"):
+        return True
+    if v in (u"False", u"0", u"false"):
+        return False
+    return None
+
+
+def n_beat(rows):
+    u"""Считаем только ЗНАЯ. Незнание не прибавляется ни к одной стороне."""
+    return sum(1 for r in rows if beats(r) is True)
+
+
+def n_beat_unknown(rows):
+    return sum(1 for r in rows if beats(r) is None)
+
+
 GATE_ORDER = dict((k, i) for i, (k, _e, _d) in enumerate(LADDER))
 ALPHA = 0.05
 
@@ -213,12 +250,12 @@ def claims(rows, n_repo):
         # Потребитель, читающий таблицу по ключу, молча терял одну из них.
         # Ключ машинной таблицы обязан быть уникальным — иначе она не машинная.
         ("beat buy-and-hold under pre-registered rules",
-         sum(1 for r in e0 if r.get("beats_bh")), PREREG, "E0",
+         n_beat(e0), PREREG, "E0",
          "freqtrade Market change"),
         ("survivors under the full rule set", len(e4), REPAIR, "E0+E1+E2+E3+E4",
          "E1 fixed after the data; see LEDGER.md"),
         ("beat buy-and-hold under the full rule set",
-         sum(1 for r in e4 if r.get("beats_bh")), REPAIR, "E0+E1+E2+E3+E4",
+         n_beat(e4), REPAIR, "E0+E1+E2+E3+E4",
          "freqtrade Market change"),
         ("BH rejections", k_bh, EXPLORATORY, "E4",
          "multiplicity added after external review"),
@@ -261,9 +298,10 @@ def build(rows, n_repo):
     L.append(u"survivors under each decision set")
     for ep in EPOCHS:
         s = survivors_at(rows, ep)
-        beat = [r for r in s if r.get("beats_bh")]
-        L.append(u"  rules declared up to %s   survivors %4d   beat buy-and-hold %3d"
-                 % (ep, len(s), len(beat)))
+        beat, unk = n_beat(s), n_beat_unknown(s)
+        L.append(u"  rules declared up to %s   survivors %4d   beat buy-and-hold %3d%s"
+                 % (ep, len(s), beat,
+                    u"   (unknown %d)" % unk if unk else u""))
     L.append(u"")
     L.append(u"Benjamini-Hochberg threshold %s over %d tests, %d rejected"
              % ((u"%.3e" % thr) if k_bh else u"none", n_bh, k_bh))

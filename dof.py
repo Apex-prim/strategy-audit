@@ -131,7 +131,11 @@ def main():
         b = r["runs"]["out_sample"].get("summary")
         if not isinstance(a, dict) or a.get("trades") is None:
             continue
-        m = measure(where.get(r["strategy"], ""), r["strategy"]) if where.get(r["strategy"]) else None
+        # `where` строится полным обходом repos/ ДО этого цикла, поэтому
+        # отсутствие ключа — определённый ответ «файла стратегии в корпусе
+        # нет», а не «не знаю». Семантика объявлена, проверка на месте:
+        # уносить её в переменную нельзя — это прячет её от totality.py.
+        m = measure(where.get(r["strategy"], ""), r["strategy"]) if where.get(r["strategy"]) else None  # TOTAL: полный обход repos/
         if not m:
             continue
         e1 = a.get("expectancy")

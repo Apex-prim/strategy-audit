@@ -28,10 +28,15 @@ taking anyone's word.
 
 ## 3. The result it produced
 
-Six strategies reached the gate. Five cleared the effect-size gate before it.
-**None cleared `G12`.** Over the full window they return +38.6% to +159.6%
-against buy-and-hold's +346.3% — a shortfall of 187 to 308 percentage points of
+Fourteen strategies reached the gate. Ten cleared the effect-size gate before
+it. **None cleared `G12`.** Over the full window they return +38.6% to +156.6%
+against buy-and-hold's +346.3% — a shortfall of 190 to 308 percentage points of
 cumulative return.
+
+*Those were six and five until 2026-08-22, when the trap rule was corrected to
+the community's own definition and stopped disqualifying eight strategies it
+should never have counted. The verdict at `G12` did not move — that was checked
+before the rule was changed, and it is the whole point of this document.*
 
 ## 4. When the regime dependence was found
 

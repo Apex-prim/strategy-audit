@@ -58,8 +58,8 @@ return code behind them rather than a promise.
 ## Two numbers, and the order they were decided in
 
 Read the last table again. Under the rules **declared before the sweep**, 66
-strategies survive and **four beat the market**. Under the full rule set, six
-survive and **none** does.
+strategies survive and **four beat the market**. Under the full rule set,
+fourteen survive and **none** does.
 
 Both are published because the difference is not a better measurement — it is
 the same measurement under a rule that was chosen later. Both bias detectors ran

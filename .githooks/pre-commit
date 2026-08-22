@@ -12,3 +12,9 @@ python verify_ledger.py || exit 1
 # This derives the status from git and CORPUS_RUN.json rather than
 # trusting the prose, and refuses a commit where the two disagree.
 python freeze_guard.py || exit 1
+
+# Totality: no check may have an input for which it has no defined answer.
+# Three of the four defects found on 2026-08-22 were the same shape — a partial
+# function with a silent default, and the default was the flattering one. A
+# site is either fixed or its semantics are declared inline with `# TOTAL:`.
+python totality.py || exit 1
