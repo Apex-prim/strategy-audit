@@ -35,6 +35,7 @@ survivors under each decision set
   rules declared up to E4   survivors    6   beat buy-and-hold   0
 
 Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
+Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 6 of 6 survivors still clear it)
 ```
 <!-- LEDGER:END -->
 
@@ -61,6 +62,25 @@ reported returns of **+63,645,298%** and **+29,748,386%**.
 That is a degree of freedom left open in the pre-registration and closed after
 the data — smaller than inventing a detector, and still real. It is spelled out,
 with dates from `git log`, in **[LEDGER.md](LEDGER.md)**.
+
+Transparency does not convert a post-hoc decision into a pre-registered one.
+The only thing that does is fixing the rule before the next numbers exist, so
+**[PREREGISTRATION.md](PREREGISTRATION.md)** freezes all eleven gates, their
+thresholds and the primary endpoint for the next corpus — committed before that
+corpus is swept, with both dates checkable in `git log`.
+
+Which class each published number belongs to is a field, not a paragraph:
+**[CLAIMS.csv](CLAIMS.csv)** marks every figure as descriptive,
+pre-registered, repair-adjusted or exploratory, with the epochs it depends on.
+Two of the ten are pre-registered. Two are repair-adjusted. A paragraph has no
+return code; a column can be checked.
+
+**Dependence.** Benjamini-Hochberg controls FDR under independence or positive
+dependence of a particular kind — and 65% of this corpus is copies, so that
+guarantee formally does not apply. Benjamini-Yekutieli, which holds under
+*arbitrary* dependence, is therefore reported alongside it. Its threshold is
+5.0× stricter and **all six survivors still clear it**. The conclusion does not
+rest on the dependence assumption.
 
 ## Where the corpus actually dies
 

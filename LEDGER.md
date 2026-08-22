@@ -78,6 +78,7 @@ survivors under each decision set
   rules declared up to E4   survivors    6   beat buy-and-hold   0
 
 Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
+Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 6 of 6 survivors still clear it)
 ```
 
 ## Reading the ladder

@@ -80,7 +80,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 import traps as traps_mod
 from harness import find_strategies
 from ledger_block import (ALPHA, EPOCHS, GATE_EPOCH, LADDER, bh, bh_population,
-                          build, survivors_at)
+                          build, claims, survivors_at)
 
 FOUND = u"НАЙДЕНО"
 BEGIN = u"<!-- LEDGER:BEGIN -->"
@@ -424,6 +424,14 @@ def main():
             print(u"Сначала пересчитайте всё одной версией харнесса.")
             return 1
         write_csv(rows, os.path.join(repo_dir, "LEDGER.csv"))
+        # класс каждого утверждения — машинно, файлом, а не абзацем
+        with io.open(os.path.join(repo_dir, "CLAIMS.csv"), "w",
+                     encoding="utf-8", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["claim", "value", "class", "epochs_required", "source"])
+            for row in claims(rows, n_repos()):
+                w.writerow(row)
+        print(u"записан CLAIMS.csv — класс каждого числа")
         io.open(os.path.join(repo_dir, "LEDGER.md"), "w",
                 encoding="utf-8").write(ledger_md(rows, blk))
         rp = os.path.join(repo_dir, "README.md")

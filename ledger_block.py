@@ -56,6 +56,37 @@ def bh(pvals, alpha=ALPHA):
     return (s[k - 1] if k else 0.0), k
 
 
+
+def by(pvals, alpha=ALPHA):
+    u"""Бенджамини–Йекутиели: FDR при ПРОИЗВОЛЬНОЙ зависимости.
+
+    ЗАЧЕМ ДОБАВЛЕНО (22.08, после внешнего разбора). BH держит FDR при
+    независимости или положительной зависимости определённого класса. У нас
+    65% корпуса — копии, то есть структура зависимости произвольна, и гарантия
+    BH формально не действует. Мы записали это ограничение в multiplicity.py
+    ещё 21.08, но записать ограничение — не то же самое, что снять его.
+
+    BY снимает: тот же ход, порог делится на гармоническое число H_n. Ценой
+    строгости — при n=81 это в 4.98 раза более жёсткий порог.
+
+    ⚠ ЭТО ПРАВИЛО ЭПОХИ E5: добавлено ПОСЛЕ данных, по внешнему замечанию.
+    Оно НЕ вводится как ступень лестницы — оно ничего не меняет (все шесть
+    выживших проходят и его), и вводить ступень, чтобы получить тот же ответ,
+    значило бы наращивать степени свободы без нужды. Печатается как проверка
+    устойчивости рядом с BH.
+    """
+    n = len(pvals)
+    if not n:
+        return 0.0, 0
+    h = sum(1.0 / i for i in range(1, n + 1))
+    s = sorted(pvals)
+    k = 0
+    for i, v in enumerate(s, 1):
+        if v <= alpha * i / (n * h):
+            k = i
+    return (s[k - 1] if k else 0.0), k
+
+
 def alive_at(row, gate):
     u"""Дожила ли строка ДО этой ступени (не пройдя её ещё)."""
     d = row.get("dropped_at") or ""
@@ -140,6 +171,52 @@ def repos_plausible(n_repo, n_rows):
     return None
 
 
+
+# ── класс утверждения: машинно, а не прозой ──────────────────────────────
+# Внешний разбор 22.08: «отделить descriptive / exploratory / confirmatory
+# МАШИННО, а не только словами». Справедливо: до сих пор класс жил в тексте,
+# а текст не имеет кода возврата. Здесь каждое публикуемое число несёт свой
+# класс и список эпох, без которых оно не существует.
+DESCRIPTIVE = "descriptive"      # счёт того, что есть; решений не требует
+REPAIR = "repair-adjusted"       # правило доопределено ПОСЛЕ данных
+EXPLORATORY = "exploratory"      # правило пришло после данных извне
+PREREG = "pre-registered"        # правило объявлено ДО прогона
+
+
+def claims(rows, n_repo):
+    u"""Публикуемые утверждения с их классом. Одна строка — одно число."""
+    thr, k_bh = bh(bh_population(rows))
+    thr_by, k_by = by(bh_population(rows))
+    e0 = survivors_at(rows, "E0")
+    e4 = survivors_at(rows, "E4")
+    held = sum(1 for r in e4
+               if r.get("os_p") is not None and r["os_p"] <= thr_by)
+    out = [
+        ("strategies in corpus", len(rows), DESCRIPTIVE, "-",
+         "census of what could be found and loaded"),
+        ("repositories swept", n_repo, DESCRIPTIVE, "-",
+         "corpus_sources.json"),
+        ("negative in the author's own window", 
+         sum(1 for r in rows if (r.get("dropped_at") or "") == "G2_is_pos"),
+         DESCRIPTIVE, "-", "ladder gate G2"),
+        ("survivors under pre-registered rules", len(e0), PREREG, "E0",
+         "CHECKLIST.md 2026-08-20 15:00, commit 4d5a937"),
+        ("of those, beat buy-and-hold", sum(1 for r in e0 if r.get("beats_bh")),
+         PREREG, "E0", "freqtrade Market change"),
+        ("survivors under the full rule set", len(e4), REPAIR, "E0+E1+E2+E3+E4",
+         "E1 fixed after the data; see LEDGER.md"),
+        ("of those, beat buy-and-hold", sum(1 for r in e4 if r.get("beats_bh")),
+         REPAIR, "E0+E1+E2+E3+E4", "freqtrade Market change"),
+        ("BH rejections", k_bh, EXPLORATORY, "E4",
+         "multiplicity added after external review"),
+        ("BY rejections (arbitrary dependence)", k_by, EXPLORATORY, "E5",
+         "added 2026-08-22 after external review"),
+        ("survivors still clearing BY", held, EXPLORATORY, "E5",
+         "robustness of the repair-adjusted result"),
+    ]
+    return out
+
+
 def build(rows, n_repo):
     u"""Тот самый блок, который лежит в README между маркерами."""
     codes = sorted(set(r.get("code_md5") or "" for r in rows))
@@ -177,5 +254,13 @@ def build(rows, n_repo):
     L.append(u"")
     L.append(u"Benjamini-Hochberg threshold %s over %d tests, %d rejected"
              % ((u"%.3e" % thr) if k_bh else u"none", n_bh, k_bh))
+    thr_by, k_by = by(bh_population(rows))
+    surv_e4 = survivors_at(rows, "E4")
+    held = sum(1 for r in surv_e4
+               if r.get("os_p") is not None and r["os_p"] <= thr_by)
+    L.append(u"Benjamini-Yekutieli  threshold %s, %d rejected  "
+             u"(arbitrary dependence; %d of %d survivors still clear it)"
+             % ((u"%.3e" % thr_by) if k_by else u"none", k_by,
+                held, len(surv_e4)))
     L.append(u"```")
     return u"\n".join(L)
