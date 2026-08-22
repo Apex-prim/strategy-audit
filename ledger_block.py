@@ -209,12 +209,17 @@ def claims(rows, n_repo):
          DESCRIPTIVE, "-", "ladder gate G2"),
         ("survivors under pre-registered rules", len(e0), PREREG, "E0",
          "CHECKLIST.md 2026-08-20 15:00, commit 4d5a937"),
-        ("of those, beat buy-and-hold", sum(1 for r in e0 if r.get("beats_bh")),
-         PREREG, "E0", "freqtrade Market change"),
+        # ⚠ 22.08: обе строки назывались одинаково «of those, beat buy-and-hold».
+        # Потребитель, читающий таблицу по ключу, молча терял одну из них.
+        # Ключ машинной таблицы обязан быть уникальным — иначе она не машинная.
+        ("beat buy-and-hold under pre-registered rules",
+         sum(1 for r in e0 if r.get("beats_bh")), PREREG, "E0",
+         "freqtrade Market change"),
         ("survivors under the full rule set", len(e4), REPAIR, "E0+E1+E2+E3+E4",
          "E1 fixed after the data; see LEDGER.md"),
-        ("of those, beat buy-and-hold", sum(1 for r in e4 if r.get("beats_bh")),
-         REPAIR, "E0+E1+E2+E3+E4", "freqtrade Market change"),
+        ("beat buy-and-hold under the full rule set",
+         sum(1 for r in e4 if r.get("beats_bh")), REPAIR, "E0+E1+E2+E3+E4",
+         "freqtrade Market change"),
         ("BH rejections", k_bh, EXPLORATORY, "E4",
          "multiplicity added after external review"),
         ("BY rejections (arbitrary dependence)", k_by, EXPLORATORY, "E5",
