@@ -311,10 +311,10 @@ Caveats, stated rather than omitted:
 
 ## Corrections
 
-Nine errors in this audit have been found, published and fixed — including a
+Ten errors in this audit have been found, published and fixed — including a
 metric that was not scale-free, a claim about five strategies made from the one
 I was looking at, and a consistency check that could not catch its own error
-because both sides used the same wrong formula.
+because both sides used the same wrong formula, and a "trap" of my own invention that a reader correctly refuted within hours of publication.
 
 They are collected in **[CORRECTIONS.md](CORRECTIONS.md)**, with what each one
 changed. An audit that hides its own corrections is asking for a trust it has

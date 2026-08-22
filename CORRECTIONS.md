@@ -172,3 +172,42 @@ before that layer existed carry no such field, so the absent value read as
 
 It now fails a strategy whose duration was never measured. Absence of a flag is
 not absence of the defect.
+
+---
+
+## A "trap" that was not one (2026-08-22)
+
+I claimed a tenth trap of my own, not in the community's list: an average trade
+shorter than the strategy's own candle. The reasoning was that the engine knows
+a candle's high and low but not which came first, so same-candle fills are an
+assumption — **"and the assumption is usually the flattering one."**
+
+`stash`, in the freqtrade Discord, replied: *"It's not really a trap."*
+
+He was right, and the code says so. `backtesting.py`, on a trailing stop
+triggering inside the entry candle:
+
+```python
+# Special case: trailing triggers within same candle as trade opened. Assume most
+# pessimistic price movement, which is moving just enough to arm stoploss and
+# immediately going down to stop price.
+```
+
+and the result is clamped to the candle low so the fill stays realistic —
+*"worst realistic case"*, in the source's own words. **freqtrade errs against
+the strategy, not for it.** The flattery claim was simply false.
+
+The scale was wrong too. Of 895 strategies, 496 had a measurable duration and
+**exactly one** traded below its own candle. Gate `G9_candle` has disqualified
+nobody.
+
+**What survives** is weaker and worth keeping: a strategy trading below the
+resolution of its own data rests on the engine's model rather than on an
+observed price sequence. Since that model is documented and conservative, it is
+a reliability caveat, not a flattered number — and the fix is finer data, not an
+argument about the model.
+
+The gate stays as a reliability flag, its wording is corrected in
+[CHECKLIST.md](CHECKLIST.md) and on every card, and the claim it once carried is
+withdrawn. Found by a reader, in public, within hours of publication — which is
+the entire reason for publishing.

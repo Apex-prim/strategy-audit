@@ -200,12 +200,28 @@ which pairs are missing and say so alongside the number.
 
 Divide the average trade duration by your timeframe. If the answer is close to
 one — or below it — a large part of your result was produced *inside* single
-candles, where a candle-level backtest is guessing.
+candles, where the engine is modelling rather than replaying.
 
-The engine knows the open, high, low and close of a candle. It does not know
-which of the high and the low came first. When an entry and its exit fall in the
-same candle, the fill prices the engine chooses are an assumption, not a
-measurement, and the assumption is usually the flattering one.
+> **Corrected 2026-08-22, after `stash` in the freqtrade Discord said "it's not
+> really a trap".** He was right and the original wording here was wrong. It
+> said the engine's same-candle assumption is "usually the flattering one".
+> Reading `backtesting.py` shows the opposite for freqtrade: for a trailing stop
+> triggering in the entry candle it takes the **most pessimistic** path —
+> *"moving just enough to arm stoploss and immediately going down to stop
+> price"* — and it clamps the result to the candle low so the fill stays
+> realistic. The engine errs against the strategy, not for it.
+
+What survives is weaker and still worth knowing: **a strategy whose average
+trade is shorter than its own candle is operating below the resolution of its
+data.** Its result rests on the engine's modelling assumptions rather than on an
+observed sequence of prices. Those assumptions are documented and conservative,
+so this is a *reliability* caveat, not a flattery trap — and if the number
+matters to you, the answer is to re-run on finer data, not to argue about the
+model.
+
+Scale: in a corpus of 895 strategies, 496 had a measurable duration and
+**exactly one** traded below its own candle. It is a rare condition, and this
+question is here for the case where it applies, not because it is common.
 
 **How to check:** freqtrade prints `Avg. Duration` in the `ENTER TAG STATS`
 table. Compare it with your timeframe.

@@ -152,10 +152,12 @@ def card(r):
                     and s.get("dur_over_candle") < 1.0:
                 L.append(u"")
                 L.append(u"⚠ **Trades close inside their own candle (%s): "
-                         u"average hold %.2f candles.** The engine knows a "
-                         u"candle's high and low but not which came first, so "
-                         u"these fills are an assumption rather than a "
-                         u"measurement." % (lab, s["dur_over_candle"]))
+                         u"average hold %.2f candles.** The result rests on the "
+                         u"engine's same-candle model rather than on an observed "
+                         u"price sequence. freqtrade resolves that case "
+                         u"pessimistically, so this is a reliability caveat, not "
+                         u"a flattered number — but it is below the resolution of "
+                         u"its own data." % (lab, s["dur_over_candle"]))
         if isinstance(b, dict) and b.get("dur_over_candle") is None:
             L.append(u"")
             L.append(u"*Trade duration was not measured on this card — the "

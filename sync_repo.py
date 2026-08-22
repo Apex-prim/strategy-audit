@@ -136,11 +136,23 @@ def main():
     for f in missing + differ:
         shutil.copy2(os.path.join(_ROOT, f), os.path.join(REPO, f))
         print(u"скопирован %s" % f)
-    for f in orphans:
-        os.remove(os.path.join(REPO, f))
-        print(u"удалён сирота %s" % f)
+    # ⚠ 22.08: прежняя версия УДАЛЯЛА сирот сама и снесла freeze_guard.py —
+    # файл, добавленный в список только во второй копии этого же скрипта.
+    # Это повтор класса «инструмент владеет общей папкой» (17.08, rmtree и
+    # .docx оператора). Удаление теперь требует ОТДЕЛЬНОГО флага, а по
+    # умолчанию сироты НАЗЫВАЮТСЯ и остаются жить.
+    if orphans and "--delete-orphans" not in sys.argv:
+        print(u"⚠ сироты НЕ удалены — нужен явный --delete-orphans:")
+        for f in orphans:
+            print(u"     %s" % f)
+        print(u"  прежде чем удалять, проверьте, не забыт ли файл в списке")
+    elif orphans:
+        for f in orphans:
+            os.remove(os.path.join(REPO, f))
+            print(u"удалён сирота %s" % f)
     print(u"готово: %d скопировано, %d удалено"
-          % (len(missing) + len(differ), len(orphans)))
+          % (len(missing) + len(differ),
+             len(orphans) if "--delete-orphans" in sys.argv else 0))
     return 0
 
 
