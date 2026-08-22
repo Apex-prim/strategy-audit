@@ -22,4 +22,4 @@ Declared timeframe: `none declared`. This is a named cause, not a verdict on the
 
 *Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **undetermined** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
 
-*Code fingerprint `8d9b3a08743f` · strategy list `d43e19f4fcbe76b6`*
+*Code fingerprint `590bf74986c5` · strategy list `a039f448c17bed72`*

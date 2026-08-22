@@ -5,7 +5,7 @@ Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-s
 ## Could not be measured
 
 ```
-Impossible to load Strategy 'CryptoFrogHO'. This class does not exist or contains Python code errors.
+TypeError: IStrategy.min_roi_reached_entry() missing 2 required positional arguments: 'trade_dur' and 'current_time'
 ```
 
 Declared timeframe: `5m`. This is a named cause, not a verdict on the strategy — see the note on buckets in [../BASELINE.md](../BASELINE.md).
@@ -14,7 +14,7 @@ Declared timeframe: `5m`. This is a named cause, not a verdict on the strategy �
 
 | check | result | detail |
 |---|---|---|
-| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | код 1 |
 | indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
 | прогрев не объявлен | **found** | самый длинный индикатор 20 свечей, startup_candle_count не задан (по умолчанию 0) |
 
@@ -22,4 +22,4 @@ Declared timeframe: `5m`. This is a named cause, not a verdict on the strategy �
 
 *Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
 
-*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*
+*Code fingerprint `590bf74986c5` · strategy list `a039f448c17bed72`*

@@ -1,29 +1,37 @@
 # SMAOffsetProtectOptV1
 
-Source: [`PeetCrypto/freqtrade-stuff`](https://github.com/PeetCrypto/freqtrade-stuff) · file `SMAOffsetProtectOptV1.py`
+Source: [`Foxel05/freqtrade-stuff`](https://github.com/Foxel05/freqtrade-stuff) · file `SMAOffsetProtectOptV1.py`
 
 ## Result
 
 | metric | author's window | out of sample |
 |---|---|---|
-| trades | 36 | 243 |
-| expectancy per trade (USDT) | 0.53 | 1.48 |
-| mean profit p-value | 0.1118 | 7.796e-05 |
+| trades | 22 | 181 |
+| average profit per trade % | -1.34 | 2.42 |
+| win rate % | 54.5 | 77.3 |
+| average trade duration, minutes | 131.0 | 112.0 |
+| duration measured in own candles | 26.2 | 22.4 |
+| expectancy per trade (USDT) | -1.67 | 3.81 |
+| mean profit p-value | 0.3603 | 4.841e-06 |
 | market change % (baseline) | -58.37 | 346.34 |
-| strategy total % | 1.9 | 35.87 |
-| Sharpe | 0.26 | 0.51 |
-| Sortino | 0.27 | 0.3 |
-| max drawdown % | 0.61 | 4.03 |
-| profit factor | 1.99 | 3.43 |
+| strategy total % | -3.66 | 69.04 |
+| Sharpe | -0.12 | 0.51 |
+| Sortino | -0.13 | 0.68 |
+| max drawdown % | 5.06 | 3.93 |
+| profit factor | 0.57 | 3.26 |
 
-**Retained out of sample: 279%**
+**Retained out of sample: n/a**
 
-> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
+> **Read that number with care.** The author's window was a bear market (buy-and-hold −58%) and the out-of-sample window a bull market (+346%). For a long-biased strategy this ratio rewards having done *badly* in 2018–2020, so it measures regime luck as much as robustness. The regime-free comparison is the excess over buy-and-hold, below.
 
-⚠ **Not statistically significant in its author's own window** (p = 0.1118 > 0.05): the average trade is not distinguishable from zero.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free either. Cross-strategy comparisons in this repository use average profit per trade in percent.
 
-Baseline: buy-and-hold on the same pairs returned **-58.37%**; the strategy returned **1.9%**.
-Out of sample: buy-and-hold **346.34%** vs strategy **35.87%** — loses to it.
+**Excess over buy-and-hold** (regime-free): author's window **+54.7 pp**, out of sample **-277.3 pp**.
+
+⚠ **Not statistically significant in its author's own window** (p = 0.3603 > 0.05): the average trade is not distinguishable from zero.
+
+Baseline: buy-and-hold on the same pairs returned **-58.37%**; the strategy returned **-3.66%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **69.04%** — loses to it.
 
 ## Checks
 
@@ -38,4 +46,4 @@ Out of sample: buy-and-hold **346.34%** vs strategy **35.87%** — loses to it.
 
 *Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
 
-*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*
+*Code fingerprint `590bf74986c5` · strategy list `a039f448c17bed72`*

@@ -88,13 +88,15 @@ have nothing left in the window their own author chose** — two negative, one a
 metric `MACDCrossoverWithTrend` read −0.01 and the claim was "three of five turn
 negative". It is two, plus one at zero. The weaker version is the correct one.*
 
-**[BASELINE.md](BASELINE.md) — fifty-five corpus strategies pass every
-statistical test in this repository, and none of them beats buy-and-hold.**
-Full sweep, 571 strategies. By the statistics most people use, 17% survive; by
-one free column they skip, 0% do.
+**[BASELINE.md](BASELINE.md) — strategies pass every statistical test in this
+repository, and then fail the one column freqtrade prints for free.** By the
+statistics most people use, a sizeable fraction survives. By `Market change` —
+buy-and-hold on the same pairs over the same window — the survivor count is
+where the argument actually is. The counts themselves are in
+[LEDGER.md](LEDGER.md), regenerated from the pipeline rather than typed here.
 
-**[TRAPS.md](TRAPS.md) — 71% of the strategies that pass every statistical test
-carry at least one backtesting trap that no statistic can see.** Checks built
+**[TRAPS.md](TRAPS.md) — most strategies that pass every statistical test still
+carry a backtesting trap that no statistic can see.** Checks built
 from the freqtrade community's own
 [backtesting-traps](https://brookmiles.github.io/freqtrade-stuff/2021/04/12/backtesting-traps/)
 document, after a member pointed out that bias detectors are not enough.
@@ -137,22 +139,33 @@ what a reader takes from a results table — not what the author did.
 > re-fitting at each step. An earlier version of this README used the wrong
 > word; it is corrected here rather than quietly edited away.
 
-**Auditing your own strategy?** → **[CHECKLIST.md](CHECKLIST.md)** — ten
-mechanical questions, each tied to a defect actually found here — nine in the
-audited strategies, one in this pipeline.
+**Auditing your own strategy?** → **[CHECKLIST.md](CHECKLIST.md)** — thirteen
+mechanical questions, each tied to a defect actually found here — eight in the
+audited strategies, four in this pipeline.
 
 ## Reproduce it yourself
 
 ```bash
 pip install -r requirements.txt
-python fetch_data.py      # ~74k hourly candles per pair from Binance public data
-python replicate.py       # in-sample, out-of-sample, fee sensitivity
+python fetch_bulk.py 1h   # hourly candles per pair, from Binance monthly archives
+python harness.py         # the five case-study strategies: both windows, both detectors
+python ledger.py --csv    # one row per strategy, with provenance; writes LEDGER.csv
 ```
 
 No API key required — the data comes from Binance's public data mirror.
 Nothing here talks to an exchange account.
 
-Expect roughly 15 minutes for the download and 2 minutes for the run.
+Expect roughly 4 minutes for the download and 3 minutes for the five audits.
+The full corpus sweep is `python corpus.py --shard 0/8` (eight processes,
+about 90 minutes on 12 cores).
+
+> Two scripts were **deleted** on 2026-08-21 rather than left lying around:
+> `replicate.py`, a pandas re-implementation this README already described as
+> the wrong way to do it, and `stats.py` and `funnel.py`, both superseded by
+> `ledger.py` and both capable of disagreeing with it. `fetch_data.py` went
+> with them — it fed only the pandas path. They were removed because an external reviewer read the
+> repository and praised `replicate.py` as a strength. Code that is present is
+> code that is believed, whatever the prose says about it.
 
 ## What is deliberately *not* in this repository
 
@@ -250,7 +263,7 @@ Or, in the open:
   that returned 5.896 for a probability, caught before publication because a
   value outside [0,1] means a broken instrument, not a surprising result.
 
-**What you get:** the ten checks in [CHECKLIST.md](CHECKLIST.md) run against
+**What you get:** the thirteen checks in [CHECKLIST.md](CHECKLIST.md) run against
 your code — in-sample and out-of-sample expectancy, p-value, buy-and-hold
 baseline, cost sensitivity, and freqtrade's own bias detectors — plus a written
 finding for anything that does not hold.
@@ -265,15 +278,47 @@ sooner and cheaper.
 This is a growing corpus, not a one-off post. The same procedure is being run
 across every public freqtrade strategy that can be found and loaded.
 
+The block below is **written by `ledger.py`, not by hand**, and a pre-commit
+hook rejects a commit in which it disagrees with a fresh recount. An earlier
+version of this section said *571 strategies, 55 clean* for a day after the
+corpus had grown to 900 — which is exactly the failure this repository was
+built to catch, occurring in the repository itself.
+
+<!-- LEDGER:BEGIN -->
 ```
-repositories cloned          10
-strategy classes found     1055
-unique after dedup          571   (484 are copies — Schism alone appears in 16 repos)
-swept                       571   complete
-produced numbers            344   the other 227 are categorised by cause
-passed every stat test       57   of which 2 have look-ahead bias
-beat buy-and-hold             0   of 55 clean — see BASELINE.md
+generated by ledger.py — do not edit by hand
+harness code md5   590bf74986c5
+corpus plan md5    a039f448c17bed72
+repositories swept   53
+strategies in ledger 895
+
+the ladder, and where the corpus leaves it
+  G0_measured   E0   895 ->  496
+  G1_trades     E0   496 ->  456
+  G2_is_pos     E0   456 ->  158
+  G3_is_sig     E0   158 ->   83
+  G4_os_pos     E0    83 ->   81
+  G5_os_sig     E0    81 ->   72
+  G6_lookahead  E0    72 ->   66
+  G7_recursive  E1    66 ->   15
+  G8_traps      E2    15 ->    6
+  G9_candle     E3     6 ->    6
+  G10_fdr       E4     6 ->    6
+
+survivors under each decision set
+  rules declared up to E0   survivors   66   beat buy-and-hold   4
+  rules declared up to E1   survivors   15   beat buy-and-hold   0
+  rules declared up to E2   survivors    6   beat buy-and-hold   0
+  rules declared up to E3   survivors    6   beat buy-and-hold   0
+  rules declared up to E4   survivors    6   beat buy-and-hold   0
+
+Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
 ```
+<!-- LEDGER:END -->
+
+Full explanation of what these counts mean, and of the one decision made after
+seeing the data: **[LEDGER.md](LEDGER.md)** · machine-readable
+[LEDGER.csv](LEDGER.csv).
 
 ### A methodological defect found in this project, before publication
 
@@ -281,8 +326,10 @@ The corpus sweep was producing numbers that were **silently wrong**, and the
 mechanism is worth writing down because it is the exact failure this repository
 exists to catch.
 
-Only **52 of the 571 strategies declare `timeframe = '1h'`**. The largest group —
-**351** — declares `5m`. Only 1h data had been downloaded.
+Of the 571 strategies in the corpus *at the time* — it has grown since, and
+these two figures are a record of that moment rather than a current count — only
+**52 declare `timeframe = '1h'`**. The largest group, **351**, declares `5m`.
+Only 1h data had been downloaded.
 
 A missing-data run should fail loudly. It did not, because the backtest config
 carried `"timeframe": "1h"`, and **freqtrade's config overrides the timeframe a

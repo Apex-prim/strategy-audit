@@ -5,7 +5,7 @@ Source: [`davidzr/freqtrade-strategies`](https://github.com/davidzr/freqtrade-st
 ## Could not be measured
 
 ```
-Impossible to load Strategy 'redditMA'. This class does not exist or contains Python code errors.
+Timeframe needs to be set in either configuration or as cli argument `--timeframe 5m`
 ```
 
 Declared timeframe: `none declared`. This is a named cause, not a verdict on the strategy — see the note on buckets in [../BASELINE.md](../BASELINE.md).
@@ -14,11 +14,11 @@ Declared timeframe: `none declared`. This is a named cause, not a verdict on the
 
 | check | result | detail |
 |---|---|---|
-| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | вывод не разобран |
-| indicator recursion (freqtrade's own `recursive-analysis`) | clean | рекурсивных отклонений не найдено |
+| look-ahead bias (freqtrade's own `lookahead-analysis`) | could not run | Timeframe needs to be set in either configuration or as cli argument `--timeframe 5m` |
+| indicator recursion (freqtrade's own `recursive-analysis`) | could not run | Timeframe needs to be set in either configuration or as cli argument `--timeframe 5m` |
 
 ---
 
 *Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **undetermined** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
 
-*Code fingerprint `2da4e157b88f` · strategy list `dac6309df791d209`*
+*Code fingerprint `590bf74986c5` · strategy list `a039f448c17bed72`*

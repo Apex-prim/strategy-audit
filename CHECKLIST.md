@@ -1,18 +1,19 @@
-# Ten questions to ask your own backtest
+# Thirteen questions to ask your own backtest
 
 Each corresponds to a defect actually found in the public strategies audited
 here. None requires judgement, a guru, or a paid course.
 
-**Five are a single command. Five are a careful read of your own code.** They
-are marked, because claiming all ten are one-liners would be the same kind of
-overstatement this repository exists to catch.
+**Eight are a single command. Five are a careful read of your own code.** They
+are marked, because claiming all thirteen are one-liners would be the same kind
+of overstatement this repository exists to catch.
 
-    ⌨  one command      1, 2, 3, 4, 7, 10
-    👁  read your code   5, 6, 8, 9
+    ⌨  one command      1, 2, 3, 4, 7, 10, 11, 12
+    👁  read your code   5, 6, 8, 9, 13
 
-Nine come from defects found in the public strategies audited here. **Number 10
-comes from a defect found in this project's own pipeline** — which is exactly
-why it is in the list.
+Eight come from defects found in the public strategies audited here. **Four —
+9, 10, 12 and 13 — come from defects found in this project's own pipeline**,
+which is exactly why they are in the list. Number 4 is here because an outside
+reader pointed out that it was missing.
 
 Commands assume freqtrade. The reasoning applies to any engine.
 
@@ -195,6 +196,91 @@ which pairs are missing and say so alongside the number.
 
 ---
 
+## ⌨ 11. How long is your average trade, measured in candles?
+
+Divide the average trade duration by your timeframe. If the answer is close to
+one — or below it — a large part of your result was produced *inside* single
+candles, where a candle-level backtest is guessing.
+
+The engine knows the open, high, low and close of a candle. It does not know
+which of the high and the low came first. When an entry and its exit fall in the
+same candle, the fill prices the engine chooses are an assumption, not a
+measurement, and the assumption is usually the flattering one.
+
+**How to check:** freqtrade prints `Avg. Duration` in the `ENTER TAG STATS`
+table. Compare it with your timeframe.
+
+```
+Avg. Duration   0:05:00      on a 5m strategy   <- one candle: distrust
+Avg. Duration   4 days       on a 5m strategy   <- fine
+```
+
+**Passing looks like:** average duration is several candles or more, and if it
+is not, you have tick or 1m data behind the claim rather than the same candles
+the signals came from.
+
+*Found because a strategy in this corpus survived every statistical gate with an
+average hold of under one candle. Nothing statistical can see that; the ratio
+can.*
+
+---
+
+## ⌨ 12. How many strategies did you try before this one?
+
+A p-value of 0.05 means one in twenty by chance. If you tested forty variants
+and are reporting the best, roughly two of them were expected to clear that bar
+while being worthless — and you would have no way of telling which.
+
+This applies to hyperopt runs, to parameter sweeps, and to "I tried a few ideas
+and this one worked". Every one of them is a test, whether or not you wrote it
+down.
+
+**How to check:** count the tests honestly, then apply a correction. Benjamini–
+Hochberg controls the share of false discoveries among the ones you keep, and is
+a few lines of code:
+
+```python
+s = sorted(pvals); n = len(s); k = 0
+for i, p in enumerate(s, 1):
+    if p <= 0.05 * i / n:
+        k = i        # k hypotheses survive; the threshold is s[k-1]
+```
+
+**Passing looks like:** the number of tests is stated, and the surviving
+p-values clear a corrected threshold rather than a raw 0.05.
+
+*This repository failed this check itself until an outside reader pointed it
+out. Hundreds of strategies were run against p < 0.05 twice, and the correction
+was added afterwards — which is recorded as a post-data decision rather than
+folded in quietly.*
+
+---
+
+## 👁 13. Can the number in your README be regenerated from today's code?
+
+Not "was it true when you wrote it". Whether, right now, running what is in your
+repository produces the figure your README shows.
+
+Documents outlive the code they describe. A results table stays persuasive long
+after the script that produced it has been rewritten or deleted, and a reader
+has no way to tell the difference — the stale number and the current one look
+exactly alike.
+
+**How to check:** delete the number from your README and regenerate it. If you
+cannot, the number is a memory, not a measurement.
+
+**Passing looks like:** the published figures are written by a script, and
+something with an exit code refuses to let them disagree — a pre-commit hook, a
+CI job, anything that fails rather than warns.
+
+*Found in this repository. Its README carried "571 strategies, 55 clean" for a
+day after the corpus had grown past 900, and an external reviewer built a
+favourable assessment on those figures plus two scripts that had already been
+deleted. Nothing was false when written. See `verify_ledger.py`, which is the
+return code that now enforces it.*
+
+---
+
 ## What this checklist cannot tell you
 
 Whether your idea is any good. Every check above is about whether your
@@ -207,7 +293,7 @@ than dressed up.
 
 ---
 
-*Want these ten run against your strategy?*
+*Want these thirteen run against your strategy?*
 
 **📧 faxesuxan24@gmail.com** for a private audit, or open an issue to do it in
 the open. The harness in this repository — `harness.py` — is the same pipeline,

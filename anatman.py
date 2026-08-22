@@ -124,11 +124,29 @@ def c7():
 
 def c8():
     u"""20.08 · stats/funnel читали ОДНУ папку, и пять стратегий, выбранных
-    МНОЮ вручную, попали бы в знаменатель популяции."""
-    src = io.open(os.path.join(_ROOT, "funnel.py"), encoding="utf-8").read()
-    s2 = io.open(os.path.join(_ROOT, "stats.py"), encoding="utf-8").read()
-    return ('"corpus"' in src and 'get("source")' in s2,
-            u"популяции снова могут смешаться в одном знаменателе")
+    МНОЮ вручную, попали бы в знаменатель популяции.
+
+    21.08 случай ПЕРЕСТРОЕН. Он был написан на ДВА имени файла, и когда
+    stats.py удалили, проверка сломалась бы — то есть держалась на случае,
+    а не на классе. Теперь она сама находит ВСЕ модули, читающие results/,
+    и требует отбора популяции от каждого, называя их число."""
+    import glob as _g
+    seen, bad = [], []
+    for p in sorted(_g.glob(os.path.join(_ROOT, "*.py"))):
+        name = os.path.basename(p)
+        if name == "anatman.py":
+            continue
+        src = io.open(p, encoding="utf-8", errors="replace").read()
+        reads = ('"results"' in src and "json.load" in src
+                 and ("glob(" in src or "listdir(" in src))
+        if not reads:
+            continue
+        seen.append(name)
+        if "source" not in src:
+            bad.append(name)
+    return (len(seen) >= 3 and not bad,
+            u"популяция не отбирается в [%s]; читателей results/ найдено %d"
+            % (u", ".join(bad) or u"—", len(seen)))
 
 
 def c9():
@@ -162,6 +180,18 @@ def c10():
             u"замок пропустил второго писателя (%r, %r)" % (first, second))
 
 
+def c11():
+    u"""21.08 · критерий исключения был УЗОК: только lookahead-analysis.
+    Сквозь него прошла NOTankAi_15_Cleaned_v2 с итогом +63 645 298% —
+    «смещения не обнаружено». Поймал ВТОРОЙ детектор: recursive-analysis
+    нашёл, что её пороги плывут на 9% от объёма загруженной истории.
+    Из 67 прошедших воронку 51 помечена ИМЕННО ВТОРЫМ, а не первым."""
+    src = io.open(os.path.join(_ROOT, "funnel.py"), encoding="utf-8").read()
+    both = ("recursive" in src and "lookahead" in src
+            and "r in la or r in rc" in src)
+    return (both, u"воронка снова исключает только по одному детектору")
+
+
 def main():
     print(u"ANATMAN — прожитые дефекты как исполняемые случаи")
     print(u"каждый случай = та самая строка, на которой сломалось\n")
@@ -175,6 +205,8 @@ def main():
     case(8, "20.08", u"популяции не смешиваются в знаменателе", c8)
     case(9, "20.08", u"список для долей детерминирован", c9)
     case(10, "20.08", u"замок отказывает второму писателю", c10)
+
+    case(11, "21.08", u"исключение учитывает ОБА детектора freqtrade", c11)
 
     ok = sum(1 for _n, _t, o in RESULTS if o)
     print(u"\nИТОГ: %d/%d" % (ok, len(RESULTS)))

@@ -43,6 +43,14 @@ jobs:
           sys.exit(1 if bad else 0)
           PY
 
+      - name: Ledger check — prove the comparison can fail, then run it
+        run: |
+          python verify_ledger.py --selftest
+          python verify_ledger.py
+
+      - name: Every published module must be declared part of the pipeline
+        run: python sync_repo.py --orphans
+
       - name: Every strategy card must be backed by a result file
         run: |
           python - <<'PY'

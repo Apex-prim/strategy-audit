@@ -6,22 +6,30 @@ Source: [`werkkrew/freqtrade-strategies`](https://github.com/werkkrew/freqtrade-
 
 | metric | author's window | out of sample |
 |---|---|---|
-| trades | 12 | 176 |
-| expectancy per trade (USDT) | 2.78 | 1.55 |
-| mean profit p-value | 0.00433 | 0.006265 |
+| trades | 10 | 158 |
+| average profit per trade % | 1.88 | 1.06 |
+| win rate % | 100.0 | 97.5 |
+| average trade duration, minutes | 3920.0 | 281.0 |
+| duration measured in own candles | 784.0 | 56.2 |
+| expectancy per trade (USDT) | 2.35 | 1.39 |
+| mean profit p-value | 0.009984 | 0.02344 |
 | market change % (baseline) | -58.23 | 346.34 |
-| strategy total % | 3.33 | 27.37 |
-| Sharpe | 0.34 | 0.3 |
-| Sortino | -100.0 | 5.74 |
-| max drawdown % | 0.0 | 8.45 |
-| profit factor | 0.0 | 2.52 |
+| strategy total % | 2.35 | 22.02 |
+| Sharpe | 0.28 | 0.23 |
+| Sortino | -100.0 | 2.79 |
+| max drawdown % | 0.0 | 9.72 |
+| profit factor | 0.0 | 2.25 |
 
-**Retained out of sample: 56%**
+**Retained out of sample: 59%**
 
-> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
+> **Read that number with care.** The author's window was a bear market (buy-and-hold −58%) and the out-of-sample window a bull market (+346%). For a long-biased strategy this ratio rewards having done *badly* in 2018–2020, so it measures regime luck as much as robustness. The regime-free comparison is the excess over buy-and-hold, below.
 
-Baseline: buy-and-hold on the same pairs returned **-58.23%**; the strategy returned **3.33%**.
-Out of sample: buy-and-hold **346.34%** vs strategy **27.37%** — loses to it.
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free either. Cross-strategy comparisons in this repository use average profit per trade in percent.
+
+**Excess over buy-and-hold** (regime-free): author's window **+60.6 pp**, out of sample **-324.3 pp**.
+
+Baseline: buy-and-hold on the same pairs returned **-58.23%**; the strategy returned **2.35%**.
+Out of sample: buy-and-hold **346.34%** vs strategy **22.02%** — loses to it.
 
 ## Checks
 
@@ -35,4 +43,4 @@ Out of sample: buy-and-hold **346.34%** vs strategy **27.37%** — loses to it.
 
 *Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **5m** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
 
-*Code fingerprint `4a7c7414af9b` · strategy list `dac6309df791d209`*
+*Code fingerprint `590bf74986c5` · strategy list `a039f448c17bed72`*

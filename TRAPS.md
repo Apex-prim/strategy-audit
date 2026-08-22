@@ -14,18 +14,25 @@ own guesses on top of practitioner experience would have made it worse.
 ## What the corpus looks like under their checks
 
 ```
-strategies checked                              804
-of which passed the full statistical funnel      72
+strategies checked                              895
+of which pass every statistical gate             72
+of which also clear both bias detectors          15
 
-stoploss is not a stop                          245
-inert trailing setting                          164
-trailing tighter than the spread                 27
-trailing without trailing_stop_positive          22
+stoploss is not a stop                          263
+inert trailing setting                          177
+trailing tighter than the spread                 37
+trailing without trailing_stop_positive          25
 tight ROI on a long timeframe                     4
 
-flagged by at least one trap    353 of 804   (44%)
-among funnel survivors           51 of  72   (71%)
+flagged by at least one trap   393 of 895   (44%)
+among statistical survivors     51 of  72   (71%)
+among detector-clean            9 of  15    (60%)
 ```
+
+*These counts are read from [LEDGER.csv](LEDGER.csv), not computed separately —
+one source, so the two cannot drift apart. The corpus grew from 804 to 895 and
+the survivor figure stayed at 71%; that is stability, not a coincidence
+preserved by rounding.*
 
 **Seventy-one percent of the strategies that clear every statistical test carry
 at least one of these.** Neither `lookahead-analysis` nor `recursive-analysis`

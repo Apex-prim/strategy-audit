@@ -7,12 +7,14 @@ u"""tfscan — какие таймфреймы объявляют стратег
 как результат. Это надо ЗНАТЬ до публикации, а не после.
 """
 import collections
+import os as _os
+_ROOT = _os.environ.get("AUDIT_ROOT") or _os.path.dirname(_os.path.abspath(__file__))
 import io
 import os
 import re
 import sys
 
-sys.path.insert(0, "C:/tmp/audit")
+sys.path.insert(0, _ROOT)
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
@@ -23,8 +25,8 @@ RX = re.compile(r"""^\s*timeframe\s*[:=]\s*['"]([^'"]+)['"]""", re.M)
 
 tf = collections.Counter()
 seen = set()
-for d in sorted(os.listdir("C:/tmp/audit/repos")):
-    p = os.path.join("C:/tmp/audit/repos", d)
+for d in sorted(os.listdir(_os.path.join(_ROOT, "repos"))):
+    p = os.path.join(_os.path.join(_ROOT, "repos"), d)
     if not os.path.isdir(p):
         continue
     for f, n in find_strategies(p):

@@ -7,6 +7,10 @@ Source: [`jaredrsommer/freqtradestrategies`](https://github.com/jaredrsommer/fre
 | metric | author's window | out of sample |
 |---|---|---|
 | trades | 963 | 3728 |
+| average profit per trade % | 0.53 | 1.08 |
+| win rate % | 93.4 | 94.8 |
+| average trade duration, minutes | 6166.0 | 5777.0 |
+| duration measured in own candles | 102.77 | 96.28 |
 | expectancy per trade (USDT) | -0.52 | 0.0 |
 | mean profit p-value | 0.01773 | 0.9923 |
 | market change % (baseline) | -59.27 | 348.67 |
@@ -18,7 +22,11 @@ Source: [`jaredrsommer/freqtradestrategies`](https://github.com/jaredrsommer/fre
 
 **Retained out of sample: n/a**
 
-> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free. Cross-strategy comparisons in this repository use average profit per trade in percent.
+> **Read that number with care.** The author's window was a bear market (buy-and-hold −58%) and the out-of-sample window a bull market (+346%). For a long-biased strategy this ratio rewards having done *badly* in 2018–2020, so it measures regime luck as much as robustness. The regime-free comparison is the excess over buy-and-hold, below.
+
+> Expectancy above is in USDT and the backtests run with `stake_amount: "unlimited"`, which compounds — so it is **not** scale-free either. Cross-strategy comparisons in this repository use average profit per trade in percent.
+
+**Excess over buy-and-hold** (regime-free): author's window **+9.4 pp**, out of sample **-348.0 pp**.
 
 Baseline: buy-and-hold on the same pairs returned **-59.27%**; the strategy returned **-49.89%**.
 Out of sample: buy-and-hold **348.67%** vs strategy **0.65%** — loses to it.
@@ -36,4 +44,4 @@ Out of sample: buy-and-hold **348.67%** vs strategy **0.65%** — loses to it.
 
 *Run by freqtrade itself. Fee 0.1% per side, 8 USDT pairs, timeframe **1h** (the strategy's own — never overridden by config). Author's window 2018-03-01…2020-03-01, out of sample 2020-03-01…2026-08-19. "Could not check" is never printed as "clean".*
 
-*Code fingerprint `8d9b3a08743f` · strategy list `d43e19f4fcbe76b6`*
+*Code fingerprint `590bf74986c5` · strategy list `a039f448c17bed72`*

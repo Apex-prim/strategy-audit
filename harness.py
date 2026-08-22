@@ -55,6 +55,10 @@ STRAT_DIR = os.path.join(ROOT, "user_data", "strategies")
 RESULTS = os.path.join(ROOT, "results")
 CODE_MD5 = __import__("hashlib").md5(
     io.open(os.path.abspath(__file__), "rb").read()).hexdigest()[:12]
+TF_MINUTES = {"1m": 1, "3m": 3, "5m": 5, "15m": 15, "30m": 30,
+              "1h": 60, "2h": 120, "4h": 240, "6h": 360,
+              "8h": 480, "12h": 720, "1d": 1440, "3d": 4320,
+              "1w": 10080}
 IN_RANGE = "20180301-20200301"
 OUT_RANGE = "20200301-20260820"
 
@@ -229,6 +233,51 @@ def missing_pairs(out):
     return sorted(set(re.findall(r"No history for (\S+), \w+, \S+ found", out)))
 
 
+RX_TAG_TOTAL = re.compile(
+    u"Enter Tag\\s*\\|\\s*Entries.*?\\n.*?\\|\\s*TOTAL\\s*\\|\\s*(\\d+)\\s*\\|\\s*(-?[\\d.]+)\\s*\\|"
+    u"[^\\|]*\\|[^\\|]*\\|\\s*([0-9 a-z,:]+?)\\s*\\|",
+    re.S)
+
+
+def _dur_min(txt):
+    u"""«2 days, 05:07:00» / «21:37:00» → минуты. None — не разобрано."""
+    if not txt:
+        return None
+    m = re.search(r"(?:(\d+)\s*days?,\s*)?(\d+):(\d+):(\d+)", txt)
+    if not m:
+        return None
+    d = int(m.group(1) or 0)
+    return d * 1440 + int(m.group(2)) * 60 + int(m.group(3)) + int(m.group(4)) / 60.0
+
+
+def tag_total(out):
+    u"""Строка TOTAL из ENTER TAG STATS: средняя сделка %, длительность, WR.
+
+    Берётся ИМЕННО этот раздел, а не сводка по парам: у него один TOTAL на
+    весь прогон, и его поля совпадают с общими. Раздел LEFT OPEN TRADES
+    имеет собственный TOTAL с другими числами — спутать их значило бы
+    отчитаться о незакрытых сделках как обо всех."""
+    i = out.find("ENTER TAG STATS")
+    if i < 0:
+        return {}
+    seg = out[i:i + 4000]
+    for line in seg.splitlines():
+        if "TOTAL" not in line:
+            continue
+        cells = [c.strip() for c in line.split(chr(9474))]
+        cells = [c for c in cells if c != ""]
+        if len(cells) < 6:
+            continue
+        try:
+            return {"avg_profit_pct": float(cells[2]),
+                    "avg_duration_min": _dur_min(cells[5]),
+                    "win_pct": float(cells[6].split()[-1])
+                    if len(cells) > 6 else None}
+        except (ValueError, IndexError):
+            return {}
+    return {}
+
+
 def _sp(path):
     u"""--strategy-path: берём стратегию ТАМ, ГДЕ ОНА ЛЕЖИТ, не копируя.
     Копирование в общую папку смешало бы репозитории и дало бы дубли имён —
@@ -290,6 +339,15 @@ def backtest(name, timerange, fee="0.001", path=None, want_tf=None):
     d["used_timeframe"] = used
     d["declared_timeframe"] = want_tf
     d["missing_pairs"] = missing_pairs(out)
+    d.update(tag_total(out))
+    # ⚠ САМЫЙ ОСТРЫЙ ФЛАГ ИЗ СТАТЬИ СООБЩЕСТВА: сделка КОРОЧЕ СВЕЧИ, то есть
+    # открылась и закрылась внутри одной свечи. В бэктесте так бывает, вживую
+    # по большей части нет. В КОДЕ это невидимо — только в длительностях.
+    tf_min = TF_MINUTES.get(used or want_tf)
+    ad = d.get("avg_duration_min")
+    if tf_min and ad is not None:
+        d["dur_over_candle"] = round(ad / float(tf_min), 2)
+        d["intracandle"] = bool(ad < tf_min)
     return (PASS, u"", d)
 
 

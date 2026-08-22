@@ -1,6 +1,12 @@
-# Downloaded market data — regenerate with fetch_data.py
+# Downloaded market data — regenerate with fetch_bulk.py
 data/
 *.csv
+# ...except the ledger itself. It is not market data: it is the published
+# record every number in this repository is derived from, and verify_ledger.py
+# refuses to run without it. Excluded once by accident — CI would have failed
+# with "LEDGER.csv is missing", which is the correct failure for a missing
+# ledger and the wrong reason to see it.
+!LEDGER.csv
 
 # Secrets — never commit. This list is convenience, not a control:
 # the control is tools/secret_gate.py, wired as a pre-commit hook.

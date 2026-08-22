@@ -1,3 +1,9 @@
 #!/bin/sh
 # Refuses any commit containing a credential. Not advice — a return code.
 python tools/secret_gate.py || exit 1
+
+# Refuses any commit whose published counts no longer reproduce from the
+# published ledger. The README of this repository once carried "571 strategies,
+# 55 clean" for a day after the corpus had grown past 900, and an outside
+# reviewer built an assessment on it. Staleness reads as authority.
+python verify_ledger.py || exit 1

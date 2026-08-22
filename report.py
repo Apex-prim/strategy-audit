@@ -18,6 +18,7 @@ u"""report — карточки и указатели. ВЫВОД ПО-АНГЛ�
 """
 from __future__ import print_function
 
+import hashlib
 import io
 import json
 import os
@@ -54,6 +55,25 @@ def survives(a, b):
     return u"%.0f%%" % (100.0 * b / a)
 
 
+_COLLIDE = set()
+
+
+def md_name(name):
+    u"""Имя файла карточки, устойчивое к регистру.
+
+    ⚠ ДЕФЕКТ 22.08. Карточка писалась как `strategy + ".md"`. В корпусе есть
+    ДЕСЯТЬ пар имён, различающихся только регистром — Ichi/ichi, SAR/Sar,
+    SuperTrend/Supertrend и ещё семь. Файловая система Windows их не
+    различает, вторая карточка затирала первую, и десять стратегий пропадали
+    из публикации молча. Ровно этот дефект уже был починен в corpus.py, а
+    здесь остался: я починил СЛУЧАЙ, а не КЛАСС.
+    """
+    if name.lower() in _COLLIDE:
+        return u"%s__%s" % (name, hashlib.md5(
+            name.encode("utf-8")).hexdigest()[:6])
+    return name
+
+
 def card(r):
     L = []
     s = r["strategy"]
@@ -80,6 +100,10 @@ def card(r):
         L.append(u"| metric | author's window | out of sample |")
         L.append(u"|---|---|---|")
         for key, lab in (("trades", u"trades"),
+                         ("avg_profit_pct", u"average profit per trade %"),
+                         ("win_pct", u"win rate %"),
+                         ("avg_duration_min", u"average trade duration, minutes"),
+                         ("dur_over_candle", u"duration measured in own candles"),
                          ("expectancy", u"expectancy per trade (USDT)"),
                          ("p_value", u"mean profit p-value"),
                          ("market_change_pct", u"market change % (baseline)"),
@@ -120,6 +144,23 @@ def card(r):
             L.append(u"")
             L.append(u"**Excess over buy-and-hold** (regime-free): %s."
                      % u", ".join(exc))
+        # ⑨ Длительность против собственной свечи. Сделка, открытая и закрытая
+        # внутри одной свечи, оценена движком по ДОПУЩЕНИЮ о порядке максимума
+        # и минимума, а не по измерению — и допущение обычно лестное.
+        for lab, s in ((u"author's window", a), (u"out of sample", b)):
+            if isinstance(s, dict) and s.get("dur_over_candle") is not None \
+                    and s.get("dur_over_candle") < 1.0:
+                L.append(u"")
+                L.append(u"⚠ **Trades close inside their own candle (%s): "
+                         u"average hold %.2f candles.** The engine knows a "
+                         u"candle's high and low but not which came first, so "
+                         u"these fills are an assumption rather than a "
+                         u"measurement." % (lab, s["dur_over_candle"]))
+        if isinstance(b, dict) and b.get("dur_over_candle") is None:
+            L.append(u"")
+            L.append(u"*Trade duration was not measured on this card — the "
+                     u"layer post-dates it. Missing is recorded as missing, not "
+                     u"as passed.*")
         pv = g(a, "p_value")
         if pv is not None and pv > 0.05:
             L.append(u"")
@@ -219,7 +260,7 @@ def corpus_index(rows):
                 return u"%+.0f" % (s["total_pct"] - s["market_change_pct"])
             return u"—"
         L.append(u"| [%s](%s.md) | `%s` | %s | %s | %s | %s | %s | %s | %s | %s | **%s** |"
-                 % (r["strategy"], r["strategy"], r["repo"].split("/")[0],
+                 % (r["strategy"], md_name(r["strategy"]), r["repo"].split("/")[0],
                     a.get("used_timeframe") or u"—", a.get("trades"),
                     a.get("expectancy"), a.get("p_value"),
                     b.get("expectancy", u"—"), b.get("p_value", u"—"),
@@ -234,7 +275,7 @@ def corpus_index(rows):
               u"| strategy | declared tf | reason |", u"|---|---|---|"]
         for r in sorted(dead, key=lambda x: x["strategy"]):
             L.append(u"| [%s](%s.md) | %s | `%s` |"
-                     % (r["strategy"], r["strategy"],
+                     % (r["strategy"], md_name(r["strategy"]),
                         r.get("declared_timeframe") or u"none",
                         (r["runs"]["in_sample"].get("why") or u"").strip()[:120]))
     return u"\n".join(L)
@@ -252,7 +293,7 @@ def index(rows):
         e2 = g(out.get("summary"), "expectancy")
         tf = g(ins.get("summary"), "used_timeframe") or r.get("declared_timeframe")
         L.append(u"| [%s](%s.md) | `%s` | %s | %s | %s | **%s** | %s | %s |"
-                 % (r["strategy"], r["strategy"], r["repo"].split("/")[0],
+                 % (r["strategy"], md_name(r["strategy"]), r["repo"].split("/")[0],
                     tf or u"—", e1 if e1 is not None else u"—",
                     e2 if e2 is not None else u"—", survives(e1, e2) or u"—",
                     EN.get(r["runs"]["lookahead"]["level"], u"—"),
@@ -264,13 +305,24 @@ if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     os.makedirs(CORP, exist_ok=True)
     rows, crows = [], []
+    # собрать имена, совпадающие без учёта регистра, ДО первой записи
+    seen_low = {}
+    for f in sorted(os.listdir(RESULTS)):
+        if f.endswith(".json"):
+            nm = json.load(io.open(os.path.join(RESULTS, f),
+                                   encoding="utf-8"))["strategy"]
+            seen_low[nm.lower()] = seen_low.get(nm.lower(), 0) + 1
+    _COLLIDE.update(k for k, v in seen_low.items() if v > 1)
+    if _COLLIDE:
+        print(u"имён с коллизией по регистру: %d (карточки получат хеш)"
+              % len(_COLLIDE))
     for f in sorted(os.listdir(RESULTS)):
         if not f.endswith(".json"):
             continue
         r = json.load(io.open(os.path.join(RESULTS, f), encoding="utf-8"))
         d = CORP if r.get("source") != "case_study" else OUT
         (crows if d is CORP else rows).append(r)
-        io.open(os.path.join(d, r["strategy"] + ".md"), "w",
+        io.open(os.path.join(d, md_name(r["strategy"]) + ".md"), "w",
                 encoding="utf-8").write(card(r) + chr(10))
     if rows:
         io.open(os.path.join(OUT, "INDEX.md"), "w",

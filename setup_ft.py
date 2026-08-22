@@ -6,6 +6,14 @@
 ходит именно туда. Поэтому конвертируем, а не качаем повторно.
 """
 import json
+import sys as _sys
+_sys.path.insert(0, "C:/tmp/audit")
+import runlock as _rl
+if not _rl.acquire("fetch"):      # общая папка свечей — один писатель
+    raise SystemExit(2)
+import atexit as _at
+_at.register(lambda: _rl.release("fetch"))
+
 import os
 import sys
 

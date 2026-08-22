@@ -102,6 +102,6 @@ workaround.
 python harvest.py <owner/repo> [<owner/repo> ...]   # fetch strategy files only
 python census_repos.py                              # this table
 python corpus.py --shard k/5                        # measure
-python funnel.py                                    # the funnel, per population
+python ledger.py --pop=corpus            # the ladder, one population at a time
 python anatman.py                                   # every lived defect, as a test
 ```
