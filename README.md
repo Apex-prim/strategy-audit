@@ -4,8 +4,8 @@ Every public freqtrade strategy that could be found and loaded — 895 unique
 classes from 53 repositories — run by **freqtrade itself** on its own declared
 timeframe, in its author's window and in years the author never saw.
 
-**Six clear every bias, trap and multiplicity check. Five of those have a real
-per-trade edge that survives doubled costs. None beats buy-and-hold.**
+**Fourteen clear every bias, trap and multiplicity check. Ten of those have a
+real per-trade edge that survives doubled costs. None beats buy-and-hold.**
 
 <!-- LEDGER:BEGIN -->
 ```
@@ -102,8 +102,8 @@ return code; a column can be checked.
 dependence of a particular kind — and 65% of this corpus is copies, so that
 guarantee formally does not apply. Benjamini-Yekutieli, which holds under
 *arbitrary* dependence, is therefore reported alongside it. Its threshold is
-5.0× stricter and **all six survivors still clear it**. The conclusion does not
-rest on the dependence assumption.
+5.0× stricter and **thirteen of the fourteen survivors still clear it**. The
+conclusion does not rest on the dependence assumption.
 
 ## Where the corpus actually dies
 
@@ -119,13 +119,13 @@ And the ladder ends on two gates that are not statistical at all. `G11_effect`
 asks whether the lower bound of the 95% interval on the average trade stays
 positive after **doubling** the cost assumption — significance without size is
 worth nothing, and `p = 1e-8` on a microscopic edge is less use than `p = 0.003`
-on a durable one. Five of the six clear it.
+on a durable one. Ten of the fourteen clear it.
 
 `G12_economic` asks whether the strategy beat holding the same coins. **None
-does** — and not by a little. Over the whole out-of-sample window the six return
-+38.6% to +159.6% in total while buy-and-hold returns +346.3%: a shortfall of
-**187 to 308 percentage points of cumulative return**, not per trade and not
-annualised. Each of them earns a genuine 0.30% to 1.74% *per trade*. They are
+does** — and not by a little. Over the whole out-of-sample window the ten return
++38.6% to +156.6% in total while buy-and-hold returns +346.3%: a shortfall of
+**190 to 308 percentage points of cumulative return**, not per trade and not
+annualised. Each of them earns a genuine 0.46% to 1.74% *per trade*. They are
 not broken and they are not noise: they capture a fraction of a rise they never
 predicted, and holding captured all of it.
 
