@@ -75,7 +75,26 @@ def inspect(path, cls):
 
     v = {"trailing_stop": None, "trailing_stop_positive": None,
          "trailing_stop_positive_offset": None, "stoploss": None,
-         "timeframe": None, "roi_first": None, "roi_zero": None}
+         "timeframe": None, "roi_first": None, "roi_zero": None,
+         "leverage": 1.0}
+    # ПЛЕЧО. Hippocritical, freqtrade Discord 22.08: «if you have 1% trailing
+    # and do 10x leverage then it essentially becomes 0.1% trailing». Это не
+    # мнение — это в исходнике движка:
+    #     stop_rate = open * (1 + offset - trailing_stop_positive / leverage)
+    # Дистанция трейлинга ДЕЛИТСЯ на плечо, значит и сравнивать со спредом надо
+    # делённую. Я читал эту строку утром и не связал.
+    #
+    # ⚠ ЧЕГО ЭТОТ РАЗБОР НЕ ВИДИТ: плечо из конфига, плечо из динамического
+    # leverage(), плечо, зависящее от пары. Здесь берётся только буквальный
+    # `return <число>` — это НИЖНЯЯ ГРАНИЦА числа таких стратегий, а не оно.
+    m = re.search(r"def\s+leverage\s*\(.*?return\s+([0-9.]+)", src, re.S)
+    if m:
+        try:
+            lv = float(m.group(1))
+            if lv > 0:
+                v["leverage"] = lv
+        except ValueError:
+            pass
     for st in node.body:
         if not isinstance(st, ast.Assign) or not st.targets:
             continue
@@ -134,10 +153,14 @@ def flags(v, notes=None):
                           u"stop trails at the full stoploss distance (%s). Wide, "
                           u"but executable — a note, not a trap"
                           % (v.get("stoploss"),)))
-        elif tsp < SPREAD:
-            out.append((u"trailing tighter than the spread",
-                        u"trailing_stop_positive = %.4f, below the 0.1–0.5%% "
-                        u"spread the trap article names" % tsp))
+        else:
+            lv = v.get("leverage") or 1.0
+            eff = tsp / lv if lv > 0 else tsp
+            if eff < SPREAD:
+                out.append((u"trailing tighter than the spread",
+                            u"trailing_stop_positive = %.4f at %.0fx leverage = "
+                            u"%.5f effective, below the 0.1–0.5%% spread the trap "
+                            u"article names" % (tsp, lv, eff)))
     if tsp is not None and v.get("trailing_stop") is not True:
         out.append((u"inert trailing setting",
                     u"trailing_stop_positive = %s while trailing_stop is not True" % tsp))

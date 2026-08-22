@@ -20,10 +20,10 @@ of which also clear both bias detectors          15
 
 stoploss is not a stop                          263
 inert trailing setting                          177
-trailing tighter than the spread                 37
+trailing tighter than the spread                 38
 tight ROI on a long timeframe                     4
 
-flagged by at least one trap   370 of 895   (41%)
+flagged by at least one trap   371 of 895   (41%)
 among statistical survivors     50 of  72   (69%)
 among detector-clean            9 of  15    (60%)
 ```
@@ -43,6 +43,18 @@ among detector-clean            9 of  15    (60%)
 > **zero** were disqualified by that flag alone. The ladder is byte-identical
 > after the change — 15 → 6 → 5 → 0. A rule can be corrected on its merits when
 > no verdict depends on it, and that is checked rather than asserted.
+>
+> **And a second correction from the same conversation.** *"if you have 1%
+> trailing and do 10x leverage then it essentially becomes 0.1% trailing."*
+> True, and it is in the engine: `backtesting.py` computes the trailing distance
+> as `trailing_stop_positive / leverage`. The check now compares the
+> **effective** distance against the spread. One strategy changes hands — `WTX3`,
+> 1% at 10× = 0.001 — and it never produced numbers, so again no verdict moves.
+>
+> ⚠ Leverage detection here reads only a literal `return <number>` inside
+> `leverage()`. Leverage from the config, computed leverage, or per-pair
+> leverage is invisible to it. The 36 strategies it finds are a **floor**, not
+> a count.
 
 *These counts are read from [LEDGER.csv](LEDGER.csv), not computed separately —
 one source, so the two cannot drift apart. The corpus grew from 804 to 895 and

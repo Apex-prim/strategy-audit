@@ -244,3 +244,63 @@ category at 177. There the backtest is honest — trailing is off and the engine
 runs it off — and it is the *reader* who is misled. Whether that belongs in a
 list of backtesting traps is the community's call, not mine, and the question
 has been put to them.
+
+---
+
+## Leverage divides the trailing distance, and I had read the line that says so (2026-08-22)
+
+`Hippocritical`, minutes after the previous correction: *"and incorporate
+leverage with that check — if you have 1% trailing and do 10x leverage then it
+essentially becomes 0.1% trailing."*
+
+Correct, and not a matter of opinion. `backtesting.py`:
+
+```python
+stop_rate = row[OPEN_IDX] * (
+    1 + side_1 * abs(self.strategy.trailing_stop_positive_offset)
+    - side_1 * abs(self.strategy.trailing_stop_positive / leverage)
+)
+```
+
+The trailing distance is **divided by leverage**, so the figure that must be
+compared against the spread is the effective one. A 1% trailing stop at 10×
+is a 0.1% price distance — inside the spread, and therefore the very trap the
+check exists to find.
+
+**I had read that exact line the same morning**, while checking a different
+claim about same-candle fills, and did not connect it to my own tightness
+check. Reading a line and seeing what it means for your own code are different
+acts.
+
+The check is now leverage-aware. Corpus-wide it moves one strategy — `WTX3`,
+1% at 10× = 0.001 effective — from clean to flagged, taking the tight-trailing
+count from 37 to 38 and the total from 370 to 371. `WTX3` never produced
+numbers, so no verdict moves. Ladder after the change: 15 → 6 → 5 → 0, identical.
+
+**Stated because it weakens the finding:** leverage is detected only from a
+literal `return <number>` inside `leverage()`. Leverage set in the config,
+computed at runtime, or varying per pair is invisible here. The 36 strategies
+found declaring leverage are a floor, not a count — so the true number of
+effectively-tight trailing stops in this corpus is **unknown and at least 38**.
+
+---
+
+## Measured, and it did not hold: "most of those are caught by lookahead-analysis"
+
+From the same conversation. Testable directly, so it was tested.
+
+```
+strategies carrying at least one trap        371
+  lookahead-analysis found bias               11
+  lookahead-analysis cleared them             91
+  lookahead-analysis could not run           268
+```
+
+Among the 102 where the detector actually ran, it flagged 11 — about one in
+nine, not most.
+
+**But the honest figure is neither 3% nor 11%.** For 268 of the 371 there is no
+lookahead verdict at all, because the analyser could not run on them. Reporting
+"only 3% overlap" would be the same overstatement in the opposite direction:
+counting an absent verdict as a clean one. The overlap is one in nine where it
+is known, and unknown for the other 72%.
