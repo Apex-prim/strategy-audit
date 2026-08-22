@@ -40,7 +40,15 @@ try:
 except Exception:
     pass
 
-LADDER_FILE = "ledger_block.py"
+# ⚠ 22.08: сторож следил ТОЛЬКО за ledger_block.py — файлом, где лежат ИМЕНА
+# ступеней. Но смысл ступени живёт в коде, который её ВЫЧИСЛЯЕТ: G8 задаётся
+# traps.py, G11/G12 — ledger.py. В тот день traps.py менялся трижды, смысл G8
+# менялся вместе с ним, а сторож продолжал показывать позавчерашнее время.
+# Ровно тот класс, что уже записан в память: проверка спрашивала про СЛОВО
+# (где объявлены имена), а не про ПРЕДМЕТ (где решается судьба стратегии).
+# Берём МАКСИМУМ по всем файлам, определяющим правило.
+LADDER_FILES = ["ledger_block.py", "traps.py", "ledger.py"]
+LADDER_FILE = LADDER_FILES[0]          # для сообщений
 RUN_FILE = "CORPUS_RUN.json"
 CLAIMS_FILE = "CLAIMS.csv"
 PRIMARY = "survivors under the full rule set"
@@ -50,16 +58,35 @@ def ts(epoch):
     return time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime(epoch))
 
 
-def rule_time():
-    u"""Когда лестница менялась в последний раз, по git."""
-    try:
-        out = subprocess.run(
-            ["git", "log", "-1", "--format=%ct", "--", LADDER_FILE],
-            cwd=_HERE, capture_output=True, timeout=30)
-        s = out.stdout.decode().strip()
-        return int(s) if s else None
-    except Exception:
-        return None
+def rule_time(files=None):
+    u"""Когда правило менялось в последний раз, по git.
+
+    Правило — это НЕ только список имён ступеней, но и код, который решает,
+    кто ступень проходит. Возвращаем самое ПОЗДНЕЕ изменение среди них:
+    правило не старше своей самой свежей части.
+    """
+    best = None
+    for f in (files or LADDER_FILES):
+        try:
+            out = subprocess.run(
+                ["git", "log", "-1", "--format=%ct", "--", f],
+                cwd=_HERE, capture_output=True, timeout=30)
+            v = out.stdout.decode().strip()
+            if v:
+                v = int(v)
+                if best is None or v > best:
+                    best = v
+        except Exception:
+            continue
+    return best
+
+
+def rule_parts():
+    u"""Время по каждому файлу правила — чтобы вердикт можно было проверить."""
+    out = {}
+    for f in LADDER_FILES:
+        out[f] = rule_time([f])
+    return out
 
 
 def data_time():
@@ -135,6 +162,16 @@ def selftest():
     # незнание не должно читаться как «ок» — это отдельный случай
     ok.append((u"незнание не равно согласию",
                verdict(None, None)[0] is None))
+    # ⚠ прожитый дефект 22.08: сторож смотрел только на файл ИМЁН ступеней,
+    # а traps.py трижды менял смысл G8 — и сторож этого не видел. Случай
+    # становится исполняемым: правило обязано быть НЕ СТАРШЕ своей самой
+    # свежей части, и файлы, задающие ступени, обязаны быть в списке.
+    parts = rule_parts()
+    known = [v for v in parts.values() if v]
+    ok.append((u"смысл ступени учтён, а не только её имя",
+               "traps.py" in LADDER_FILES and "ledger.py" in LADDER_FILES))
+    ok.append((u"правило не старше своей самой свежей части",
+               (not known) or rule_time() == max(known)))
     for n, v in ok:
         print(u"  %-44s %s" % (n, u"OK" if v else u"FAILED"))
     bad = [n for n, v in ok if not v]

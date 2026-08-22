@@ -394,3 +394,30 @@ the checks are individually verifiable — each is a named constant, a documente
 threshold from the community's own article, and a number regenerated from
 `LEDGER.csv` by `verify_ledger.py`. Verifiability of *what it does* is not the
 same claim as completeness of *what exists*, and only the second is refused here.
+
+---
+
+## The freeze guard watched the names of the gates, not their meaning (2026-08-22)
+
+`freeze_guard.py` exists to answer one question against its own author: was the
+rule fixed before the data were seen, or adjusted after? It derives the answer
+from `git log`.
+
+It was reading the history of **one** file — `ledger_block.py`, where the ladder's
+*names* are declared. But what a gate *means* lives in the code that decides who
+passes it: `traps.py` for G8, `ledger.py` for G11 and G12. On the day
+`traps.py` was rewritten three times, the meaning of G8 moved with it and the
+guard kept reporting the day before yesterday.
+
+Found by the guard itself: it printed a timestamp hours older than the commit it
+was gating.
+
+**Fixed** by taking the latest change across every file that defines a gate — a
+rule is no older than its freshest part. The reported gap widens from 15.7 h to
+20.5 h; the verdict class does not change (`repair-adjusted` either way), so
+nothing published moves. Two self-test cases now pin it: that the semantic files
+are in the watch list, and that the reported time equals the maximum over them.
+
+This is the same class as three other entries here — **a check that asked about
+the word rather than the subject.** It is on record because a machine built to
+catch that class had it, in the part of itself that judges its author.
