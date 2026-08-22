@@ -1,4 +1,4 @@
-# Backtesting traps: 71% of the survivors carry at least one
+# Backtesting traps: 69% of the survivors carry at least one
 
 When this audit was posted to the freqtrade Discord, `froggleston` said the bias
 checks are not the only thing that flags a gamed strategy. He was right, and I
@@ -21,20 +21,35 @@ of which also clear both bias detectors          15
 stoploss is not a stop                          263
 inert trailing setting                          177
 trailing tighter than the spread                 37
-trailing without trailing_stop_positive          25
 tight ROI on a long timeframe                     4
 
-flagged by at least one trap   393 of 895   (44%)
-among statistical survivors     51 of  72   (71%)
+flagged by at least one trap   370 of 895   (41%)
+among statistical survivors     50 of  72   (69%)
 among detector-clean            9 of  15    (60%)
 ```
 
+> **One flag was removed on 2026-08-22, and the removal was checked before it
+> was made.** `trailing_stop = True` with no `trailing_stop_positive` was
+> counted as a trap on the grounds that the stop then trails at the full
+> stoploss distance. `Hippocritical`, in the freqtrade Discord: *"if you have
+> loose trailing you wont have a trap; if you have things like 0.1% trailing
+> then not."*
+>
+> He is right. A wide trailing stop is executable — it sits far from the spread
+> and fills reliably. What makes a trailing stop a trap is **tightness**, not
+> trailing. The check now records it as a note rather than a disqualification.
+>
+> Before changing it: of the nine strategies disqualified at the traps gate,
+> **zero** were disqualified by that flag alone. The ladder is byte-identical
+> after the change — 15 → 6 → 5 → 0. A rule can be corrected on its merits when
+> no verdict depends on it, and that is checked rather than asserted.
+
 *These counts are read from [LEDGER.csv](LEDGER.csv), not computed separately —
 one source, so the two cannot drift apart. The corpus grew from 804 to 895 and
-the survivor figure stayed at 71%; that is stability, not a coincidence
-preserved by rounding.*
+the survivor figure moved only from 71% to 69% — and that only because a flag
+was withdrawn on its merits, not because the corpus changed under it.*
 
-**Seventy-one percent of the strategies that clear every statistical test carry
+**Sixty-nine percent of the strategies that clear every statistical test carry
 at least one of these.** Neither `lookahead-analysis` nor `recursive-analysis`
 nor any p-value sees them, because they are properties of the strategy's
 configuration rather than of its signal.

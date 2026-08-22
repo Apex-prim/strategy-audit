@@ -211,3 +211,36 @@ The gate stays as a reliability flag, its wording is corrected in
 [CHECKLIST.md](CHECKLIST.md) and on every card, and the claim it once carried is
 withdrawn. Found by a reader, in public, within hours of publication — which is
 the entire reason for publishing.
+
+---
+
+## A trap that was only a trap when tight (2026-08-22)
+
+`traps.py` counted `trailing_stop = True` with no `trailing_stop_positive` as a
+trap: freqtrade then trails at the full stoploss distance rather than at a few
+percent, which looked like a setting the author did not mean.
+
+`Hippocritical`, in the freqtrade Discord: *"if you have loose trailing you wont
+have a trap; if you have things like 0.1% trailing then not."*
+
+He is right, and the distinction is the whole point. A **wide** trailing stop is
+executable — it sits far from the spread and fills reliably in live trading. A
+**tight** one, at 0.1%, is inside the spread and fills in backtest but not in
+reality. Trailing is not the trap; tightness is.
+
+The flag is now recorded as a note rather than a disqualification. Corpus-wide,
+strategies carrying at least one trap fall from 393 to 370 (44% to 41%), and
+among those clearing every statistical gate from 51 to 50 (71% to 69%).
+
+**The change was checked before it was made.** Of the nine strategies
+disqualified at the traps gate, zero were disqualified by that flag alone, and
+the ladder after the change is identical: 15 → 6 → 5 → 0. Correcting a rule on
+its merits is legitimate exactly when no verdict depends on it — and that is a
+measurement, not a reassurance.
+
+**Left open, and asked rather than decided:** `trailing_stop_positive` set while
+`trailing_stop` is `False` still counts as a trap, and it is the largest single
+category at 177. There the backtest is honest — trailing is off and the engine
+runs it off — and it is the *reader* who is misled. Whether that belongs in a
+list of backtesting traps is the community's call, not mine, and the question
+has been put to them.

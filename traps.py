@@ -107,8 +107,12 @@ def inspect(path, cls):
     return v
 
 
-def flags(v):
+def flags(v, notes=None):
+    u"""Дисквалифицирующие ловушки. `notes` — список для наблюдений,
+    которые ловушками НЕ являются (см. 22.08 про широкий трейлинг)."""
     out = []
+    if notes is None:
+        notes = []
     if not v:
         return out
     tf = v.get("timeframe")
@@ -116,9 +120,20 @@ def flags(v):
     tsp = v.get("trailing_stop_positive")
     if v.get("trailing_stop") is True:
         if tsp is None:
-            out.append((u"trailing without trailing_stop_positive",
-                        u"stop trails at the full stoploss distance (%s), not a few percent"
-                        % (v.get("stoploss"),)))
+            # ⚠ БОЛЬШЕ НЕ ЛОВУШКА, 22.08. Hippocritical (freqtrade Discord):
+            # «if you have loose trailing you wont have a trap; if you have
+            # things like 0.1% trailing then not». Он прав: широкий трейлинг
+            # (на полном расстоянии стопа) ИСПОЛНИМ в реальности — он далеко от
+            # спреда и наливается надёжно. Ловушкой делает ТЕСНОТА, а не сам
+            # трейлинг. Это наблюдение, а не дисквалификация.
+            #
+            # Проверено перед изменением: на корпусе 895 ни один вердикт от
+            # этого флага не зависел — из девяти выбитых на G8 ноль выбиты им
+            # одним. Правило меняется по существу, а не под результат.
+            notes.append((u"loose trailing (no trailing_stop_positive)",
+                          u"stop trails at the full stoploss distance (%s). Wide, "
+                          u"but executable — a note, not a trap"
+                          % (v.get("stoploss"),)))
         elif tsp < SPREAD:
             out.append((u"trailing tighter than the spread",
                         u"trailing_stop_positive = %.4f, below the 0.1–0.5%% "
