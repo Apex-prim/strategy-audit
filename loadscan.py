@@ -69,7 +69,8 @@ def main():
         p = os.path.join(REPOS, d)
         if not os.path.isdir(p):
             continue
-        for sub, dirs, _ in os.walk(p):
+        # TOTAL: диагностический обход, в вердикт не входит
+    for sub, dirs, _ in os.walk(p):
             dirs[:] = [x for x in dirs if x not in (".git", "__pycache__", "venv")]
             for name, loc, st in scan(sub):
                 # ключ — файл в своём репозитории: os.walk заходит и в

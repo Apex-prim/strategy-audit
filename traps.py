@@ -190,7 +190,14 @@ def flags(v, notes=None):
                       u"backtest and live: a risk defect, not a backtesting trap"
                       % sl))
     roi = v.get("roi_zero")
-    if roi is not None and mins and mins >= 60 and roi <= 0.01:
+    if roi is not None and mins is None:
+        # тотальность: длительность свечи неизвестна ⇒ судить о «тесной цели на
+        # длинной свече» НЕЛЬЗЯ. Раньше здесь молча не было ловушки. Теперь
+        # незнание названо вслух и попадает в наблюдения.
+        notes.append((u"roi trap not evaluated",
+                      u"timeframe %r is unknown to TF_MIN, so the ROI-vs-candle "
+                      u"check has no defined answer here" % (tf,)))
+    if roi is not None and mins is not None and mins >= 60 and roi <= 0.01:
         out.append((u"tight ROI on a long timeframe",
                     u"first minimal_roi entry %.4f on %s candles" % (roi, tf)))
     return out
@@ -227,7 +234,10 @@ def main():
     flagged_all, flagged_surv = set(), set()
     for name in allrows:
         p = where.get(name)
+        # TOTAL: отсутствие исходника — определённое значение «НЕ ОСМОТРЕНА»,
+        # оно попадает в tally и потому видно в отчёте, а не пропадает молча.
         if not p:
+            tally[u"НЕ ОСМОТРЕНА: исходник не найден"] += 1
             continue
         fl = flags(inspect(p, name))
         for lab, _d in fl:

@@ -83,6 +83,7 @@ def find_strategies(path):
     u"""[(файл, имя класса)] — по СТРУКТУРЕ (наследование IStrategy), а не
     по имени файла. Имя обманчиво, база наследования — нет."""
     out = []
+    # TOTAL: имена стратегий собираются в множество и сортируются вызывающим
     for dirpath, dirs, names in os.walk(path):
         dirs[:] = [d for d in dirs if d not in (".git", "__pycache__", "venv")]
         for n in names:
@@ -345,7 +346,10 @@ def backtest(name, timerange, fee="0.001", path=None, want_tf=None):
     # по большей части нет. В КОДЕ это невидимо — только в длительностях.
     tf_min = TF_MINUTES.get(used or want_tf)
     ad = d.get("avg_duration_min")
-    if tf_min and ad is not None:
+    # TOTAL: неизвестная свеча ⇒ поля не пишутся, и G9_candle ниже по течению
+    # ВАЛИТ стратегию с неизмеренной длительностью (починено 22.08). Отсутствие
+    # здесь не пропуск, а отказ — просто выносится он в другом месте.
+    if tf_min and ad is not None:  # TOTAL: отсутствие ⇒ отказ на G9
         d["dur_over_candle"] = round(ad / float(tf_min), 2)
         d["intracandle"] = bool(ad < tf_min)
     return (PASS, u"", d)

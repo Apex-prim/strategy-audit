@@ -40,6 +40,8 @@ REPO = os.path.join(_ROOT, "repo")
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # КОНВЕЙЕР — ровно эти модули считают опубликованные числа.
+# TOTAL: манифест конвейера — перечисление здесь не дефект, а сам предмет:
+# опубликованный код обязан быть объявлен, и sync_repo отказывает сиротам.
 PIPELINE = [
     "totality.py",
     "harness.py",        # измерение: движок, оба окна, оба прибора
@@ -67,7 +69,7 @@ PIPELINE = [
 ]
 
 # Живёт только в репозитории: проверяет опубликованное на чистой машине.
-REPO_ONLY = ["verify_ledger.py", "freeze_guard.py"]
+REPO_ONLY = ["verify_ledger.py", "freeze_guard.py"]  # TOTAL: манифест и ЕСТЬ объявление
 
 
 def orphans_only():

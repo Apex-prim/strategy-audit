@@ -28,6 +28,8 @@ from harness import find_strategies
 REPOS = os.path.join(_ROOT, "repos")
 MAX_KB = 60000          # объявленный предел: репозитории тяжелее не берём
 
+# TOTAL: перечень запрашиваемых пар — это ВХОД исследования, объявленный
+# намеренно, а не область проверки. Расширение списка — решение, не находка.
 WANT = [
     "keithorange/HUGE_FreqTrade_Strategy_Collection",
     "Foxel05/freqtrade-stuff",

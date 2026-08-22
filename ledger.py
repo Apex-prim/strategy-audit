@@ -190,8 +190,13 @@ def row_of(r, where):
     b = r["runs"]["out_sample"].get("summary")
     a = a if isinstance(a, dict) else {}
     b = b if isinstance(b, dict) else {}
+    # ⚠ 22.08, тотальность: было `tr = ... if p else []`. Не нашли исходник —
+    # список ловушек пуст — G8 ПРОЙДЕНА. «Не смотрели» читалось как «чисто»,
+    # ровно дефект G9_candle. На этом корпусе латентно (0 строк из 895 без
+    # исходника), но умолчание было льстивым. Теперь незнание — своё значение.
     p = where.get(r["strategy"])
-    tr = traps_mod.flags(traps_mod.inspect(p, r["strategy"])) if p else []
+    inspected = p is not None
+    tr = traps_mod.flags(traps_mod.inspect(p, r["strategy"])) if inspected else []
 
     g = collections.OrderedDict()
     g["G0_measured"] = bool(a.get("trades") is not None and b.get("trades") is not None)
@@ -202,7 +207,7 @@ def row_of(r, where):
     g["G5_os_sig"] = (b.get("p_value") if b.get("p_value") is not None else 1) < ALPHA
     g["G6_lookahead"] = r["runs"]["lookahead"]["level"] != FOUND
     g["G7_recursive"] = r["runs"]["recursive"]["level"] != FOUND
-    g["G8_traps"] = len(tr) == 0
+    g["G8_traps"] = inspected and len(tr) == 0   # неосмотренная НЕ проходит
     # ⚠ ОТСУТСТВИЕ ПОЛЯ — НЕ «ПРОШЛА». Карточки, посчитанные до появления слоя
     # длительности, поля не содержат, и `not card.get("intracandle")` молча
     # читалось как «прошла». Наличие ≠ содержание — ступень требует ИЗМЕРЕНИЯ.

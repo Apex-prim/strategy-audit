@@ -89,7 +89,7 @@ def main():
                              and os.path.getsize(os.path.join(OUT, "%s-%s.feather" % (f, TF))) > 100000)]
     print(u"ТАЙМФРЕЙМ %s · пар к загрузке %d из %d" % (TF, len(todo), len(PAIRS)), flush=True)
     for sym, ft in todo:
-        t0 = time.time()
+        t0 = time.time()  # TOTAL: длительность для печати, в вердикт не входит
         rows, gaps, neterr = [], [], 0
         for y, m in months():
             r, st = grab(sym, TF, "%04d-%02d" % (y, m))
@@ -123,7 +123,7 @@ def main():
             note += u" · СЕТЕВЫХ ОТКАЗОВ %d — ряд НЕПОЛОН" % neterr
         print(u"  ✓ %-9s %8d свечей  %s … %s  за %.0f с%s"
               % (sym, len(d), str(d["date"].iloc[0])[:10], str(d["date"].iloc[-1])[:10],
-                 time.time() - t0, note), flush=True)
+                 time.time() - t0, note), flush=True)  # TOTAL: печать длительности
     print(u"ГОТОВО %s" % TF, flush=True)
 
 
