@@ -89,6 +89,7 @@ END = u"<!-- LEDGER:END -->"
 CSV_COLS = ["strategy", "repo", "file", "population", "code_md5", "plan_md5",
             "is_trades", "is_exp", "is_p", "is_market",
             "os_trades", "os_exp", "os_p", "os_total", "os_market",
+            "os_avg_pct", "os_ci_low",
             "beats_bh", "lookahead", "recursive", "recursive_kind",
             "traps_n", "traps",
             "dur_over_candle", "dropped_at", "survives_through"]
@@ -120,6 +121,35 @@ def load(population="corpus"):
     return rows
 
 
+
+def ci_low(mean_pct, p_value, n):
+    u"""Нижняя граница 95% интервала средней сделки, в процентах.
+
+    Восстанавливается из того, что печатает freqtrade: среднее, p-значение и
+    число сделок. z берётся из p (двусторонний), стандартная ошибка = |m| / z,
+    граница = m - 1.96*se. Нормальное приближение допустимо: у выживших от 304
+    до 2688 сделок.
+
+    ⚠ ЗАЧЕМ (E6, 22.08). Лестница требовала ЗНАЧИМОСТИ и не требовала
+    ВЕЛИЧИНЫ. p = 1e-8 при микроскопическом эффекте бесполезнее, чем p = 0.003
+    при устойчивом. Возражение внешнее, дыра наша.
+    """
+    from statistics import NormalDist
+    if mean_pct is None or p_value is None or not n:
+        return None
+    pv = min(max(float(p_value), 1e-300), 0.999999)
+    try:
+        z = NormalDist().inv_cdf(1.0 - pv / 2.0)
+    except Exception:
+        return None
+    z = min(max(z, 1e-6), 40.0)
+    se = abs(mean_pct) / z
+    return mean_pct - 1.96 * se
+
+
+EXTRA_COST_PCT = 0.20   # удвоение издержки 0.1%->0.2% за сторону = 0.20 пп/сделку
+
+
 def recursive_kind(node):
     u"""РАЗДЕЛИТЬ ДВЕ РАЗНЫЕ ВЕЩИ ПОД ОДНИМ ЯРЛЫКОМ.
 
@@ -145,6 +175,12 @@ def recursive_kind(node):
     if u"меняются" in why or u"%" in why:
         return u"drift_measured"
     return u"other"
+
+
+def beats_precomputed(b):
+    if b.get("total_pct") is None or b.get("market_change_pct") is None:
+        return None
+    return b["total_pct"] > b["market_change_pct"]
 
 
 def row_of(r, where):
@@ -173,7 +209,11 @@ def row_of(r, where):
     g["G9_candle"] = (b.get("dur_over_candle") is not None
                       and not bool(b.get("intracandle")))
     g["G10_fdr"] = None                       # второй проход
+    lo = ci_low(b.get("avg_profit_pct"), b.get("p_value"), b.get("trades"))
+    g["G11_effect"] = bool(lo is not None and (lo - EXTRA_COST_PCT) > 0)
+    g["G12_economic"] = bool(beats_precomputed(b))
 
+    lo_ci = ci_low(b.get("avg_profit_pct"), b.get("p_value"), b.get("trades"))
     beats = None
     if b.get("total_pct") is not None and b.get("market_change_pct") is not None:
         beats = b["total_pct"] > b["market_change_pct"]
@@ -186,6 +226,8 @@ def row_of(r, where):
         "is_p": a.get("p_value"), "is_market": a.get("market_change_pct"),
         "os_trades": b.get("trades"), "os_exp": b.get("expectancy"),
         "os_p": b.get("p_value"), "os_total": b.get("total_pct"),
+        "os_avg_pct": b.get("avg_profit_pct"),
+        "os_ci_low": (None if lo_ci is None else round(lo_ci, 4)),
         "os_market": b.get("market_change_pct"), "beats_bh": beats,
         "lookahead": r["runs"]["lookahead"]["level"],
         "recursive": r["runs"]["recursive"]["level"],

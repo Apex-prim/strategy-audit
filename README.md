@@ -4,7 +4,8 @@ Every public freqtrade strategy that could be found and loaded — 895 unique
 classes from 53 repositories — run by **freqtrade itself** on its own declared
 timeframe, in its author's window and in years the author never saw.
 
-**Six survive every check. None beats buy-and-hold.**
+**Six clear every bias, trap and multiplicity check. Five of those have a real
+per-trade edge that survives doubled costs. None beats buy-and-hold.**
 
 <!-- LEDGER:BEGIN -->
 ```
@@ -26,6 +27,8 @@ the ladder, and where the corpus leaves it
   G8_traps      E2    15 ->    6
   G9_candle     E3     6 ->    6
   G10_fdr       E4     6 ->    6
+  G11_effect    E6     6 ->    5
+  G12_economic  E6     5 ->    0
 
 survivors under each decision set
   rules declared up to E0   survivors   66   beat buy-and-hold   4
@@ -33,8 +36,14 @@ survivors under each decision set
   rules declared up to E2   survivors    6   beat buy-and-hold   0
   rules declared up to E3   survivors    6   beat buy-and-hold   0
   rules declared up to E4   survivors    6   beat buy-and-hold   0
+  rules declared up to E5   survivors    6   beat buy-and-hold   0
+  rules declared up to E6   survivors    0   beat buy-and-hold   0
 
 Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
+
+PRIMARY ENDPOINT — survivors that beat buy-and-hold, frozen rule
+  0 of 456 eligible = 0.00%
+
 Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 6 of 6 survivors still clear it)
 ```
 <!-- LEDGER:END -->
@@ -91,6 +100,18 @@ published strategies are already negative before anyone tests them on new data.
 The second largest is `G7_recursive` — indicator values that change with how
 much history you feed them. Of the 51 killed there, **50 were measured drift**;
 only one was the formality of an undeclared warm-up.
+
+And the ladder ends on two gates that are not statistical at all. `G11_effect`
+asks whether the lower bound of the 95% interval on the average trade stays
+positive after **doubling** the cost assumption — significance without size is
+worth nothing, and `p = 1e-8` on a microscopic edge is less use than `p = 0.003`
+on a durable one. Five of the six clear it.
+
+`G12_economic` asks whether the strategy beat holding the same coins. **None
+does** — and not by a little. The six trail buy-and-hold by 187 to 308
+percentage points while each earns a genuine 0.30% to 1.74% per trade. They are
+not broken and they are not noise: they capture a fraction of a rise they never
+predicted, and holding captured all of it.
 
 - **[BASELINE.md](BASELINE.md)** — why `Market change`, the line freqtrade
   prints for free under every backtest, decides the question.

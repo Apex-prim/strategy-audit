@@ -30,8 +30,16 @@ LADDER = [
     ("G8_traps",      "E2", u"ни одной ловушки сообщества"),
     ("G9_candle",     "E3", u"длительность ИЗМЕРЕНА и не короче свечи"),
     ("G10_fdr",       "E4", u"p вне выборки проходит порог Бенджамини-Хохберга"),
+    # ── E6: размер эффекта и экономический гейт (22.08) ──────────────────
+    # Дыра, названная внешним разбором и подтверждённая счётом: лестница
+    # требовала ЗНАЧИМОСТИ и не требовала ВЕЛИЧИНЫ. p=1e-8 при микроскопическом
+    # эффекте бесполезнее, чем p=0.003 при устойчивом. G11 требует, чтобы
+    # нижняя граница 95% интервала средней сделки была положительна ПОСЛЕ
+    # удвоенной издержки; G12 — чтобы стратегия обошла альтернативу.
+    ("G11_effect",    "E6", u"нижняя граница 95% CI средней сделки > 0 при 2x издержке"),
+    ("G12_economic",  "E6", u"обошла «купил и держал» на тех же парах"),
 ]
-EPOCHS = ["E0", "E1", "E2", "E3", "E4"]
+EPOCHS = ["E0", "E1", "E2", "E3", "E4", "E5", "E6"]
 GATE_EPOCH = dict((k, e) for k, e, _d in LADDER)
 GATE_ORDER = dict((k, i) for i, (k, _e, _d) in enumerate(LADDER))
 ALPHA = 0.05
@@ -258,6 +266,15 @@ def build(rows, n_repo):
     surv_e4 = survivors_at(rows, "E4")
     held = sum(1 for r in surv_e4
                if r.get("os_p") is not None and r["os_p"] <= thr_by)
+    e6 = survivors_at(rows, "E6")
+    L.append(u"")
+    L.append(u"PRIMARY ENDPOINT — survivors that beat buy-and-hold, frozen rule")
+    L.append(u"  %d of %d eligible = %.2f%%"
+             % (len(e6), len([r for r in rows if (r.get("dropped_at") or "") not in
+                              ("G0_measured", "G1_trades")]),
+                100.0 * len(e6) / max(1, len([r for r in rows
+                    if (r.get("dropped_at") or "") not in ("G0_measured", "G1_trades")]))))
+    L.append(u"")
     L.append(u"Benjamini-Yekutieli  threshold %s, %d rejected  "
              u"(arbitrary dependence; %d of %d survivors still clear it)"
              % ((u"%.3e" % thr_by) if k_by else u"none", k_by,

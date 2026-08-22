@@ -69,6 +69,8 @@ the ladder, and where the corpus leaves it
   G8_traps      E2    15 ->    6
   G9_candle     E3     6 ->    6
   G10_fdr       E4     6 ->    6
+  G11_effect    E6     6 ->    5
+  G12_economic  E6     5 ->    0
 
 survivors under each decision set
   rules declared up to E0   survivors   66   beat buy-and-hold   4
@@ -76,8 +78,14 @@ survivors under each decision set
   rules declared up to E2   survivors    6   beat buy-and-hold   0
   rules declared up to E3   survivors    6   beat buy-and-hold   0
   rules declared up to E4   survivors    6   beat buy-and-hold   0
+  rules declared up to E5   survivors    6   beat buy-and-hold   0
+  rules declared up to E6   survivors    0   beat buy-and-hold   0
 
 Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
+
+PRIMARY ENDPOINT — survivors that beat buy-and-hold, frozen rule
+  0 of 456 eligible = 0.00%
+
 Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 6 of 6 survivors still clear it)
 ```
 

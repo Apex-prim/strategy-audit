@@ -31,9 +31,22 @@ all of the following, evaluated in this order:
 | 9 | community backtesting traps | zero flags | `traps.py`, thresholds theirs |
 | 10 | trade duration | **measured**, and ≥ 1 own candle | `harness.py` |
 | 11 | multiplicity | p out of sample ≤ Benjamini-Hochberg threshold | `ledger_block.py` |
+| 12 | effect size | lower bound of the 95% interval on the average trade > 0 **after doubling the cost assumption** | frozen here |
+| 13 | economic | strategy total % > `Market change` on the same pairs and window | freqtrade |
 
-The **primary endpoint** is the count of survivors that beat `Market change`
-(buy-and-hold on the same pairs over the same window) out of sample.
+The **primary endpoint** is the survivor count after gate 13, expressed as a
+fraction of eligible strategies — those that produced numbers and had at least
+30 trades.
+
+> **Amendment, 2026-08-22, before any next-corpus data exists.** Gates 12 and 13
+> were added on the day this file was written, after an outside reader pointed
+> out that the ladder demanded significance and never demanded size. The
+> amendment is recorded rather than folded in silently: it is legitimate only
+> because no result from the next corpus exists yet, and `git log` shows this
+> file amended before the first card of that corpus. **After the next sweep
+> begins, no amendment is legitimate** — a new disqualifier is reported as a
+> separate exploratory finding and the primary endpoint stays computed under the
+> thirteen gates above.
 
 The **secondary endpoint**, reported alongside and never instead, is the same
 count under Benjamini-Yekutieli, which controls FDR under arbitrary dependence.
