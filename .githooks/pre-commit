@@ -7,3 +7,8 @@ python tools/secret_gate.py || exit 1
 # 55 clean" for a day after the corpus had grown past 900, and an outside
 # reviewer built an assessment on it. Staleness reads as authority.
 python verify_ledger.py || exit 1
+
+# A rule younger than the data cannot support a confirmatory claim.
+# This derives the status from git and CORPUS_RUN.json rather than
+# trusting the prose, and refuses a commit where the two disagree.
+python freeze_guard.py || exit 1

@@ -74,9 +74,23 @@ with dates from `git log`, in **[LEDGER.md](LEDGER.md)**.
 
 Transparency does not convert a post-hoc decision into a pre-registered one.
 The only thing that does is fixing the rule before the next numbers exist, so
-**[PREREGISTRATION.md](PREREGISTRATION.md)** freezes all eleven gates, their
-thresholds and the primary endpoint for the next corpus — committed before that
-corpus is swept, with both dates checkable in `git log`.
+**[PREREGISTRATION.md](PREREGISTRATION.md)** freezes all thirteen gates, their
+thresholds and the primary endpoint for the next corpus.
+
+**Frozen 2026-08-22.** The next corpus has not been swept: no result file for it
+exists. You do not have to take that on trust — `freeze_guard.py` derives the
+status from `git log` and `CORPUS_RUN.json` and refuses a commit that claims
+more than the dates allow. On this corpus it returns **repair-adjusted**,
+because the last two gates were added 15 hours *after* the first result card:
+
+```
+ladder last changed : 2026-08-22 10:59:04 UTC
+first observation   : 2026-08-21 19:58:24 UTC
+verdict             : repair-adjusted
+```
+
+The guard is in CI and in the pre-commit hook. It is the only part of this
+repository whose job is to contradict its author.
 
 Which class each published number belongs to is a field, not a paragraph:
 **[CLAIMS.csv](CLAIMS.csv)** marks every figure as descriptive,
@@ -108,10 +122,48 @@ worth nothing, and `p = 1e-8` on a microscopic edge is less use than `p = 0.003`
 on a durable one. Five of the six clear it.
 
 `G12_economic` asks whether the strategy beat holding the same coins. **None
-does** — and not by a little. The six trail buy-and-hold by 187 to 308
-percentage points while each earns a genuine 0.30% to 1.74% per trade. They are
+does** — and not by a little. Over the whole out-of-sample window the six return
++38.6% to +159.6% in total while buy-and-hold returns +346.3%: a shortfall of
+**187 to 308 percentage points of cumulative return**, not per trade and not
+annualised. Each of them earns a genuine 0.30% to 1.74% *per trade*. They are
 not broken and they are not noise: they capture a fraction of a rise they never
 predicted, and holding captured all of it.
+
+> **It was the window, and the test says so.** The suspicion was that `G12`
+> measured the bull market rather than the strategies. Split by calendar year —
+> a division declared before the run, precisely so it could not be chosen to fit
+> the answer — the separation is total:
+>
+> ```
+> year    market       survivors beating buy-and-hold
+> 2020   +143.04%      0 of 5
+> 2021   +218.33%      0 of 5
+> 2022    -66.70%      5 of 5
+> 2023    +76.37%      0 of 5
+> 2024    +95.90%      0 of 5
+> 2025    -20.89%      5 of 5
+> 2026    -29.65%      5 of 5
+> ```
+>
+> Seven years, seven correct calls by the sign of the market. **The aggregate
+> verdict was a property of the window.**
+>
+> That is not a discovery of working strategies. In 2022 the market fell 66.7%
+> while these five returned between −5.9% and +3.5% — they were barely in the
+> market at all, and sitting out a crash is something cash does without any
+> strategy. The right benchmark for a low-exposure strategy is an
+> exposure-matched one, which this audit does not compute.
+>
+> **`G12` was not changed in response.** Making it regime-conditional, or
+> swapping the benchmark, would have been a rule adjusted after seeing what it
+> produced — on the same data, the same day. The finding is published as
+> exploratory, the gate stands, and the next corpus decides under a rule fixed in
+> advance. The episode is recorded in
+> **[DECISION_INVARIANCE.md](DECISION_INVARIANCE.md)**.
+>
+> So "none beats buy-and-hold" remains true of **these strategies, these eight
+> pairs, this window, this execution model** — and is now known to depend on the
+> window's direction.
 
 - **[BASELINE.md](BASELINE.md)** — why `Market change`, the line freqtrade
   prints for free under every backtest, decides the question.

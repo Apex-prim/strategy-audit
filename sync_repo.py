@@ -66,7 +66,7 @@ PIPELINE = [
 ]
 
 # Живёт только в репозитории: проверяет опубликованное на чистой машине.
-REPO_ONLY = ["verify_ledger.py"]
+REPO_ONLY = ["verify_ledger.py", "freeze_guard.py"]
 
 
 def orphans_only():

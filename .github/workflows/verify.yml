@@ -48,6 +48,11 @@ jobs:
           python verify_ledger.py --selftest
           python verify_ledger.py
 
+      - name: Freeze guard — a rule younger than the data is not confirmatory
+        run: |
+          python freeze_guard.py --selftest
+          python freeze_guard.py
+
       - name: Every published module must be declared part of the pipeline
         run: python sync_repo.py --orphans
 
