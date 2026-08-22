@@ -24,19 +24,19 @@ the ladder, and where the corpus leaves it
   G5_os_sig     E0    81 ->   72
   G6_lookahead  E0    72 ->   66
   G7_recursive  E1    66 ->   15
-  G8_traps      E2    15 ->    6
-  G9_candle     E3     6 ->    6
-  G10_fdr       E4     6 ->    6
-  G11_effect    E6     6 ->    5
-  G12_economic  E6     5 ->    0
+  G8_traps      E2    15 ->   14
+  G9_candle     E3    14 ->   14
+  G10_fdr       E4    14 ->   14
+  G11_effect    E6    14 ->   10
+  G12_economic  E6    10 ->    0
 
 survivors under each decision set
   rules declared up to E0   survivors   66   beat buy-and-hold   4
   rules declared up to E1   survivors   15   beat buy-and-hold   0
-  rules declared up to E2   survivors    6   beat buy-and-hold   0
-  rules declared up to E3   survivors    6   beat buy-and-hold   0
-  rules declared up to E4   survivors    6   beat buy-and-hold   0
-  rules declared up to E5   survivors    6   beat buy-and-hold   0
+  rules declared up to E2   survivors   14   beat buy-and-hold   0
+  rules declared up to E3   survivors   14   beat buy-and-hold   0
+  rules declared up to E4   survivors   14   beat buy-and-hold   0
+  rules declared up to E5   survivors   14   beat buy-and-hold   0
   rules declared up to E6   survivors    0   beat buy-and-hold   0
 
 Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
@@ -44,7 +44,7 @@ Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
 PRIMARY ENDPOINT — survivors that beat buy-and-hold, frozen rule
   0 of 456 eligible = 0.00%
 
-Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 6 of 6 survivors still clear it)
+Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 13 of 14 survivors still clear it)
 ```
 <!-- LEDGER:END -->
 
@@ -311,10 +311,17 @@ Caveats, stated rather than omitted:
 
 ## Corrections
 
-Twelve errors in this audit have been found, published and fixed — including a
+Fifteen errors in this audit have been found, published and fixed — including a
 metric that was not scale-free, a claim about five strategies made from the one
-I was looking at, and a consistency check that could not catch its own error
-because both sides used the same wrong formula, and a "trap" of my own invention that a reader correctly refuted within hours of publication.
+I was looking at, a consistency check that could not catch its own error because
+both sides used the same wrong formula, and a "trap" of my own invention that a
+reader correctly refuted within hours of publication.
+
+**Six of the fifteen came from readers**, and the largest is the most recent:
+the trap list was not using the community's own definition of a trap. Corrected,
+it flags 42 strategies rather than 371 and removes exactly one from the ladder.
+The published endpoint did not move — that was checked before the change was
+made, not after.
 
 They are collected in **[CORRECTIONS.md](CORRECTIONS.md)**, with what each one
 changed. An audit that hides its own corrections is asking for a trust it has

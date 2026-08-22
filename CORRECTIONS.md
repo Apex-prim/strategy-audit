@@ -285,7 +285,33 @@ effectively-tight trailing stops in this corpus is **unknown and at least 38**.
 
 ---
 
-## Measured, and it did not hold: "most of those are caught by lookahead-analysis"
+## Two detectors compared as rivals, when they have different subjects (2026-08-22)
+
+An earlier version of this file carried the section below under the heading
+*"Measured, and it did not hold"*, treating the overlap between `traps.py` and
+`lookahead-analysis` as a test of the latter.
+
+`Hippocritical`: *"careful — traps and lookahead-analysis check on different
+things, you mix them together."* He then said what his tool does:
+
+> *"It does a full backtest and then n cut-off backtests with the same start but
+> cut off where the trade would buy. If the trade buys at a different time, then
+> something fucked with the backtest dataframe and looked into the future. It
+> doesn't look into the strategy at all, it just checks its behaviour."*
+
+A black-box behavioural probe and a white-box reading of declared constants do
+not have the same subject. **Low overlap between them is what should be
+expected, and it is evidence about neither.** The numbers below are unchanged
+and still worth recording; what is withdrawn is the framing that made them a
+verdict on a detector.
+
+The mistake is worth naming precisely, because it is not the same as the others
+in this file: nothing was miscomputed. The arithmetic was right and the question
+was wrong.
+
+---
+
+## The measurement itself, kept without the framing
 
 From the same conversation. Testable directly, so it was tested.
 
@@ -304,3 +330,67 @@ lookahead verdict at all, because the analyser could not run on them. Reporting
 "only 3% overlap" would be the same overstatement in the opposite direction:
 counting an absent verdict as a clean one. The overlap is one in nine where it
 is known, and unknown for the other 72%.
+
+---
+
+## The trap list was not using the community's definition of a trap (2026-08-22)
+
+`Hippocritical`, asked directly whether `trailing_stop_positive` set while
+`trailing_stop` is `False` — 177 of 895 — belongs in a list of backtesting traps:
+
+> *"A backtesting trap is where you have a different result from backtest to dry
+> run. Backtesting works on candles, where dry / live runs work on ticker data
+> (which is not available, only max resolution of 1 minute via
+> timeframe-detail)."*
+
+Under that definition two of the four checks do not qualify. An inert trailing
+setting runs with trailing off in backtest *and* live; a −0.99 stoploss behaves
+identically in both. Neither produces divergence. They are a reader-misleading
+declaration and a risk decision respectively — real defects, wrong list.
+
+**What changed.** Both became notes. Strategies carrying at least one
+disqualifying trap fall from **371 to 42** (41% → 5%), and the number of
+strategies this layer removes from the ladder falls from **9 to 1** — `SMAIP3v2`,
+trailing tighter than the spread.
+
+The published endpoint is unchanged: **0 of 456 eligible strategies** clear every
+gate. Checked before the change, not after: the eight strategies held only by
+those two flags were carried through the remaining gates on their own recorded
+numbers, and all eight fail G12.
+
+**Said plainly, because it is the least flattering way to put it:** a layer
+introduced as flagging 41% of the corpus disqualifies one strategy in 895. The
+earlier figure was mostly counting things that are not backtesting traps.
+
+*My first version of the pre-check said the endpoint moved from 0 to 8. It was
+wrong: it counted "never evaluated at this gate" as "passed" — the identical
+defect this audit had already fixed once, in `G9_candle`, and written up above.
+It was caught by a plausibility guard that refused a ladder whose first rung was
+zero out of 895. Third occurrence of that class in one day, and the first one an
+automatic guard caught rather than a reader.*
+
+---
+
+## The ceiling on this instrument, stated by the people who build the engine
+
+`froggleston`: *"any callback can add a backtesting trap — it can be very
+subtle."*
+
+`Hippocritical`: *"you'll quickly run into limitations with your script. Without
+you understanding what it's actually looking for, your result is impossible to
+verify — and to sanity check. Imagine why freqtrade didn't bother to implement
+such a thing. It's simply impossible to catch all that — since the facts there
+in traps, for example, are floating."*
+
+Both are correct and neither is answerable with a better regex. A trap built
+inside `custom_exit`, `confirm_trade_entry` or a custom stoploss is invisible to
+something that reads declared constants, and the thresholds are practitioner
+judgement rather than physics.
+
+**[TRAPS.md](TRAPS.md) now states the scope as a necessary condition on declared
+configuration, not a detector**, and the headline count went with it. The part of
+the criticism that is not accepted is left explicit rather than quietly dropped:
+the checks are individually verifiable — each is a named constant, a documented
+threshold from the community's own article, and a number regenerated from
+`LEDGER.csv` by `verify_ledger.py`. Verifiability of *what it does* is not the
+same claim as completeness of *what exists*, and only the second is refused here.

@@ -1,4 +1,4 @@
-# Backtesting traps: 69% of the survivors carry at least one
+# Backtesting traps: a static screen that disqualifies one strategy in 895
 
 When this audit was posted to the freqtrade Discord, `froggleston` said the bias
 checks are not the only thing that flags a gamed strategy. He was right, and I
@@ -8,25 +8,105 @@ asked what else. The community answered with a link to their own document:
 
 It describes six ways a backtest flatters a strategy. Four are checkable by
 reading the code, and `traps.py` now checks them. **Nothing in this file is my
-own idea** — including the 0.1–0.5% spread threshold, which is theirs. Adding my
-own guesses on top of practitioner experience would have made it worse.
+own idea** — including the 0.1–0.5% spread threshold, which is theirs.
 
-## What the corpus looks like under their checks
+## What a backtesting trap is — the community's definition, not mine
+
+`Hippocritical`, freqtrade Discord, 2026-08-22:
+
+> *"A backtesting trap is where you have a different result from backtest to dry
+> run. Backtesting works on candles, where dry / live runs work on ticker data
+> (which is not available, only max resolution of 1 minute via
+> timeframe-detail)."*
+
+**Divergence between backtest and live is the whole definition.** Applying it to
+my own four checks disqualifies two of them:
+
+| check | backtest vs live | verdict |
+|---|---|---|
+| trailing tighter than the spread | backtest fills inside the spread, live does not | **trap** |
+| tight ROI on a long timeframe | the target is granted from the candle's range, not its path | **trap** |
+| inert trailing setting | trailing is off in *both* — the engine does what the config says | not a trap |
+| stoploss is not a stop | −0.99 behaves identically in both | not a trap |
+
+The last two are real defects — one misleads the reader, the other is a risk
+decision most people would not make knowingly — but they do not make a backtest
+disagree with live, so they are recorded as notes and disqualify nobody.
+
+I had already written that this question was *"the community's call, not mine"*.
+It was answered, so it is applied rather than debated.
+
+**Checked before it was applied.** Eight strategies were held at the traps gate
+by those two flags alone. Carried forward through the remaining gates on their
+own recorded numbers, **all eight fail G12** — none beats buy-and-hold on its
+own pairs. The published endpoint does not move.
+
+*(My first attempt at that check counted the eight as surviving everything
+downstream, because it treated "never evaluated" as "passed" — the same defect
+this audit had already fixed once, in `G9_candle`. It was caught by a
+plausibility guard that refused a ladder starting at zero.)*
+
+## What the corpus looks like after that
 
 ```
 strategies checked                              895
-of which pass every statistical gate             72
-of which also clear both bias detectors          15
+of which pass every statistical gate             72      flagged  8
+of which also clear both bias detectors          15      flagged  1
 
-stoploss is not a stop                          263
-inert trailing setting                          177
 trailing tighter than the spread                 38
 tight ROI on a long timeframe                     4
+flagged                                          42 of 895   (5%)
 
-flagged by at least one trap   371 of 895   (41%)
-among statistical survivors     50 of  72   (69%)
-among detector-clean            9 of  15    (60%)
+DISQUALIFIED BY THIS LAYER                        1 of 895
+   SMAIP3v2 — trailing tighter than the spread
+
+notes, not disqualifications
+   stoploss is not a stop                       263
+   inert trailing setting                       177
+   loose trailing (no trailing_stop_positive)    23
 ```
+
+Before this correction the layer flagged 371 strategies (41%) and read as a
+substantial filter. It is not one. **Stating it plainly: this layer costs one
+strategy out of 895, and the previous 41% was mostly counting things that are
+not backtesting traps.**
+
+## What this screen is not
+
+It reads declared configuration constants out of the source. That places a hard
+ceiling on it, and two members of the community named the ceiling directly.
+
+`froggleston`: *"any callback can add a backtesting trap — it can be very
+subtle."* Correct, and fatal to any claim of completeness: a trap constructed
+inside `custom_exit`, `confirm_trade_entry` or a custom stoploss is invisible to
+a reader of constants. Nothing here counts those.
+
+`Hippocritical`: *"it's simply impossible to catch all that — since the facts
+there in traps, for example, are floating."* Also correct. The thresholds are
+practitioner judgement, not physics, and a static screen cannot enumerate a set
+whose members are invented per strategy.
+
+**So this is a necessary condition on declared configuration, not a detector.**
+Passing it means four specific documented mistakes are absent from the constants.
+It means nothing about the callbacks, and it is not evidence of soundness.
+
+## It is a different subject from lookahead-analysis
+
+`Hippocritical` explained what `lookahead-analysis` actually does, and it is
+worth stating because I had compared the two as though they were rivals:
+
+> *"It does a full backtest and then n cut-off backtests with the same start but
+> cut off where the trade would buy. If the trade buys at a different time, then
+> something looked into the future. It doesn't look into the strategy at all, it
+> just checks its behaviour."*
+
+That is a **black-box behavioural test**. This file is a **white-box reading of
+constants**. They have different subjects, so low overlap between them is the
+expected result, not a shortfall in either. Measuring one against the other, as
+an earlier version of [CORRECTIONS.md](CORRECTIONS.md) did, was a category
+error — mine.
+
+---
 
 > **One flag was removed on 2026-08-22, and the removal was checked before it
 > was made.** `trailing_stop = True` with no `trailing_stop_positive` was

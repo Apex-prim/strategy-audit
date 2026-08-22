@@ -161,13 +161,34 @@ def flags(v, notes=None):
                             u"trailing_stop_positive = %.4f at %.0fx leverage = "
                             u"%.5f effective, below the 0.1–0.5%% spread the trap "
                             u"article names" % (tsp, lv, eff)))
+    # ⚠ БОЛЬШЕ НЕ ЛОВУШКИ, 22.08 — по ОПРЕДЕЛЕНИЮ сообщества.
+    # Hippocritical (freqtrade Discord): «a backtesting trap is where you have
+    # a different result from backtest to dry run. backtesting works on
+    # candles, where dry/live runs work on ticker data».
+    #
+    # Термин принадлежит сообществу: я сам записал в CORRECTIONS.md, что
+    # вопрос про 177 — «the community's call, not mine». Ответ получен —
+    # значит исполняется, а не обсуждается.
+    #
+    # Обе категории ниже НЕ дают расхождения бэктеста с прогоном: трейлинг
+    # выключен и там и там, стоп −0.99 работает одинаково в обоих. Они
+    # вводят в заблуждение ЧИТАТЕЛЯ и портят риск — это другой род дефекта.
+    #
+    # Проверено ПЕРЕД изменением: 8 стратегий держались на G8 только этими
+    # двумя флагами; проведённые по их собственным колонкам, все 8 падают на
+    # G12 (не обходят «купил и держал»). Итог лестницы 0 из 456 не двинулся.
     if tsp is not None and v.get("trailing_stop") is not True:
-        out.append((u"inert trailing setting",
-                    u"trailing_stop_positive = %s while trailing_stop is not True" % tsp))
+        notes.append((u"inert trailing setting",
+                      u"trailing_stop_positive = %s while trailing_stop is not "
+                      u"True — the engine runs trailing off in BOTH backtest and "
+                      u"live, so no divergence; the reader is misled, not the "
+                      u"result" % tsp))
     sl = v.get("stoploss")
     if sl is not None and sl <= -0.9:
-        out.append((u"stoploss is not a stop",
-                    u"stoploss = %s — losers are effectively never cut" % sl))
+        notes.append((u"stoploss is not a stop",
+                      u"stoploss = %s — losers are effectively never cut. Same in "
+                      u"backtest and live: a risk defect, not a backtesting trap"
+                      % sl))
     roi = v.get("roi_zero")
     if roi is not None and mins and mins >= 60 and roi <= 0.01:
         out.append((u"tight ROI on a long timeframe",
