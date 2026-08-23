@@ -40,6 +40,19 @@ before the rule was changed, and it is the whole point of this document.*
 
 ## 4. When the regime dependence was found
 
+> ⚠ **2026-08-22, evening — this table was computed on a population that no
+> longer exists.** `regime_split.json` holds five strategies from the survivor
+> set as it stood before two corrections landed: the trap definition (6 → 14)
+> and then the `G6`/`G7` fix that stopped counting an unrunnable bias check as
+> a pass (14 → 2). The current survivors are `ClucHAnix_5m_old` and
+> `CombinedBinHClucAndMADV5`; **neither appears in the five**. The regime
+> finding is kept because the decision it records — refusing to repair `G12`
+> after the data invited it — is a fact about a decision, not about the
+> strategies. But the table below is **exploratory, superseded, and must not be
+> read as describing the current survivor set.** Re-running it on the two is
+> open work.
+
+
 Same day, hours later. The out-of-sample window is a bull market, so the gate
 was suspected of measuring the window rather than the strategies. The test was
 declared before it ran and deliberately neutral — calendar years, not periods

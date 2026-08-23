@@ -78,7 +78,7 @@ sys.path.insert(0, _ROOT)
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 import traps as traps_mod
-from harness import find_strategies
+from harness import find_strategies, PASS
 from ledger_block import (ALPHA, EPOCHS, GATE_EPOCH, LADDER, bh, bh_population,
                           build, claims, survivors_at)
 
@@ -205,8 +205,21 @@ def row_of(r, where):
     g["G3_is_sig"] = (a.get("p_value") if a.get("p_value") is not None else 1) < ALPHA
     g["G4_os_pos"] = (b.get("expectancy") or 0) > 0
     g["G5_os_sig"] = (b.get("p_value") if b.get("p_value") is not None else 1) < ALPHA
-    g["G6_lookahead"] = r["runs"]["lookahead"]["level"] != FOUND
-    g["G7_recursive"] = r["runs"]["recursive"]["level"] != FOUND
+    # ⚠⚠ 22.08 ВЕЧЕР, НАЙДЕНО НЕЗАВИСИМЫМ АУДИТОМ. Было `!= FOUND`, то есть
+    # «НЕ ПРИМЕНИМА» (проверку выполнить НЕ УДАЛОСЬ) засчитывалось как
+    # ПРОЙДЕННУЮ. Из 72 дошедших до G6 не проверены 49; из 14 опубликованных
+    # выживших детектор заглядывания отработал только на ДВУХ.
+    #
+    # Это ТОТ ЖЕ класс, что чинился сегодня в G9_candle («отсутствие поля =
+    # пропуск») и в G8_traps («исходник не найден = ловушек нет»). Случай был
+    # починен дважды, КЛАСС не перебран — нарушено собственное запечатанное
+    # правило `feedback_fix_the_class_not_the_case` в тот же день, когда на
+    # него ссылались.
+    #
+    # Теперь ворота требуют ПОЛОЖИТЕЛЬНОГО вердикта, как уже требуют G8 и G9:
+    # незнание не есть прохождение.
+    g["G6_lookahead"] = r["runs"]["lookahead"]["level"] == PASS
+    g["G7_recursive"] = r["runs"]["recursive"]["level"] == PASS
     g["G8_traps"] = inspected and len(tr) == 0   # неосмотренная НЕ проходит
     # ⚠ ОТСУТСТВИЕ ПОЛЯ — НЕ «ПРОШЛА». Карточки, посчитанные до появления слоя
     # длительности, поля не содержат, и `not card.get("intracandle")` молча

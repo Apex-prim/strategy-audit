@@ -64,21 +64,21 @@ the ladder, and where the corpus leaves it
   G3_is_sig     E0   158 ->   83
   G4_os_pos     E0    83 ->   81
   G5_os_sig     E0    81 ->   72
-  G6_lookahead  E0    72 ->   66
-  G7_recursive  E1    66 ->   15
-  G8_traps      E2    15 ->   14
-  G9_candle     E3    14 ->   14
-  G10_fdr       E4    14 ->   14
-  G11_effect    E6    14 ->   10
-  G12_economic  E6    10 ->    0
+  G6_lookahead  E0    72 ->   17
+  G7_recursive  E1    17 ->    2
+  G8_traps      E2     2 ->    2
+  G9_candle     E3     2 ->    2
+  G10_fdr       E4     2 ->    2
+  G11_effect    E6     2 ->    1
+  G12_economic  E6     1 ->    0
 
 survivors under each decision set
-  rules declared up to E0   survivors   66   beat buy-and-hold   4
-  rules declared up to E1   survivors   15   beat buy-and-hold   0
-  rules declared up to E2   survivors   14   beat buy-and-hold   0
-  rules declared up to E3   survivors   14   beat buy-and-hold   0
-  rules declared up to E4   survivors   14   beat buy-and-hold   0
-  rules declared up to E5   survivors   14   beat buy-and-hold   0
+  rules declared up to E0   survivors   17   beat buy-and-hold   3
+  rules declared up to E1   survivors    2   beat buy-and-hold   0
+  rules declared up to E2   survivors    2   beat buy-and-hold   0
+  rules declared up to E3   survivors    2   beat buy-and-hold   0
+  rules declared up to E4   survivors    2   beat buy-and-hold   0
+  rules declared up to E5   survivors    2   beat buy-and-hold   0
   rules declared up to E6   survivors    0   beat buy-and-hold   0
 
 Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
@@ -86,7 +86,7 @@ Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
 PRIMARY ENDPOINT — survivors that beat buy-and-hold, frozen rule
   0 of 456 eligible = 0.00%
 
-Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 13 of 14 survivors still clear it)
+Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 2 of 2 survivors still clear it)
 ```
 
 ## Reading the ladder
@@ -110,5 +110,5 @@ column of the epoch table — how many survivors beat buy-and-hold on the
 same pairs over the same window — is the one that matters, and the one
 nearly every published backtest omits.
 
-Survivors under the full rule set: **14**.
+Survivors under the full rule set: **2**.
 

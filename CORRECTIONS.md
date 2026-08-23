@@ -421,3 +421,60 @@ are in the watch list, and that the reported time equals the maximum over them.
 This is the same class as three other entries here — **a check that asked about
 the word rather than the subject.** It is on record because a machine built to
 catch that class had it, in the part of itself that judges its author.
+
+---
+
+## A gate that passed what it had never measured — again, in the gate that matters most (2026-08-22, evening)
+
+Above, under *"A gate that passed what it had never measured"*, this file
+records fixing `G9_candle`: a card with no duration field read as **passed**.
+Earlier the same day `G8_traps` was fixed for the identical reason — a strategy
+whose source could not be found scored as having no traps.
+
+The case was fixed twice. **The class was never swept.** `ledger.py` read:
+
+```python
+g["G6_lookahead"] = r["runs"]["lookahead"]["level"] != FOUND
+g["G7_recursive"] = r["runs"]["recursive"]["level"] != FOUND
+```
+
+`НЕ ПРИМЕНИМА` — *the check could not be run* — is not `FOUND`, so it passed.
+
+**The scale.** Look-ahead analysis returns no verdict for **611 of 895**
+strategies. Of the 72 reaching `G6`: **49 unmeasured, 17 clean, 6 flagged** —
+and all 49 passed. Of the fourteen strategies this repository published as
+survivors, **twelve had never been successfully look-ahead-tested.** Two had.
+
+Root cause in `harness.py`: freqtrade emits a three-cell row for
+`"too few trades caught (N/M). Test failed."` and for `"error while checking"`;
+the parser expects a four-column Yes/No row, fails, and returns NA. A strategy
+freqtrade explicitly marked **Test failed** was scored clean — contradicting
+`harness.py`'s own docstring, which says in as many words that "could not
+check" must never print as "clean".
+
+**What changed.** Both gates now require a positive verdict, exactly as `G8`
+and `G9` already did:
+
+```
+                          before        after
+G6_lookahead          72 ->  66      72 ->  17
+G7_recursive          66 ->  15      17 ->   2
+survivors published          14             2
+clear the effect-size gate   10             1
+PRIMARY ENDPOINT        0 of 456       0 of 456
+```
+
+**The headline shrinks sevenfold and the conclusion does not move.** That is
+the whole argument for making the change.
+
+**Stated because it is the least flattering part:** this was found by an
+independent audit, not by the machinery built to catch it, and it is the sixth
+occurrence in one day of a single class — a check that asks about the word
+rather than the subject. This repository's own sealed rule says *fix the class,
+not the case*; that rule was cited here hours before this gate was found still
+broken. A rule invoked and not executed is not a rule.
+
+**Consequence for the reader:** every earlier statement about "six survivors"
+or "fourteen survivors" described populations containing strategies never
+tested for look-ahead bias. The published endpoint — no strategy beats
+buy-and-hold — is unchanged under all three versions.

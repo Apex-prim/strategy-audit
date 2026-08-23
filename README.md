@@ -4,8 +4,8 @@ Every public freqtrade strategy that could be found and loaded — 895 unique
 classes from 53 repositories — run by **freqtrade itself** on its own declared
 timeframe, in its author's window and in years the author never saw.
 
-**Fourteen clear every bias, trap and multiplicity check. Ten of those have a
-real per-trade edge that survives doubled costs. None beats buy-and-hold.**
+**Two clear every bias, trap and multiplicity check. One of those has a real
+per-trade edge that survives doubled costs. It does not beat buy-and-hold.**
 
 <!-- LEDGER:BEGIN -->
 ```
@@ -22,21 +22,21 @@ the ladder, and where the corpus leaves it
   G3_is_sig     E0   158 ->   83
   G4_os_pos     E0    83 ->   81
   G5_os_sig     E0    81 ->   72
-  G6_lookahead  E0    72 ->   66
-  G7_recursive  E1    66 ->   15
-  G8_traps      E2    15 ->   14
-  G9_candle     E3    14 ->   14
-  G10_fdr       E4    14 ->   14
-  G11_effect    E6    14 ->   10
-  G12_economic  E6    10 ->    0
+  G6_lookahead  E0    72 ->   17
+  G7_recursive  E1    17 ->    2
+  G8_traps      E2     2 ->    2
+  G9_candle     E3     2 ->    2
+  G10_fdr       E4     2 ->    2
+  G11_effect    E6     2 ->    1
+  G12_economic  E6     1 ->    0
 
 survivors under each decision set
-  rules declared up to E0   survivors   66   beat buy-and-hold   4
-  rules declared up to E1   survivors   15   beat buy-and-hold   0
-  rules declared up to E2   survivors   14   beat buy-and-hold   0
-  rules declared up to E3   survivors   14   beat buy-and-hold   0
-  rules declared up to E4   survivors   14   beat buy-and-hold   0
-  rules declared up to E5   survivors   14   beat buy-and-hold   0
+  rules declared up to E0   survivors   17   beat buy-and-hold   3
+  rules declared up to E1   survivors    2   beat buy-and-hold   0
+  rules declared up to E2   survivors    2   beat buy-and-hold   0
+  rules declared up to E3   survivors    2   beat buy-and-hold   0
+  rules declared up to E4   survivors    2   beat buy-and-hold   0
+  rules declared up to E5   survivors    2   beat buy-and-hold   0
   rules declared up to E6   survivors    0   beat buy-and-hold   0
 
 Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
@@ -44,7 +44,7 @@ Benjamini-Hochberg threshold 3.872e-02 over 81 tests, 72 rejected
 PRIMARY ENDPOINT — survivors that beat buy-and-hold, frozen rule
   0 of 456 eligible = 0.00%
 
-Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 13 of 14 survivors still clear it)
+Benjamini-Yekutieli  threshold 2.752e-03, 70 rejected  (arbitrary dependence; 2 of 2 survivors still clear it)
 ```
 <!-- LEDGER:END -->
 
@@ -57,9 +57,22 @@ return code behind them rather than a promise.
 
 ## Two numbers, and the order they were decided in
 
+> ⚠ **2026-08-22, evening — this table was computed on a population that no
+> longer exists.** `regime_split.json` holds five strategies from the survivor
+> set as it stood before two corrections landed: the trap definition (6 → 14)
+> and then the `G6`/`G7` fix that stopped counting an unrunnable bias check as
+> a pass (14 → 2). The current survivors are `ClucHAnix_5m_old` and
+> `CombinedBinHClucAndMADV5`; **neither appears in the five**. The regime
+> finding is kept because the decision it records — refusing to repair `G12`
+> after the data invited it — is a fact about a decision, not about the
+> strategies. But the table below is **exploratory, superseded, and must not be
+> read as describing the current survivor set.** Re-running it on the two is
+> open work.
+
+
 Read the last table again. Under the rules **declared before the sweep**, 66
 strategies survive and **four beat the market**. Under the full rule set,
-fourteen survive and **none** does.
+two survive and **neither** does.
 
 Both are published because the difference is not a better measurement — it is
 the same measurement under a rule that was chosen later. Both bias detectors ran
@@ -102,8 +115,8 @@ return code; a column can be checked.
 dependence of a particular kind — and 65% of this corpus is copies, so that
 guarantee formally does not apply. Benjamini-Yekutieli, which holds under
 *arbitrary* dependence, is therefore reported alongside it. Its threshold is
-5.0× stricter and **thirteen of the fourteen survivors still clear it**. The
-conclusion does not rest on the dependence assumption.
+5.0× stricter and **both survivors still clear it**. The conclusion does not
+rest on the dependence assumption.
 
 ## Where the corpus actually dies
 
@@ -119,15 +132,15 @@ And the ladder ends on two gates that are not statistical at all. `G11_effect`
 asks whether the lower bound of the 95% interval on the average trade stays
 positive after **doubling** the cost assumption — significance without size is
 worth nothing, and `p = 1e-8` on a microscopic edge is less use than `p = 0.003`
-on a durable one. Ten of the fourteen clear it.
+on a durable one. One of the two clears it.
 
 `G12_economic` asks whether the strategy beat holding the same coins. **None
-does** — and not by a little. Over the whole out-of-sample window the ten return
-+38.6% to +156.6% in total while buy-and-hold returns +346.3%: a shortfall of
-**190 to 308 percentage points of cumulative return**, not per trade and not
-annualised. Each of them earns a genuine 0.46% to 1.74% *per trade*. They are
-not broken and they are not noise: they capture a fraction of a rise they never
-predicted, and holding captured all of it.
+does** — and not by a little. Over the whole out-of-sample window the single
+survivor returns **+106.9%** while buy-and-hold returns +346.3%: a shortfall of
+**239 percentage points of cumulative return**, not per trade and not
+annualised. It earns a genuine **+0.46%** *per trade*. It is not broken and it
+is not noise: it captures a fraction of a rise it never predicted, and holding
+captured all of it.
 
 > **It was the window, and the test says so.** The suspicion was that `G12`
 > measured the bull market rather than the strategies. Split by calendar year —
