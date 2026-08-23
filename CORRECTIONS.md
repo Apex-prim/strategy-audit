@@ -333,6 +333,38 @@ is known, and unknown for the other 72%.
 
 ---
 
+## Nine strategies were measured without a mechanism they contain (2026-08-23)
+
+`adjust_trade_position` — the DCA hook — is only called when
+`position_adjustment_enable` is set. freqtrade resolves that attribute in one
+order and one order only: configuration, then the strategy class, then the
+default (`strategy_resolver.py`, `_override_attribute_helper`).
+
+This sweep supplies its own `config.json`. It does not mention the flag, so
+for 82 strategies the class attribute wins and their DCA ran. **Nine define
+the method and set the flag nowhere in the class** — theirs lives in the
+`config.json` shipped alongside, which this sweep replaced. Their DCA did not
+run here. `NostalgiaForInfinity772martinsk3` is among them.
+
+Their ledger rows are not wrong. They describe a different thing than their
+author built, and until now nothing said so. The column
+`suppressed_by_our_config` in [DCA.csv](DCA.csv) marks all nine, and
+[DCA.md](DCA.md) explains it.
+
+**Found while answering a question, not by the machinery.** Someone asked in
+the Discord for DCA results; checking whether this corpus could answer it at
+all meant reading how freqtrade resolves that flag, and the nine fell out of
+that reading. Nothing in this repository would have raised them otherwise.
+
+**What it changes in the published numbers:** nothing. None of the nine
+survives the ladder under any decision set. The endpoint stands at 0 of 456.
+It is published because a count that is right for the wrong reason is still
+a thing a reader deserves to know about.
+
+**The general form, for anyone copying a strategy file:** a strategy's
+behaviour is not all in the strategy file. Take the `.py` without its config
+and you get, silently, a different strategy.
+
 ## The trap list was not using the community's definition of a trap (2026-08-22)
 
 `Hippocritical`, asked directly whether `trailing_stop_positive` set while

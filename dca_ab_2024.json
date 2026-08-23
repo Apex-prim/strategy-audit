@@ -1,0 +1,698 @@
+{
+ "AlexBattleTankKillerV40H": {
+  "on": {
+   "trades": 635,
+   "entries": 635,
+   "exits": 635,
+   "stake_sum": 17781.9939803,
+   "peak_sum": 17781.9939803,
+   "total_pct": -0.6979109530000002,
+   "total_abs": -6.979109530000002,
+   "win_pct": 68.03149606299213,
+   "dd_pct": 2.435670163348429
+  },
+  "off": {
+   "trades": 635,
+   "entries": 635,
+   "exits": 635,
+   "stake_sum": 30820.4054157,
+   "peak_sum": 30820.4054157,
+   "total_pct": -1.2592530370000006,
+   "total_abs": -12.592530370000006,
+   "win_pct": 68.03149606299213,
+   "dd_pct": 4.245078320427468
+  }
+ },
+ "cryptotank": {
+  "on": {
+   "trades": 202,
+   "entries": 243,
+   "exits": 202,
+   "stake_sum": 37482.1308215,
+   "peak_sum": 37482.1308215,
+   "total_pct": 30.264689501999996,
+   "total_abs": 302.64689502,
+   "win_pct": 83.66336633663366,
+   "dd_pct": 18.161822609345567
+  },
+  "off": {
+   "trades": 188,
+   "entries": 188,
+   "exits": 188,
+   "stake_sum": 27345.7100418,
+   "peak_sum": 27345.7100418,
+   "total_pct": 28.3934521,
+   "total_abs": 283.934521,
+   "win_pct": 82.97872340425532,
+   "dd_pct": 9.42353382393485
+  }
+ },
+ "cryptotankV5": {
+  "on": {
+   "trades": 467,
+   "entries": 467,
+   "exits": 467,
+   "stake_sum": 57678.96953,
+   "peak_sum": 57678.96953,
+   "total_pct": -11.798719526,
+   "total_abs": -117.98719526,
+   "win_pct": 90.79229122055675,
+   "dd_pct": 34.99523799906937
+  },
+  "off": {
+   "trades": 467,
+   "entries": 467,
+   "exits": 467,
+   "stake_sum": 57678.96953,
+   "peak_sum": 57678.96953,
+   "total_pct": -11.798719526,
+   "total_abs": -117.98719526,
+   "win_pct": 90.79229122055675,
+   "dd_pct": 34.99523799906937
+  }
+ },
+ "CTIBS": {
+  "on": {
+   "trades": 639,
+   "entries": 639,
+   "exits": 639,
+   "stake_sum": 77122.750945,
+   "peak_sum": 77122.750945,
+   "total_pct": -1.8997918649999987,
+   "total_abs": -18.99791864999999,
+   "win_pct": 88.88888888888889,
+   "dd_pct": 31.335067032930585
+  },
+  "off": {
+   "trades": 639,
+   "entries": 639,
+   "exits": 639,
+   "stake_sum": 77122.750945,
+   "peak_sum": 77122.750945,
+   "total_pct": -1.8997918649999987,
+   "total_abs": -18.99791864999999,
+   "win_pct": 88.88888888888889,
+   "dd_pct": 31.335067032930585
+  }
+ },
+ "E0V1E_DCA3": {
+  "on": {
+   "trades": 200,
+   "entries": 229,
+   "exits": 200,
+   "stake_sum": 19016.6790584,
+   "peak_sum": 19016.6790584,
+   "total_pct": 17.863387676000002,
+   "total_abs": 178.63387676000002,
+   "win_pct": 84.0,
+   "dd_pct": 2.662250805623162
+  },
+  "off": {
+   "trades": 208,
+   "entries": 208,
+   "exits": 208,
+   "stake_sum": 18130.4867094,
+   "peak_sum": 18130.4867094,
+   "total_pct": 13.711717885999999,
+   "total_abs": 137.11717886,
+   "win_pct": 79.32692307692308,
+   "dd_pct": 2.745620713483504
+  }
+ },
+ "eltoro": {
+  "on": {
+   "trades": 416,
+   "entries": 416,
+   "exits": 416,
+   "stake_sum": 56078.1891568,
+   "peak_sum": 56078.1891568,
+   "total_pct": 1.6545540070000007,
+   "total_abs": 16.54554007000001,
+   "win_pct": 92.3076923076923,
+   "dd_pct": 25.614602059223575
+  },
+  "off": {
+   "trades": 416,
+   "entries": 416,
+   "exits": 416,
+   "stake_sum": 56078.1891568,
+   "peak_sum": 56078.1891568,
+   "total_pct": 1.6545540070000007,
+   "total_abs": 16.54554007000001,
+   "win_pct": 92.3076923076923,
+   "dd_pct": 25.614602059223575
+  }
+ },
+ "eltoro1_4": {
+  "on": {
+   "trades": 204,
+   "entries": 204,
+   "exits": 204,
+   "stake_sum": 29396.4409189,
+   "peak_sum": 29396.4409189,
+   "total_pct": 29.459302973999996,
+   "total_abs": 294.59302973999996,
+   "win_pct": 90.68627450980392,
+   "dd_pct": 12.273881975630387
+  },
+  "off": {
+   "trades": 204,
+   "entries": 204,
+   "exits": 204,
+   "stake_sum": 29396.4409189,
+   "peak_sum": 29396.4409189,
+   "total_pct": 29.459302973999996,
+   "total_abs": 294.59302973999996,
+   "win_pct": 90.68627450980392,
+   "dd_pct": 12.273881975630387
+  }
+ },
+ "eltoro1_4_simple": {
+  "on": {
+   "trades": 199,
+   "entries": 199,
+   "exits": 199,
+   "stake_sum": 25335.5399828,
+   "peak_sum": 25335.5399828,
+   "total_pct": -1.3436457249999971,
+   "total_abs": -13.436457249999972,
+   "win_pct": 84.92462311557789,
+   "dd_pct": 30.771712197158386
+  },
+  "off": {
+   "trades": 199,
+   "entries": 199,
+   "exits": 199,
+   "stake_sum": 25335.5399828,
+   "peak_sum": 25335.5399828,
+   "total_pct": -1.3436457249999971,
+   "total_abs": -13.436457249999972,
+   "win_pct": 84.92462311557789,
+   "dd_pct": 30.771712197158386
+  }
+ },
+ "FVGAdvancedStrategy_V2": {
+  "on": {
+   "trades": 256,
+   "entries": 289,
+   "exits": 499,
+   "stake_sum": 35399.02881378,
+   "peak_sum": 39766.4097076,
+   "total_pct": 19.502451708000002,
+   "total_abs": 195.02451708,
+   "win_pct": 49.21875,
+   "dd_pct": 12.61985274666006
+  },
+  "off": {
+   "trades": 259,
+   "entries": 259,
+   "exits": 259,
+   "stake_sum": 32160.5434931,
+   "peak_sum": 32160.5434931,
+   "total_pct": 17.499506010000005,
+   "total_abs": 174.99506010000005,
+   "win_pct": 46.33204633204633,
+   "dd_pct": 8.921759916973796
+  }
+ },
+ "InverseVolatilityPortfolio": {
+  "on": {
+   "trades": 7,
+   "entries": 35,
+   "exits": 28,
+   "stake_sum": 1225.51105904,
+   "peak_sum": 2106.8476789,
+   "total_pct": 162.747431492,
+   "total_abs": 1627.47431492,
+   "win_pct": 100.0,
+   "dd_pct": 0.0
+  },
+  "off": {
+   "trades": 7,
+   "entries": 7,
+   "exits": 7,
+   "stake_sum": 989.9985445,
+   "peak_sum": 989.9985445,
+   "total_pct": 99.834892616,
+   "total_abs": 998.34892616,
+   "win_pct": 100.0,
+   "dd_pct": 0.0
+  }
+ },
+ "MaxSharpePortfolio": {
+  "on": {
+   "trades": 12,
+   "entries": 16,
+   "exits": 20,
+   "stake_sum": 3512.6344878200002,
+   "peak_sum": 6648.4257117,
+   "total_pct": 48.081892958,
+   "total_abs": 480.81892958,
+   "win_pct": 50.0,
+   "dd_pct": 21.56860393315124
+  },
+  "off": {
+   "trades": 5,
+   "entries": 5,
+   "exits": 5,
+   "stake_sum": 2658.834645,
+   "peak_sum": 2658.834645,
+   "total_pct": 100.724720085,
+   "total_abs": 1007.2472008499999,
+   "win_pct": 40.0,
+   "dd_pct": 46.833506575
+  }
+ },
+ "MinimumVariancePortfolio": {
+  "on": {
+   "trades": 16,
+   "entries": 33,
+   "exits": 34,
+   "stake_sum": 5743.58932505,
+   "peak_sum": 8258.8595623,
+   "total_pct": 330.307370884,
+   "total_abs": 3303.0737088400006,
+   "win_pct": 50.0,
+   "dd_pct": 3.4327303368650695
+  },
+  "off": {
+   "trades": 16,
+   "entries": 16,
+   "exits": 16,
+   "stake_sum": 2959.106915,
+   "peak_sum": 2959.106915,
+   "total_pct": 187.678059278,
+   "total_abs": 1876.78059278,
+   "win_pct": 50.0,
+   "dd_pct": 7.543116465547783
+  }
+ },
+ "NOTankAi_15_Cleaned": {
+  "on": {
+   "trades": 1534,
+   "entries": 1544,
+   "exits": 1534,
+   "stake_sum": 1397769.3421154,
+   "peak_sum": 1397769.3421154,
+   "total_pct": 2639.751755405,
+   "total_abs": 26397.517554050002,
+   "win_pct": 99.86962190352021,
+   "dd_pct": 0.907451888991102
+  },
+  "off": {
+   "trades": 1254,
+   "entries": 1254,
+   "exits": 1254,
+   "stake_sum": 787625.2999083,
+   "peak_sum": 787625.2999083,
+   "total_pct": 1444.1348531839997,
+   "total_abs": 14441.348531839998,
+   "win_pct": 99.76076555023923,
+   "dd_pct": 3.4558129409568066
+  }
+ },
+ "PolymarketPortfolio": {
+  "on": {
+   "trades": 58,
+   "entries": 66,
+   "exits": 69,
+   "stake_sum": 1309.33999954,
+   "peak_sum": 1750.08124,
+   "total_pct": 2.052522809,
+   "total_abs": 20.52522809,
+   "win_pct": 70.6896551724138,
+   "dd_pct": 0.5811672547655711
+  },
+  "off": {
+   "trades": 58,
+   "entries": 58,
+   "exits": 58,
+   "stake_sum": 1458.80117,
+   "peak_sum": 1458.80117,
+   "total_pct": 1.7184195739999995,
+   "total_abs": 17.184195739999996,
+   "win_pct": 67.24137931034483,
+   "dd_pct": 0.713768706515871
+  }
+ },
+ "RiskParityPortfolio": {
+  "on": {
+   "trades": 7,
+   "entries": 34,
+   "exits": 22,
+   "stake_sum": 972.19672317,
+   "peak_sum": 1785.1152651,
+   "total_pct": 162.792708154,
+   "total_abs": 1627.92708154,
+   "win_pct": 100.0,
+   "dd_pct": 0.0
+  },
+  "off": {
+   "trades": 7,
+   "entries": 7,
+   "exits": 7,
+   "stake_sum": 989.987876,
+   "peak_sum": 989.987876,
+   "total_pct": 94.26592654200002,
+   "total_abs": 942.6592654200002,
+   "win_pct": 100.0,
+   "dd_pct": 0.0
+  }
+ },
+ "SMAOffset_Hippocritical_dca": {
+  "on": {
+   "trades": 25,
+   "entries": 36,
+   "exits": 25,
+   "stake_sum": 880.24685,
+   "peak_sum": 880.24685,
+   "total_pct": 0.5411427199999999,
+   "total_abs": 5.4114271999999985,
+   "win_pct": 96.0,
+   "dd_pct": 0.40251717290234373
+  },
+  "off": {
+   "trades": 24,
+   "entries": 24,
+   "exits": 24,
+   "stake_sum": 545.08111,
+   "peak_sum": 545.08111,
+   "total_pct": 0.4636015869999999,
+   "total_abs": 4.63601587,
+   "win_pct": 91.66666666666667,
+   "dd_pct": 0.17986385978451785
+  }
+ },
+ "SMAOffset_Hippocritical_dca_leverage": {
+  "on": {
+   "trades": 25,
+   "entries": 36,
+   "exits": 25,
+   "stake_sum": 880.24685,
+   "peak_sum": 880.24685,
+   "total_pct": 0.5411427199999999,
+   "total_abs": 5.4114271999999985,
+   "win_pct": 96.0,
+   "dd_pct": 0.40251717290234373
+  },
+  "off": {
+   "trades": 24,
+   "entries": 24,
+   "exits": 24,
+   "stake_sum": 545.08111,
+   "peak_sum": 545.08111,
+   "total_pct": 0.4636015869999999,
+   "total_abs": 4.63601587,
+   "win_pct": 91.66666666666667,
+   "dd_pct": 0.17986385978451785
+  }
+ },
+ "SMAOffset_Hippocritical_dca_old": {
+  "on": {
+   "trades": 25,
+   "entries": 36,
+   "exits": 25,
+   "stake_sum": 880.24685,
+   "peak_sum": 880.24685,
+   "total_pct": 0.5411427199999999,
+   "total_abs": 5.4114271999999985,
+   "win_pct": 96.0,
+   "dd_pct": 0.40251717290234373
+  },
+  "off": {
+   "trades": 24,
+   "entries": 24,
+   "exits": 24,
+   "stake_sum": 545.08111,
+   "peak_sum": 545.08111,
+   "total_pct": 0.4636015869999999,
+   "total_abs": 4.63601587,
+   "win_pct": 91.66666666666667,
+   "dd_pct": 0.17986385978451785
+  }
+ },
+ "SMAOffset_Hippocritical_dca_protections": {
+  "on": {
+   "trades": 25,
+   "entries": 36,
+   "exits": 25,
+   "stake_sum": 880.24685,
+   "peak_sum": 880.24685,
+   "total_pct": 0.5411427199999999,
+   "total_abs": 5.4114271999999985,
+   "win_pct": 96.0,
+   "dd_pct": 0.40251717290234373
+  },
+  "off": {
+   "trades": 24,
+   "entries": 24,
+   "exits": 24,
+   "stake_sum": 545.08111,
+   "peak_sum": 545.08111,
+   "total_pct": 0.4636015869999999,
+   "total_abs": 4.63601587,
+   "win_pct": 91.66666666666667,
+   "dd_pct": 0.17986385978451785
+  }
+ },
+ "Tank1Modulus": {
+  "on": {
+   "trades": 183,
+   "entries": 183,
+   "exits": 193,
+   "stake_sum": 14435.2179441,
+   "peak_sum": 14630.9798736,
+   "total_pct": 10.91752675,
+   "total_abs": 109.1752675,
+   "win_pct": 96.72131147540983,
+   "dd_pct": 7.113449982787882
+  },
+  "off": {
+   "trades": 183,
+   "entries": 183,
+   "exits": 183,
+   "stake_sum": 14625.0278396,
+   "peak_sum": 14625.0278396,
+   "total_pct": 10.762001988,
+   "total_abs": 107.62001988,
+   "win_pct": 96.72131147540983,
+   "dd_pct": 7.111831212716205
+  }
+ },
+ "thetank3": {
+  "on": {
+   "trades": 979,
+   "entries": 979,
+   "exits": 979,
+   "stake_sum": 110165.5145062,
+   "peak_sum": 110165.5145062,
+   "total_pct": -19.515358096,
+   "total_abs": -195.15358096000003,
+   "win_pct": 74.46373850868233,
+   "dd_pct": 40.27247677103623
+  },
+  "off": {
+   "trades": 979,
+   "entries": 979,
+   "exits": 979,
+   "stake_sum": 110165.5145062,
+   "peak_sum": 110165.5145062,
+   "total_pct": -19.515358096,
+   "total_abs": -195.15358096000003,
+   "win_pct": 74.46373850868233,
+   "dd_pct": 40.27247677103623
+  }
+ },
+ "thetank4TV": {
+  "on": {
+   "trades": 454,
+   "entries": 454,
+   "exits": 454,
+   "stake_sum": 51849.9167734,
+   "peak_sum": 51849.9167734,
+   "total_pct": -18.550826331,
+   "total_abs": -185.50826331000002,
+   "win_pct": 85.02202643171806,
+   "dd_pct": 19.430375143799022
+  },
+  "off": {
+   "trades": 454,
+   "entries": 454,
+   "exits": 454,
+   "stake_sum": 51849.9167734,
+   "peak_sum": 51849.9167734,
+   "total_pct": -18.550826331,
+   "total_abs": -185.50826331000002,
+   "win_pct": 85.02202643171806,
+   "dd_pct": 19.430375143799022
+  }
+ },
+ "TRIWAVE": {
+  "on": {
+   "trades": 396,
+   "entries": 396,
+   "exits": 396,
+   "stake_sum": 49784.6411108,
+   "peak_sum": 49784.6411108,
+   "total_pct": -7.431321029,
+   "total_abs": -74.31321029,
+   "win_pct": 91.91919191919192,
+   "dd_pct": 29.965870561795654
+  },
+  "off": {
+   "trades": 396,
+   "entries": 396,
+   "exits": 396,
+   "stake_sum": 49784.6411108,
+   "peak_sum": 49784.6411108,
+   "total_pct": -7.431321029,
+   "total_abs": -74.31321029,
+   "win_pct": 91.91919191919192,
+   "dd_pct": 29.965870561795654
+  }
+ },
+ "twinturboV8": {
+  "on": {
+   "trades": 8,
+   "entries": 8,
+   "exits": 8,
+   "stake_sum": 999.5125800000001,
+   "peak_sum": 999.5125800000001,
+   "total_pct": -0.6020999159999998,
+   "total_abs": -6.020999159999999,
+   "win_pct": 87.5,
+   "dd_pct": 2.8934150323560988
+  },
+  "off": {
+   "trades": 8,
+   "entries": 8,
+   "exits": 8,
+   "stake_sum": 999.5125800000001,
+   "peak_sum": 999.5125800000001,
+   "total_pct": -0.6020999159999998,
+   "total_abs": -6.020999159999999,
+   "win_pct": 87.5,
+   "dd_pct": 2.8934150323560988
+  }
+ },
+ "twinturboV8_2": {
+  "on": {
+   "trades": 8,
+   "entries": 8,
+   "exits": 8,
+   "stake_sum": 995.83269,
+   "peak_sum": 995.83269,
+   "total_pct": -2.5903259850000007,
+   "total_abs": -25.903259850000005,
+   "win_pct": 87.5,
+   "dd_pct": 4.100023210439631
+  },
+  "off": {
+   "trades": 8,
+   "entries": 8,
+   "exits": 8,
+   "stake_sum": 995.83269,
+   "peak_sum": 995.83269,
+   "total_pct": -2.5903259850000007,
+   "total_abs": -25.903259850000005,
+   "win_pct": 87.5,
+   "dd_pct": 4.100023210439631
+  }
+ },
+ "ultratank": {
+  "on": {
+   "trades": 311,
+   "entries": 311,
+   "exits": 311,
+   "stake_sum": 36704.2659576,
+   "peak_sum": 36704.2659576,
+   "total_pct": -24.620986932999998,
+   "total_abs": -246.20986932999998,
+   "win_pct": 81.02893890675242,
+   "dd_pct": 36.849324133777436
+  },
+  "off": {
+   "trades": 311,
+   "entries": 311,
+   "exits": 311,
+   "stake_sum": 36704.2659576,
+   "peak_sum": 36704.2659576,
+   "total_pct": -24.620986932999998,
+   "total_abs": -246.20986932999998,
+   "win_pct": 81.02893890675242,
+   "dd_pct": 36.849324133777436
+  }
+ },
+ "VolatilitySystem": {
+  "on": {
+   "trades": 84,
+   "entries": 130,
+   "exits": 84,
+   "stake_sum": 8275.3512155,
+   "peak_sum": 8275.3512155,
+   "total_pct": 55.119309314999995,
+   "total_abs": 551.19309315,
+   "win_pct": 35.714285714285715,
+   "dd_pct": 15.417045839177598
+  },
+  "off": {
+   "trades": 84,
+   "entries": 84,
+   "exits": 84,
+   "stake_sum": 5236.7126937,
+   "peak_sum": 5236.7126937,
+   "total_pct": 35.071029564,
+   "total_abs": 350.71029564,
+   "win_pct": 39.285714285714285,
+   "dd_pct": 10.380252187404581
+  }
+ },
+ "wavetrend": {
+  "on": {
+   "trades": 511,
+   "entries": 965,
+   "exits": 511,
+   "stake_sum": 31374.1644115,
+   "peak_sum": 31374.1644115,
+   "total_pct": 15.798698859000002,
+   "total_abs": 157.98698859,
+   "win_pct": 94.9119373776908,
+   "dd_pct": 17.277204250733938
+  },
+  "off": {
+   "trades": 311,
+   "entries": 311,
+   "exits": 311,
+   "stake_sum": 7241.6574148,
+   "peak_sum": 7241.6574148,
+   "total_pct": 6.320575721999999,
+   "total_abs": 63.205757219999995,
+   "win_pct": 92.28295819935691,
+   "dd_pct": 4.285629890581748
+  }
+ },
+ "wavetrend_rsi": {
+  "on": {
+   "trades": 540,
+   "entries": 540,
+   "exits": 540,
+   "stake_sum": 11983.5542261,
+   "peak_sum": 11983.5542261,
+   "total_pct": -3.1291903509999996,
+   "total_abs": -31.291903509999997,
+   "win_pct": 77.96296296296296,
+   "dd_pct": 6.219662017409979
+  },
+  "off": {
+   "trades": 540,
+   "entries": 540,
+   "exits": 540,
+   "stake_sum": 11983.5542261,
+   "peak_sum": 11983.5542261,
+   "total_pct": -3.1291903509999996,
+   "total_abs": -31.291903509999997,
+   "win_pct": 77.96296296296296,
+   "dd_pct": 6.219662017409979
+  }
+ }
+}

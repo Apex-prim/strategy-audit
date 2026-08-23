@@ -8,6 +8,10 @@ data/
 # ledger and the wrong reason to see it.
 !LEDGER.csv
 
+# Same reasoning for the DCA record: it is derived and published, not
+# market data. dca.py regenerates it; without it DCA.md would be prose.
+!DCA.csv
+
 # Secrets — never commit. This list is convenience, not a control:
 # the control is tools/secret_gate.py, wired as a pre-commit hook.
 *.env

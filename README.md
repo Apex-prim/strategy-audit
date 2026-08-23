@@ -324,13 +324,13 @@ Caveats, stated rather than omitted:
 
 ## Corrections
 
-Fifteen errors in this audit have been found, published and fixed — including a
+Sixteen errors in this audit have been found, published and fixed — including a
 metric that was not scale-free, a claim about five strategies made from the one
 I was looking at, a consistency check that could not catch its own error because
 both sides used the same wrong formula, and a "trap" of my own invention that a
 reader correctly refuted within hours of publication.
 
-**Six of the fifteen came from readers**, and the largest is the most recent:
+**Six of the sixteen came from readers**, and the largest is the most recent:
 the trap list was not using the community's own definition of a trap. Corrected,
 it flags 42 strategies rather than 371 and removes exactly one from the ladder.
 The published endpoint did not move — that was checked before the change was
@@ -339,6 +339,23 @@ made, not after.
 They are collected in **[CORRECTIONS.md](CORRECTIONS.md)**, with what each one
 changed. An audit that hides its own corrections is asking for a trust it has
 not earned.
+
+## DCA, because someone asked
+
+A question in the freqtrade Discord — would anyone share results from a DCA
+strategy — turned out to be answerable from this corpus. 82 of the 895
+strategies have working position adjustment.
+
+The short version: win rate rises about fifteen points, the average loss goes
+from under twice the average win to roughly five times it, expectancy does not
+move, and zero clear the ladder in either group. Then the denominator decides
+the sign. Measured as percent of wallet, the mechanism looks better in 15 of
+16 paired runs; measured per unit of capital actually deployed, it is better
+in 3 of 16 — because a ladder strategy reserves capital and therefore enters
+smaller.
+
+**[DCA.md](DCA.md)** has the numbers, how they were produced, and the
+correction to this repository that came out of asking.
 
 ## Get in touch
 
