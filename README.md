@@ -324,13 +324,13 @@ Caveats, stated rather than omitted:
 
 ## Corrections
 
-Sixteen errors in this audit have been found, published and fixed — including a
+Seventeen errors in this audit have been found, published and fixed — including a
 metric that was not scale-free, a claim about five strategies made from the one
 I was looking at, a consistency check that could not catch its own error because
 both sides used the same wrong formula, and a "trap" of my own invention that a
 reader correctly refuted within hours of publication.
 
-**Six of the sixteen came from readers**, and the largest is the most recent:
+**Six of the seventeen came from readers**, and the largest is the most recent:
 the trap list was not using the community's own definition of a trap. Corrected,
 it flags 42 strategies rather than 371 and removes exactly one from the ladder.
 The published endpoint did not move — that was checked before the change was

@@ -12,6 +12,11 @@ data/
 # market data. dca.py regenerates it; without it DCA.md would be prose.
 !DCA.csv
 
+# And CLAIMS.csv, which freeze_guard.py reads and README links to. It was
+# swept up by *.csv and never committed: the link 404'd and every clean
+# checkout failed CI, while the working tree passed. See CORRECTIONS.md.
+!CLAIMS.csv
+
 # Secrets — never commit. This list is convenience, not a control:
 # the control is tools/secret_gate.py, wired as a pre-commit hook.
 *.env

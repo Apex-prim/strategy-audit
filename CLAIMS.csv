@@ -1,0 +1,11 @@
+claim,value,class,epochs_required,source
+strategies in corpus,895,descriptive,-,census of what could be found and loaded
+repositories swept,53,descriptive,-,corpus_sources.json
+negative in the author's own window,298,descriptive,-,ladder gate G2
+survivors under pre-registered rules,17,pre-registered,E0,"CHECKLIST.md 2026-08-20 15:00, commit 4d5a937"
+beat buy-and-hold under pre-registered rules,3,pre-registered,E0,freqtrade Market change
+survivors under the full rule set,2,repair-adjusted,E0+E1+E2+E3+E4,E1 fixed after the data; see LEDGER.md
+beat buy-and-hold under the full rule set,0,repair-adjusted,E0+E1+E2+E3+E4,freqtrade Market change
+BH rejections,72,exploratory,E4,multiplicity added after external review
+BY rejections (arbitrary dependence),70,exploratory,E5,added 2026-08-22 after external review
+survivors still clearing BY,2,exploratory,E5,robustness of the repair-adjusted result

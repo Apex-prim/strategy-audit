@@ -333,6 +333,37 @@ is known, and unknown for the other 72%.
 
 ---
 
+## A file the README links to was never in the repository (2026-08-23)
+
+`CLAIMS.csv` — the table that marks every published figure as descriptive,
+pre-registered, repair-adjusted or exploratory — matched `*.csv` in
+`.gitignore` and was never committed. The README links to it. The link
+returned 404.
+
+`freeze_guard.py` reads that file to compare its own verdict against the
+declared claim class. Without it the guard does the correct thing: it refuses
+to assert, and exits non-zero. **So CI had been failing on every clean
+checkout since the guard began requiring it** — three commits — while the
+same commands passed in a working tree where the file happens to exist.
+
+Reproduced before the fix rather than reasoned about: a fresh `git clone` of
+this repository fails `freeze_guard.py` with "primary claim not found in
+CLAIMS.csv", and the same clone with the file restored exits 0.
+
+**Found by looking at what a reader sees, not at what the local machine
+says.** The gates were run locally before the previous push and reported as
+passing. They did pass — locally. Nobody looked at the badge.
+
+Two things changed. `CLAIMS.csv` is now committed, excepted from the ignore
+rule the way `LEDGER.csv` already was. And `dca.py`, added in the previous
+commit, was published without being declared in the pipeline manifest —
+`sync_repo.py --orphans` catches exactly that, and it is the CI step after
+the one that was failing, so it had never run. It is declared now.
+
+**What it changes in the published numbers:** nothing. It changes whether a
+reader can check them, which is the only thing this repository claims to be
+for.
+
 ## Nine strategies were measured without a mechanism they contain (2026-08-23)
 
 `adjust_trade_position` — the DCA hook — is only called when
