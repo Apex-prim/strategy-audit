@@ -322,6 +322,18 @@ Caveats, stated rather than omitted:
   a self-test and a sabotage check that plants three real-shaped secrets and
   requires the gate to catch all three.
 
+## 94 of the 895 do not load at all
+
+The funnel used to show 399 strategies falling at the first gate under one
+label. [`loadcheck.py`](loadcheck.py) splits that bucket: **91 fail to import**
+(missing packages like `pyrenko`, `remora`), 3 break on their own class
+definition, 37 loaded and produced trades in one window, and 268 import
+cleanly and fall for a reason the probe cannot see.
+
+Unreported, that turns the corpus into *code that still runs today* — a
+survivorship filter nobody declared. Raised by froggleston; written up in
+[CORRECTIONS.md](CORRECTIONS.md).
+
 ## Corrections
 
 Seventeen errors in this audit have been found, published and fixed — including a

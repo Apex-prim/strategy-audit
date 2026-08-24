@@ -541,3 +541,54 @@ broken. A rule invoked and not executed is not a rule.
 or "fourteen survivors" described populations containing strategies never
 tested for look-ahead bias. The published endpoint — no strategy beats
 buy-and-hold — is unchanged under all three versions.
+
+## Strategies that never load were counted as strategies (2026-08-24)
+
+**Raised by** froggleston, in the freqtrade Discord: *"it also doesn't list
+strategies that simply don't load."*
+
+He is right, and I did not have the number. The funnel showed 399 of 895
+strategies falling at the first gate under one label, `G0_measured`, which
+says only that a measurable pair of windows never appeared. It does not say
+why. A strategy that will not import, one that imports and never trades, and
+one that died during the backtest are three different facts, and I collapsed
+them into one.
+
+**Why that matters more than a missing column.** Unreported, it makes the
+corpus quietly become *code that still runs today*. Strategies depending on a
+package that has since vanished drop out silently. That is a survivorship
+filter, and it was never declared.
+
+**The reason was not recorded at run time**, so it is reconstructed by
+[`loadcheck.py`](loadcheck.py), cheapest route first: if either window
+produced a trade count the file demonstrably loaded, which settles those from
+the ledger alone; the rest are imported in a subprocess and the exception is
+kept. Import takes seconds where a backtest takes minutes.
+
+```
+corpus                                        895
+never produced a measurable pair of windows   399
+
+  imports fine, reason still downstream       268    29.9% of corpus
+  WILL NOT IMPORT                              91    10.2% of corpus
+  loaded, one window produced trades            37     4.1% of corpus
+  loads but breaks on definition                3     0.3% of corpus
+```
+
+Examples of the import failures: `AdaptiveRenkoStrategy` needs `pyrenko`,
+`AdvancedRiskFilterStrategy` needs `remora`. Neither is installable from what
+the repository ships.
+
+**So the honest number is 94 of 895, about 10.5%, that do not load at
+all.** That is froggleston's point, and it now has a figure attached.
+
+**What this correction does not fix.** The 268 that import cleanly still fall
+at `G0_measured` for a reason this probe cannot see: no trades in the windows,
+a timeout, or a failure during the backtest itself. Import is not execution.
+Separating those three requires re-running them with the error captured, which
+is the next job, not this one. Saying it is resolved would repeat the mistake
+this correction is about.
+
+**Consequence for the reader:** the denominator in every rate quoted from the
+funnel included 94 strategies that were never runnable. The published endpoint
+— no strategy beats buy-and-hold — sits on later gates and does not move.

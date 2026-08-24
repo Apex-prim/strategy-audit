@@ -1,0 +1,56 @@
+{
+ "total_corpus": 895,
+ "g0": 399,
+ "loaded_by_ledger": 37,
+ "probed": 362,
+ "buckets": {
+  "OK_LOADS": 268,
+  "IMPORT": 91,
+  "OTHER": 3,
+  "LOADS_BUT_NO_RESULT_BOTH_WINDOWS": 37
+ },
+ "examples": {
+  "OK_LOADS": [
+   {
+    "strategy": "A9AV",
+    "detail": "1"
+   },
+   {
+    "strategy": "ADX_15M_USDT",
+    "detail": "1"
+   },
+   {
+    "strategy": "ADX_15M_USDT2",
+    "detail": "1"
+   }
+  ],
+  "IMPORT": [
+   {
+    "strategy": "AdaptiveRenkoStrategy",
+    "detail": "No module named 'pyrenko'"
+   },
+   {
+    "strategy": "AdvancedRiskFilterStrategy",
+    "detail": "No module named 'remora'"
+   },
+   {
+    "strategy": "ARIMA_15",
+    "detail": "No module named 'pmdarima'"
+   }
+  ],
+  "OTHER": [
+   {
+    "strategy": "BB_RPB_TSL_SMA_Tranz_TB_MOD",
+    "detail": "NameError: name 'BB_RPB_TSL_SMA_Tranz_TB' is not defined"
+   },
+   {
+    "strategy": "BlueEyes_MPP_v1",
+    "detail": "NameError: name 'IStrategy' is not defined"
+   },
+   {
+    "strategy": "ClucHAnix_BB_RPB_MOD_trailing_buy",
+    "detail": "NameError: name 'logging' is not defined"
+   }
+  ]
+ }
+}
