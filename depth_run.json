@@ -1,0 +1,207 @@
+{
+ "params": {
+  "lookback_h": 24,
+  "hold_h": 24,
+  "tail_bps": 500,
+  "gap_h": 48,
+  "start": "2020-01-01"
+ },
+ "symbols": {
+  "BTCUSDT": {
+   "hours": 58267,
+   "baseline_bps": 14.80520330075862,
+   "bands": [
+    {
+     "lo": 100,
+     "hi": 200,
+     "n": 12669,
+     "mean_bps": 5.413965761257664,
+     "excess_bps": -9.391237539500956
+    },
+    {
+     "lo": 200,
+     "hi": 300,
+     "n": 6751,
+     "mean_bps": 6.072385504454571,
+     "excess_bps": -8.73281779630405
+    },
+    {
+     "lo": 300,
+     "hi": 500,
+     "n": 5958,
+     "mean_bps": 7.182604279097888,
+     "excess_bps": -7.622599021660732
+    },
+    {
+     "lo": 500,
+     "hi": null,
+     "n": 3386,
+     "mean_bps": 69.78049177608425,
+     "excess_bps": 54.97528847532563
+    }
+   ],
+   "episodes": {
+    "count": 176,
+    "median_len_h": 14.0,
+    "episode_mean_bps": 144.1943587715812,
+    "episode_excess_bps": 129.38915547082257,
+    "share_up": 0.7670454545454546,
+    "first_hour_excess_bps": -29.05334347816503,
+    "first_hour_share_up": 0.5113636363636364,
+    "first_hour_ci": [
+     -93.21269215162165,
+     35.10600519529159
+    ]
+   },
+   "by_year": [
+    {
+     "year": 2020,
+     "episodes": 31,
+     "year_return_pct": 301.6442179768017,
+     "episode_excess_bps": 71.04869106146722,
+     "first_hour_excess_bps": -135.43988749363072
+    },
+    {
+     "year": 2021,
+     "episodes": 43,
+     "year_return_pct": 59.264380492848524,
+     "episode_excess_bps": 135.73368411717433,
+     "first_hour_excess_bps": -34.07944311876604
+    },
+    {
+     "year": 2022,
+     "episodes": 36,
+     "year_return_pct": -64.54963246524493,
+     "episode_excess_bps": 174.6313533230285,
+     "first_hour_excess_bps": -16.550544119277603
+    },
+    {
+     "year": 2023,
+     "episodes": 16,
+     "year_return_pct": 156.02952743994675,
+     "episode_excess_bps": 135.2009612581869,
+     "first_hour_excess_bps": 90.87394567711337
+    },
+    {
+     "year": 2024,
+     "episodes": 23,
+     "year_return_pct": 120.09693319373697,
+     "episode_excess_bps": 114.93241159896385,
+     "first_hour_excess_bps": -15.982125963102666
+    },
+    {
+     "year": 2025,
+     "episodes": 17,
+     "year_return_pct": -7.158904492834106,
+     "episode_excess_bps": 175.29095191111924,
+     "first_hour_excess_bps": 1.2796361214634566
+    },
+    {
+     "year": 2026,
+     "episodes": 10,
+     "year_return_pct": -11.912264991443866,
+     "episode_excess_bps": 67.86583074961717,
+     "first_hour_excess_bps": 5.689618839969988
+    }
+   ]
+  },
+  "ETHUSDT": {
+   "hours": 58267,
+   "baseline_bps": 20.673165780235323,
+   "bands": [
+    {
+     "lo": 100,
+     "hi": 200,
+     "n": 12398,
+     "mean_bps": 19.77514633639124,
+     "excess_bps": -0.8980194438440812
+    },
+    {
+     "lo": 200,
+     "hi": 300,
+     "n": 7425,
+     "mean_bps": 12.17953146894677,
+     "excess_bps": -8.493634311288552
+    },
+    {
+     "lo": 300,
+     "hi": 500,
+     "n": 7658,
+     "mean_bps": -1.1101414042974327,
+     "excess_bps": -21.783307184532756
+    },
+    {
+     "lo": 500,
+     "hi": null,
+     "n": 6350,
+     "mean_bps": 44.513142480658736,
+     "excess_bps": 23.839976700423414
+    }
+   ],
+   "episodes": {
+    "count": 257,
+    "median_len_h": 17.0,
+    "episode_mean_bps": 169.33723360127036,
+    "episode_excess_bps": 148.66406782103502,
+    "share_up": 0.7276264591439688,
+    "first_hour_excess_bps": 2.1059569623432117,
+    "first_hour_share_up": 0.5408560311284046,
+    "first_hour_ci": [
+     -49.31976035430655,
+     53.53167427899298
+    ]
+   },
+   "by_year": [
+    {
+     "year": 2020,
+     "episodes": 45,
+     "year_return_pct": 464.46401225114863,
+     "episode_excess_bps": 179.3724853738142,
+     "first_hour_excess_bps": 16.231896225489493
+    },
+    {
+     "year": 2021,
+     "episodes": 47,
+     "year_return_pct": 400.41110808603315,
+     "episode_excess_bps": 163.02428912475716,
+     "first_hour_excess_bps": 8.086048606857588
+    },
+    {
+     "year": 2022,
+     "episodes": 48,
+     "year_return_pct": -67.86120209475854,
+     "episode_excess_bps": 193.44823719104483,
+     "first_hour_excess_bps": -9.562106455542903
+    },
+    {
+     "year": 2023,
+     "episodes": 21,
+     "year_return_pct": 91.29484290847563,
+     "episode_excess_bps": 127.14778262046883,
+     "first_hour_excess_bps": 116.84407374741554
+    },
+    {
+     "year": 2024,
+     "episodes": 33,
+     "year_return_pct": 45.2318045102964,
+     "episode_excess_bps": 143.26040596476523,
+     "first_hour_excess_bps": -36.80196099067885
+    },
+    {
+     "year": 2025,
+     "episodes": 40,
+     "year_return_pct": -11.671474025394746,
+     "episode_excess_bps": 87.34141024553523,
+     "first_hour_excess_bps": -34.5126662471226
+    },
+    {
+     "year": 2026,
+     "episodes": 23,
+     "year_return_pct": -17.82970980434285,
+     "episode_excess_bps": 89.84804822389748,
+     "first_hour_excess_bps": -8.626522387476623
+    }
+   ]
+  }
+ }
+}

@@ -340,6 +340,22 @@ They are collected in **[CORRECTIONS.md](CORRECTIONS.md)**, with what each one
 changed. An audit that hides its own corrections is asking for a trust it has
 not earned.
 
+## Buying the drawdown, and where the number stops being reachable
+
+[DEPTH.md](DEPTH.md) asks what sits underneath DCA: after price has already
+fallen, is the next move better than average? Shallow dips are worse than
+baseline. Past 500 bps the sign flips and the effect is large — and it
+survives the obvious objection, being **strongest in 2022**, the year BTC
+lost two thirds.
+
+Then it dies on the only entry you can execute. Averaged over a crash the
+excess is +129 bps; taken at the first hour the condition fires it is −29,
+with a confidence interval that covers everything. Same data, three units of
+analysis, two of which have no tradeable meaning.
+
+It is also a correction of my own note, which had generalised a result about
+shallow dips into a claim about the whole class.
+
 ## DCA, because someone asked
 
 A question in the freqtrade Discord — would anyone share results from a DCA
