@@ -1,0 +1,99 @@
+{
+ "start": "2019-09-01",
+ "alternatives": [
+  0.53,
+  0.55,
+  0.6,
+  0.65
+ ],
+ "needed": {
+  "0.53": 2178,
+  "0.55": 783,
+  "0.60": 194,
+  "0.65": 85
+ },
+ "symbols": {
+  "BTCUSDT": {
+   "candles": 2543,
+   "years": 6.959616700889802,
+   "barriers": [
+    {
+     "bps": 500,
+     "races": 686,
+     "share_up": 0.5276967930029155,
+     "median_days": 2,
+     "needed_for_observed": 2556
+    },
+    {
+     "bps": 1000,
+     "races": 228,
+     "share_up": 0.5526315789473685,
+     "median_days": 6,
+     "needed_for_observed": 706
+    },
+    {
+     "bps": 2000,
+     "races": 67,
+     "share_up": 0.6119402985074627,
+     "median_days": 28,
+     "needed_for_observed": 155
+    },
+    {
+     "bps": 3000,
+     "races": 34,
+     "share_up": 0.6764705882352942,
+     "median_days": 46,
+     "needed_for_observed": 61
+    },
+    {
+     "bps": 5000,
+     "races": 13,
+     "share_up": 0.7692307692307693,
+     "median_days": 157,
+     "needed_for_observed": 25
+    }
+   ]
+  },
+  "ETHUSDT": {
+   "candles": 2463,
+   "years": 6.740588637919234,
+   "barriers": [
+    {
+     "bps": 500,
+     "races": 957,
+     "share_up": 0.5297805642633229,
+     "median_days": 2,
+     "needed_for_observed": 2211
+    },
+    {
+     "bps": 1000,
+     "races": 350,
+     "share_up": 0.5257142857142857,
+     "median_days": 4,
+     "needed_for_observed": 2966
+    },
+    {
+     "bps": 2000,
+     "races": 118,
+     "share_up": 0.5677966101694916,
+     "median_days": 15,
+     "needed_for_observed": 425
+    },
+    {
+     "bps": 3000,
+     "races": 48,
+     "share_up": 0.6666666666666666,
+     "median_days": 34,
+     "needed_for_observed": 69
+    },
+    {
+     "bps": 5000,
+     "races": 22,
+     "share_up": 0.7272727272727273,
+     "median_days": 71,
+     "needed_for_observed": 36
+    }
+   ]
+  }
+ }
+}

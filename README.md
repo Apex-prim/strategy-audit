@@ -340,6 +340,17 @@ They are collected in **[CORRECTIONS.md](CORRECTIONS.md)**, with what each one
 changed. An audit that hides its own corrections is asking for a trust it has
 not earned.
 
+## Before the backtest: can this history answer the question at all?
+
+[RESOLVABLE.md](RESOLVABLE.md) counts the thing a barrier claim is actually
+settled by — non-overlapping races, not candles. Seven years of BTC dailies
+is 2,543 bars and **13 races** at a 5000 bps barrier. Every row in the table
+is short of the sample it would need, by between 1.4x and 8.5x.
+
+It also shows the trap in the same table: the share resolving upward rises
+with barrier width, and so does the median duration, from days to months. A
+race that takes five months is measuring drift, not direction.
+
 ## Buying the drawdown, and where the number stops being reachable
 
 [DEPTH.md](DEPTH.md) asks what sits underneath DCA: after price has already
