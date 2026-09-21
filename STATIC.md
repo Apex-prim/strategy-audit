@@ -97,14 +97,15 @@ the 53 repositories of this ledger.
 
 ```
 repositories cloned                          188
-repositories with at least one strategy      130+
-strategy files                              4306
-strategy files distinct by content          2078
-copies of the same file in other repos      2153   (51 %)
+repositories with at least one strategy      135
+strategy files                              4912
+strategy files distinct by content          2173
+copies of the same file in other repos      2739   (56 %)
+randomness in the signal (category 4)         30
 ```
 
-**Half of the public freqtrade strategy corpus is the same strategies copied
-between repositories.** Four different accounts publish `NostalgiaForInfinity`
+**More than half of the public freqtrade strategy corpus is the same
+strategies copied between repositories.** Four different accounts publish `NostalgiaForInfinity`
 as their own. A survey that counts files counts most strategies twice; this
 one deduplicates by content hash and credits each strategy to the first
 repository (alphabetically) it appears in — a tie-break, not an attribution.

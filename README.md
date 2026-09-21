@@ -15,7 +15,7 @@ A second auditor reads the source without running it, and is calibrated
 against the first on this same ledger: **precision 100 %, sensitivity 28 %** —
 a pre-filter that never lies, not a judge. Its numbers, its four known forms
 and its 21 named misses are in **[STATIC.md](STATIC.md)**. The same page
-measures the public corpus itself: **51 % of it is copies.**
+measures the public corpus itself: **56 % of it is copies.**
 
 <!-- LEDGER:BEGIN -->
 ```
