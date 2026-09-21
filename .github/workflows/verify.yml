@@ -13,11 +13,20 @@ jobs:
   gates:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # 21.09.2026: v4/v5 работали на Node 20, который GitHub снимает с
+      # поддержки и о чём писал предупреждение в каждом прогоне. Обновлено
+      # вместе с Python — гейты проверены на 3.13 локально ДО правки.
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
+
+      # Статический прибор обязан пройти свой самотест здесь же: 38 случаев,
+      # из них 9 — ГРАНИЦЫ, где он обязан промолчать. Зелёный CI без него
+      # ничего не говорил бы о втором приборе репозитория.
+      - name: Static auditor — selftest incl. boundary controls
+        run: python foreign_strategy_audit.py --selftest
 
       - name: Secret gate — self-test and deliberate sabotage
         run: python tools/secret_gate.py --selftest

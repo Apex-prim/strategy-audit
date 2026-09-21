@@ -1,11 +1,21 @@
 # 895 public freqtrade strategies, measured out of sample
 
+[![verify](https://github.com/Apex-prim/strategy-audit/actions/workflows/verify.yml/badge.svg)](https://github.com/Apex-prim/strategy-audit/actions/workflows/verify.yml)
+[![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+[![cite](https://img.shields.io/badge/cite-CITATION.cff-lightgrey.svg)](CITATION.cff)
+
 Every public freqtrade strategy that could be found and loaded — 895 unique
 classes from 53 repositories — run by **freqtrade itself** on its own declared
 timeframe, in its author's window and in years the author never saw.
 
 **Two clear every bias, trap and multiplicity check. One of those has a real
 per-trade edge that survives doubled costs. It does not beat buy-and-hold.**
+
+A second auditor reads the source without running it, and is calibrated
+against the first on this same ledger: **precision 100 %, sensitivity 28 %** —
+a pre-filter that never lies, not a judge. Its numbers, its four known forms
+and its 21 named misses are in **[STATIC.md](STATIC.md)**. The same page
+measures the public corpus itself: **51 % of it is copies.**
 
 <!-- LEDGER:BEGIN -->
 ```
@@ -283,6 +293,16 @@ talks to an exchange account.
 **Auditing your own strategy?** → **[CHECKLIST.md](CHECKLIST.md)**: thirteen
 mechanical questions, each tied to a defect actually found here — eight in the
 audited strategies, four in this pipeline.
+
+**No freqtrade installed?** The static auditor needs nothing but Python:
+
+```bash
+python foreign_strategy_audit.py --root path/to/strategies --lang en
+```
+
+It answers in a second and, on this ledger, has never flagged a clean strategy
+— but it misses most real cases ([STATIC.md](STATIC.md)). A silence from it
+means *"none of the four forms it knows"*, not *"clean"*.
 
 ## Method, and what it cannot do
 
