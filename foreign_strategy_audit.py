@@ -149,6 +149,18 @@ LOOKAHEAD = re.compile(
     r"\.interpolate\(\s*\)\s*$|"
     # ⑥ центрированное окно — смотрит вперёд ПО ОПРЕДЕЛЕНИЮ
     r"center\s*=\s*True|"
+    # ⑦ ДВЕ СЕМЬИ, ВЗЯТЫЕ У ЧУЖОГО ДЕТЕКТОРА 21.09. `RoboticAutomations`
+    # держит 137 стратегий в папке `dirty LA/` по СВОЕМУ ast-детектору из 12
+    # правил, с точной строкой на файл. Две его семьи с высокой уверенностью
+    # у меня отсутствовали, и обе прожиты на его файлах:
+    #   backfill — `bfill()` / `fillna(method='bfill')` тянет ПОЗДНЕЕ
+    #   значение в РАННИЕ строки (23 его попадания);
+    #   extrema_scan — `argrelextrema` / `find_peaks` / zigzag ищут
+    #   экстремумы, а экстремум в точке t известен только ПОСЛЕ t (52).
+    # Это и есть «путезависимый пересчёт», который я не мог назвать у Renko.
+    # ⚠ Граница: `ffill()` — прошлое в будущее — ЗАКОННО и НЕ ловится.
+    r"\.bfill\(|fillna\(\s*method\s*=\s*[\"']bfill[\"']|"
+    r"\bargrelextrema\(|\bfind_peaks\(|\bzigzag\(|"
     # ④ РУЧНАЯ нормировка по всей выборке: (X − X.min())/(X.max() − X.min()).
     # ⛔ Прожито 21.09: три из четырёх стратегий каталога `lookahead_bias`
     # написали её БЕЗ `MinMaxScaler`, простой арифметикой, и первая
@@ -444,6 +456,33 @@ def _dup_probe(same):
         shutil.rmtree(d, ignore_errors=True)
 
 
+def _lineage_probe(copies, labelled, label_dir=u"lookahead_bias"):
+    u"""Корпус из `copies` репозиториев с ОДНОЙ и той же стратегией.
+
+    При `labelled` первая копия лежит в папке-пометке `label_dir` — как у
+    авторов freqtrade-strategies (`lookahead_bias`) или RoboticAutomations
+    (`dirty LA`). Возвращает (копий у первой записи, помечена ли).
+    """
+    import shutil
+    import tempfile
+    body = (u"class S:\n    def populate_entry_trend(self, d, m):\n"
+            u"        d['x'] = (d-d.min())/(d.max()-d.min())\n        return d\n")
+    d = tempfile.mkdtemp(prefix="anatman_lin_")
+    try:
+        for i in range(copies):
+            sub = os.path.join(d, "repo%d" % i,
+                               label_dir if (labelled and i == 0)
+                               else "strategies")
+            os.makedirs(sub)
+            with io.open(os.path.join(sub, "s.py"), "w",
+                         encoding="utf-8") as fh:
+                fh.write(body)
+        rows = lineage(d)
+        return (rows[0][0], rows[0][3]) if rows else (0, False)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
 SELFTEST = [
     (u"①_подсаженное_заглядывание_НАЙДЕНО",
      lambda: len(check_lookahead(_DIRTY)) >= 1),
@@ -586,6 +625,37 @@ SELFTEST = [
      lambda: check_random(_CLEAN) == []),
     (u"④_упоминание_в_комментарии_НЕ_считается",
      lambda: check_random(u"# np.random.randint here\n") == []),
+    # ⛔ РОДОСЛОВНАЯ: три копии → три; пометка у ОДНОЙ копии — пометка всей
+    # родословной (остальные несут дефект БЕЗ пометки); одиночка — не копия.
+    (u"⑫_три_копии_одной_стратегии_видны_как_ТРИ",
+     lambda: _lineage_probe(3, labelled=False) == (3, False)),
+    (u"⑫_пометка_у_одной_копии_помечает_родословную",   # граница ⑩
+     lambda: _lineage_probe(3, labelled=True) == (3, True)),
+    (u"⑫_одиночка_копией_НЕ_считается",
+     lambda: _lineage_probe(1, labelled=False) == (1, False)),
+    # ⛔ ПРОЖИТО 21.09: папка-пометка бывает не только `lookahead_bias`.
+    # `dirty LA` у RoboticAutomations — та же пометка другим именем.
+    (u"⑫_папка_dirty_LA_тоже_пометка_автора",             # граница ⑪
+     lambda: _lineage_probe(2, labelled=True, label_dir=u"dirty LA")
+     == (2, True)),
+    (u"⑫_обычная_папка_пометкой_НЕ_считается",
+     lambda: _lineage_probe(2, labelled=True, label_dir=u"strategies")
+     == (2, False)),
+    # ⛔ ⑦ ДВЕ СЕМЬИ ОТ ЧУЖОГО ДЕТЕКТОРА — и граница для каждой: `ffill`
+    # законен (прошлое в будущее), экстремум в комментарии — не вычисление.
+    (u"⑦_bfill_тянет_будущее_назад_НАЙДЕН",
+     lambda: len(check_lookahead(u"df['x'] = df['x'].bfill()\n")) >= 1),
+    (u"⑦_fillna_method_bfill_НАЙДЕН",
+     lambda: len(check_lookahead(
+         u"df['x'] = df['x'].fillna(method='bfill')\n")) >= 1),
+    (u"⑦_но_ffill_ЗАКОНЕН_и_молчит",                       # граница ⑫
+     lambda: check_lookahead(u"df['x'] = df['x'].ffill()\n") == []),
+    (u"⑦_argrelextrema_НАЙДЕН",
+     lambda: len(check_lookahead(
+         u"idx = argrelextrema(df['close'].values, np.greater, order=5)\n"
+     )) >= 1),
+    (u"⑦_find_peaks_в_комментарии_НЕ_считается",
+     lambda: check_lookahead(u"# peaks via find_peaks(x)\n") == []),
     (u"②_считает_подбираемые_параметры",
      lambda: count_params(u"a = IntParameter(1,5)\nb = DecimalParameter(0,1)") == 2),
     (u"③_читает_таблицу_целей",
@@ -768,15 +838,132 @@ def main_corpus(a):
     return 0
 
 
+# ⛔ ПОМЕТКА АВТОРА — ПАПКА, И ИМЁН У НЕЁ БОЛЬШЕ ОДНОГО. Прожито на первом
+# прогоне родословной 21.09: признак знал только `lookahead_bias/` (так у
+# freqtrade-strategies), а `RoboticAutomations` держит свою папку-пометку
+# `dirty LA/` — и её копии у `jaredrsommer` лежат БЕЗ папки. Прибор
+# печатал «копий без пометки: 0» и был слеп ровно на том, ради чего
+# построен. Список коротко и явно; новое имя — с прожитым случаем.
+LABEL_DIRS = (u"lookahead_bias", u"dirty la", u"dirty_la", u"lookahead/")
+
+
+def _author_labelled(rel):
+    r = rel.replace("\\", "/").lower()
+    return any(k in r for k in LABEL_DIRS)
+
+
+def lineage(corpus):
+    u"""Родословная: одна стратегия → все репозитории, где она лежит.
+
+    ⛔ ПОВОД 21.09: 56 % публичного корпуса — копии, и `DevilStra2` у `ntsd`
+    оказался переименованной копией стратегии, которую официальный
+    репозиторий держит в каталоге `lookahead_bias/` КАК ОБРАЗЕЦ ОШИБКИ.
+    Помеченный сломанным код расходится по чужим репозиториям, ТЕРЯЯ
+    ПОМЕТКУ. Кто у кого взял — не вопрос авторства (порядок обхода
+    алфавитный); вопрос в том, УНАСЛЕДОВАЛА ЛИ КОПИЯ ИЗВЕСТНЫЙ ДЕФЕКТ.
+
+    Возвращает список записей: (число_копий, отпечаток, [(репо, путь)],
+    помечен_ли_автором, кандидат_ли_статики).
+    """
+    import hashlib
+    where = {}
+    for name in sorted(os.listdir(corpus)):
+        d = os.path.join(corpus, name)
+        if not os.path.isdir(d) or name.startswith("."):
+            continue
+        for dp, dn, fn in os.walk(d):
+            dn[:] = [x for x in dn if x not in (".git", "__pycache__")]
+            for f in fn:
+                if not f.endswith(".py") or "test" in f.lower():
+                    continue
+                p = os.path.join(dp, f)
+                try:
+                    src = io.open(p, encoding="utf-8", errors="replace").read()
+                except Exception:                        # noqa: BLE001
+                    continue
+                fw = framework_of(src)
+                if fw is None:
+                    continue
+                sh = hashlib.md5(src.encode("utf-8", "replace")).hexdigest()
+                rel = os.path.relpath(p, d).replace("\\", "/")
+                ent = where.setdefault(sh, {u"at": [], u"src": src, u"fw": fw})
+                ent[u"at"].append((name, rel))
+    out = []
+    for sh, ent in where.items():
+        # ⚠ «помечен автором» — по ПУТИ у ЛЮБОЙ из копий: если хоть один
+        # владелец положил файл в папку-пометку, дефект объявлен, и
+        # остальные копии несут его БЕЗ пометки.
+        labelled = any(_author_labelled(rel) for _, rel in ent[u"at"])
+        flagged = bool(check_lookahead(ent[u"src"], framework=ent[u"fw"]))
+        out.append((len(ent[u"at"]), sh[:12], sorted(ent[u"at"]),
+                    labelled, flagged))
+    out.sort(key=lambda x: (-x[0], x[1]))
+    return out
+
+
+def main_lineage(a):
+    rows = lineage(a.corpus)
+    copies = [r for r in rows if r[0] >= 2]
+    inherited = [r for r in copies if r[3] or r[4]]
+    print(u"── РОДОСЛОВНАЯ · %s" % a.corpus)
+    print(u"   различных стратегий: %d · из них лежат в ≥2 местах: %d"
+          % (len(rows), len(copies)))
+    print(u"   ⛔ размноженных С ИЗВЕСТНЫМ ДЕФЕКТОМ (помечен автором копии "
+          u"или кандидат статики): %d" % len(inherited))
+    lost = sum(1 for n, sh, at, lab, flg in inherited if lab
+               for r, rel in at if not _author_labelled(rel))
+    print(u"   ⛔ копий, ПОТЕРЯВШИХ пометку автора по дороге: %d  "
+          u"(родословных с пометкой: %d)"
+          % (lost, sum(1 for r in inherited if r[3])))
+    print(u"      ⚠ по ТОЧНОМУ содержимому; правленый форк (как DevilStra2 у "
+          u"ntsd, 70 строк из 720) сюда не попадает — слепое пятно названо")
+    print()
+    print(u"   %-5s %-13s %-9s %-8s %s"
+          % (u"копий", u"отпечаток", u"помечен", u"статика", u"где"))
+    for n, sh, at, lab, flg in rows[:25]:
+        if n < 2:
+            break
+        repos = sorted(set(r for r, _ in at))
+        print(u"   %-5d %-13s %-9s %-8s %s%s"
+              % (n, sh, u"ДА" if lab else u"—", u"ДА" if flg else u"—",
+                 u", ".join(repos[:4]),
+                 u" +%d" % (len(repos) - 4) if len(repos) > 4 else u""))
+    print()
+    print(u"   ── РАЗМНОЖЕННЫЕ С ИЗВЕСТНЫМ ДЕФЕКТОМ, ВСЕ")
+    for n, sh, at, lab, flg in inherited:
+        tag = (u"помечен автором у %s" %
+               next(r for r, rel in at if _author_labelled(rel))
+               if lab else u"кандидат статики")
+        print(u"   %s · %d копий · %s" % (sh, n, tag))
+        for r, rel in at:
+            mark = u"⚠ БЕЗ ПОМЕТКИ" if lab and not _author_labelled(rel) \
+                else u""
+            print(u"        %s/%s  %s" % (r, rel, mark))
+    print()
+    print(u"   ⚠ «Помечен» — по пути у ЛЮБОЙ копии; «статика» — кандидат, "
+          u"не находка.")
+    print(u"     Порядок в списке алфавитный, авторства не устанавливает.")
+    return 0
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="")
     ap.add_argument("--corpus", default="")
+    ap.add_argument("--lineage", default="",
+                    help=u"каталог корпусов: кто у кого скопировал и "
+                         u"унаследовала ли копия известный дефект")
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--lang", default="ru", choices=sorted(LANG))
     a = ap.parse_args(argv[1:])
     if a.selftest:
         return selftest()
+    if a.lineage:
+        if not os.path.isdir(a.lineage):
+            sys.stderr.write(u"⛔ ОТКАЗ (код 2): каталога корпуса нет\n")
+            return 2
+        a.corpus = a.lineage
+        return main_lineage(a)
     if a.corpus:
         if not os.path.isdir(a.corpus):
             sys.stderr.write(u"⛔ ОТКАЗ (код 2): каталога корпуса нет\n")

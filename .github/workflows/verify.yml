@@ -22,11 +22,17 @@ jobs:
         with:
           python-version: "3.13"
 
-      # Статический прибор обязан пройти свой самотест здесь же: 38 случаев,
-      # из них 9 — ГРАНИЦЫ, где он обязан промолчать. Зелёный CI без него
+      # Статический прибор обязан пройти свой самотест здесь же: 48 случаев,
+      # из них 12 — ГРАНИЦЫ, где он обязан промолчать. Зелёный CI без него
       # ничего не говорил бы о втором приборе репозитория.
       - name: Static auditor — selftest incl. boundary controls
         run: python foreign_strategy_audit.py --selftest
+
+      # Калибратор воспроизводит матрицу STATIC.md из реестра; его самотест
+      # держит на диске двухстрочный реестр и трёхфайловый корпус, чтобы
+      # проверялась и арифметика, и поиск файла по пути.
+      - name: Calibrator — selftest
+        run: python calibrate.py --selftest
 
       - name: Secret gate — self-test and deliberate sabotage
         run: python tools/secret_gate.py --selftest

@@ -12,10 +12,12 @@ timeframe, in its author's window and in years the author never saw.
 per-trade edge that survives doubled costs. It does not beat buy-and-hold.**
 
 A second auditor reads the source without running it, and is calibrated
-against the first on this same ledger: **precision 100 %, sensitivity 28 %** —
-a pre-filter that never lies, not a judge. Its numbers, its four known forms
-and its 21 named misses are in **[STATIC.md](STATIC.md)**. The same page
-measures the public corpus itself: **56 % of it is copies.**
+against the first on this same ledger: **precision 100 %, sensitivity 45 %** —
+a pre-filter that never lies, not a judge. Its numbers, its six known forms
+and its 16 named misses are in **[STATIC.md](STATIC.md)**. The same page
+measures the public corpus itself — **56 % of it is copies, and 89 of those
+copies carry a lookahead defect their original owner had labelled** — and
+measures a third, independent detector against both.
 
 <!-- LEDGER:BEGIN -->
 ```

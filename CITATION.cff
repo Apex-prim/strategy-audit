@@ -13,7 +13,10 @@ abstract: >-
   classes from 53 repositories — run by freqtrade itself in the author's window
   and out of sample. Every number is regenerated from LEDGER.csv and a CI gate
   fails if the README disagrees. A second, static auditor is calibrated against
-  the dynamic one on the same ledger: precision 100 %, sensitivity 28 %.
+  the dynamic one on the same ledger: precision 100 %, sensitivity 45 %. A
+  content-hash lineage of 2173 distinct public strategies shows 56 % of the
+  corpus to be copies, 89 of them carrying a lookahead defect their original
+  owner had labelled.
 keywords:
   - freqtrade
   - backtesting
