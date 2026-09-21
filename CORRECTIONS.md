@@ -592,3 +592,73 @@ this correction is about.
 **Consequence for the reader:** the denominator in every rate quoted from the
 funnel included 94 strategies that were never runnable. The published endpoint
 — no strategy beats buy-and-hold — sits on later gates and does not move.
+
+---
+
+## Three findings from an outside review, adjudicated by reading the code (2026-09-21)
+
+**Reported by a reader** — an external review of this repository raised three
+points about its statistics, with the wording frozen before any answer. Each
+was adjudicated by reading the code that produces the number, not the prose
+around it. Two stand, one does not, and the impact of each was measured before
+being written down.
+
+### 1. The per-strategy p-value assumes independent trades — CONFIRMED, unstated
+
+`harness.py:190` takes *Mean profit p-value* from freqtrade's own backtest
+report: a t-test on per-trade profits. That test treats trades as independent
+draws. In a multi-pair backtest they are not — trades overlap in time, share
+regimes, and cluster — so the effective sample is smaller than the trade count
+and every p-value in the ledger is optimistic. `ci_low()` in `ledger.py` inherits
+the same assumption. Nothing in the README said so; the Benjamini–Yekutieli
+line addresses dependence *between strategies*, not *within* one.
+
+**Direction of the error:** it favours strategies. Gates G3 and G5 (`p < α`)
+pass more than they should; a correct p can only move a strategy *down* the
+ladder. The published endpoint — zero survivors beat buy-and-hold — is
+therefore not weakened by this finding; it would only get harder to reach.
+
+**What is not yet done:** the fix is a block bootstrap (or an effective-n
+correction from the autocorrelation of trade profits) inside the harness, and
+a re-run of the corpus. Recorded as debt, not claimed as fixed.
+
+### 2. The FDR family is selected on the sign of the same out-of-sample data — PARTIAL, impact measured
+
+`bh_population()` in `ledger_block.py` admits a strategy to the
+Benjamini–Hochberg family only if it has ≥30 trades, positive and significant
+expectancy in the author's window, **and positive expectancy out of sample**.
+The last condition looks at the very data whose p-values are then corrected.
+The in-sample conditions are a legitimate pre-filter (different data); the
+out-of-sample one is selection before the test.
+
+Measured on the published ledger, dropping the out-of-sample sign filter:
+
+```
+family as published          81 tests   BH threshold 0.03872   72 rejected
+family without OOS-sign filter   83 tests   BH threshold 0.03872   73 rejected
+excluded by the filter            2   BinHV45HO (p 0.704)
+                                      CombinedBinHAndClucHyperV3 (p 0.0038, negative expectancy)
+Benjamini–Yekutieli, 83 tests               threshold 0.003761   71 rejected
+```
+
+The threshold does not move; the one extra rejection is a strategy that is
+significantly *negative* — a two-sided p rejecting in the direction nobody is
+claiming. That is the real defect the reviewer's point exposes: the p-values are
+two-sided while the claim is one-sided (*positive* edge). The clean form is the
+83-strategy family with one-sided p-values, and that is the change to make in
+`ledger_block.py` before the next corpus run. **Both survivors keep their status
+under either family**, so no published number changes today.
+
+### 3. "threshold" reported as the largest rejected p-value — NOT a defect
+
+`ledger_block.py:306` prints the Benjamini–Hochberg threshold as the largest
+p-value rejected by the step-up rule. That is the definition of the BH cutoff:
+reject every p ≤ p₍ₖ₎ where k is the largest index with p₍ᵢ₎ ≤ (i/m)·α. Reporting
+p₍ₖ₎ is standard and is what the code does. The reviewer's reading — that the
+word stands in for a different quantity — was checked against the code and does
+not hold. Kept here so that the refutation is as visible as the two findings.
+
+**Consequence for the reader:** no number in the README changes from this
+entry. Finding 1 adds a stated assumption and a debt; finding 2 changes how the
+family will be defined next run; finding 3 changes nothing. All three were
+written down before any of them was fixed.
