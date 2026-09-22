@@ -50,10 +50,18 @@ def selftest():
     требуется, чтобы её посчитали; и тут же требуется, чтобы исправные рядом
     считались исправными — «всё сломано» такой же слепой ответ, как «всё цело».
     """
-    d = os.path.join(_ROOT, "_sabotage")
-    os.makedirs(d, exist_ok=True)
-    io.open(os.path.join(d, "BrokenOnPurpose.py"), "w", encoding="utf-8").write(BROKEN)
-    rows = scan(d)
+    # ⚠ 2026-09-22: каталог диверсии создавался в КОРНЕ репозитория и не
+    # удалялся — один `git add -A`, и заведомо сломанная стратегия ушла бы
+    # в публикацию. Теперь — временный каталог, удаляется всегда.
+    import shutil
+    import tempfile
+    d = tempfile.mkdtemp(prefix="loadscan_sabotage_")
+    try:
+        io.open(os.path.join(d, "BrokenOnPurpose.py"), "w",
+                encoding="utf-8").write(BROKEN)
+        rows = scan(d)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
     failed = [x for x in rows if x[2] == "LOAD FAILED"]
     okrows = [x for x in rows if x[2] == "OK"]
     good = len(failed) == 1 and failed[0][1] == "BrokenOnPurpose.py"
@@ -70,7 +78,10 @@ def main():
         if not os.path.isdir(p):
             continue
         # TOTAL: диагностический обход, в вердикт не входит
-    for sub, dirs, _ in os.walk(p):
+        # ⚠ 2026-09-22: вставка маркера выше (ade33b2a, 22.08) сдвинула эту
+        # строку на уровень ВНЕ цикла по репозиториям — обход шёл один раз,
+        # по последнему `p`. Отступ возвращён; см. CORRECTIONS.md.
+        for sub, dirs, _ in os.walk(p):
             dirs[:] = [x for x in dirs if x not in (".git", "__pycache__", "venv")]
             for name, loc, st in scan(sub):
                 # ключ — файл в своём репозитории: os.walk заходит и в

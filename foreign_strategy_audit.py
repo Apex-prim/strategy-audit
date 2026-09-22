@@ -1045,10 +1045,14 @@ def main(argv):
                 files.append(os.path.join(dp, f))
 
     look, params, roi_only, total, by_fw = [], [], [], 0, {}
+    # ⛔ 22.09 (разбор B-мест, форма D334): непрочитанный файл выпадал из
+    #    корпуса молча — «N стратегий» не говорило, сколько не открылось.
+    unread = []
     for p in files:
         try:
             src = io.open(p, encoding="utf-8", errors="replace").read()
-        except Exception:                                # noqa: BLE001
+        except (IOError, OSError) as ex:
+            unread.append((os.path.relpath(p, a.root), type(ex).__name__))
             continue
         fw = framework_of(src)
         if fw is None:
@@ -1072,6 +1076,11 @@ def main(argv):
     print(t[u"total"]
           % (total, u", ".join(u"%s %d" % (k, v)
                                for k, v in sorted(by_fw.items())) or u"—"))
+    if unread:
+        print(u"   ⚠ НЕ ПРОЧИТАНО / UNREAD: %d — вне счёта, это «не знаю»"
+              % len(unread))
+        for rel, why in unread[:8]:
+            print(u"        %s (%s)" % (rel, why))
     print()
     print(t[u"look"]
           % (len(look), total, len(look) / total * 100 if total else 0))

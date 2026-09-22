@@ -662,3 +662,50 @@ not hold. Kept here so that the refutation is as visible as the two findings.
 entry. Finding 1 adds a stated assumption and a debt; finding 2 changes how the
 family will be defined next run; finding 3 changes nothing. All three were
 written down before any of them was fixed.
+
+---
+
+## The README gate checked a quarter of the README (2026-09-22)
+
+The repository description said *"a CI gate fails if the README disagrees"*.
+A clean-clone check changed the README headline from **895** to **896** and ran
+`verify_ledger.py`: it answered *"README numbers reproduce from LEDGER.csv"*,
+exit 0. The gate compared only the block between the `LEDGER` markers —
+**52 of the 241 numbers** in the README. The headline, and everything in
+prose, was not checked by anything. A change inside the block was caught
+(exit 1), so the gate worked; it was the claim about it that was too large.
+
+The same check found two more things of the same kind:
+
+- The self-tests of all three CI gates — `verify_ledger.py`, `freeze_guard.py`,
+  `calibrate.py` — exercised only their helper functions. None called
+  `main()`, so a green CI proved the arithmetic, not that the gate as run by
+  CI could fail.
+- The published copy of `foreign_strategy_audit.py` had fallen behind its
+  owner: a file that could not be read left the corpus count silently. The
+  owner had been fixed the same day; the copy had not.
+- `loadscan.py` (a diagnostic, not a source of any published number — the
+  "94 of 895 do not load" figure comes from `loadcheck.py`): since commit
+  `ade33b2a` (2026-08-22) the directory walk sat one indentation level
+  *outside* the loop over repositories, so it scanned only the last one. The
+  `# TOTAL:` marker inserted by that commit moved the line. The other ten
+  markers of the same commit were checked; none moved code. Its self-test also
+  wrote a deliberately broken strategy into `_sabotage/` in the repository
+  root and never removed it — one `git add -A` from being published. Both
+  fixed. ⚠ The loop fix is verified structurally (the walk is now inside the
+  loop, by syntax tree), **not by a run**: the self-test needs freqtrade, and
+  the machine that made the fix does not have it.
+
+**What changed.** `verify_ledger.py` now also checks the README headline and
+`CLAIMS.csv` (strategies, repositories) against the ledger, fails when
+`CLAIMS.csv` is missing, and **prints its coverage** — *53 of 241 numbers
+checked; the other 188 are prose and are NOT checked*. Each of the three gates
+now has self-test cases that drive `main()` on planted lies; the headline
+895 → 896 is one of them. The auditor copy is synced from its owner.
+
+**Consequence for the reader:** no published number changes. What changes is
+what the green check means: it covers the ledger block, the headline and
+`CLAIMS.csv` — not the prose, which is the reader's to check.
+
+*Found by running the repository's own gates against deliberately altered
+copies of its files, not by reading.*

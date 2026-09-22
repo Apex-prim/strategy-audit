@@ -4,10 +4,15 @@ Three kinds of contribution are useful here, in this order.
 
 ## 1. Tell me a number is wrong
 
-Every number in the README is regenerated from [LEDGER.csv](LEDGER.csv) by
-`ledger.py`, and `verify_ledger.py` fails CI if they disagree. So if a number
-looks wrong, one of three things is true: the ledger row is wrong, the harness
-that produced the row is wrong, or the prose around the number misreads it.
+The ledger block of the README is regenerated from [LEDGER.csv](LEDGER.csv) by
+`ledger.py`, and `verify_ledger.py` fails CI if it, the README headline or
+`CLAIMS.csv` disagree with the ledger. **That is a minority of the numbers in the
+README**; the gate prints the exact count on every run (no figure is repeated
+here, because a figure repeated in prose goes stale). The other numbers sit in
+prose and nothing checks them automatically; they are exactly where a reader's
+check is most useful. So if a number looks wrong, one of three things is true:
+the ledger row is wrong, the harness that produced the row is wrong, or the
+prose around the number misreads it.
 Open an issue naming the strategy and the column. Errors found in this
 repository are published *in* it — see [CORRECTIONS.md](CORRECTIONS.md) — not
 quietly patched.

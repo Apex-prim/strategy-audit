@@ -29,6 +29,7 @@ import csv
 import io
 import json
 import os
+import re
 import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -71,11 +72,52 @@ def rows_from_csv(path):
     return out
 
 
-def n_repos():
+def n_repos(root=None):
     u"""Зовём ту же реализацию, что и ledger.py. Раньше здесь была копия, и
     обе копии ошибались одинаково — поэтому сверка молчала."""
     from ledger_block import n_repos as _n
-    return _n(os.path.join(_HERE, "corpus_sources.json"))
+    return _n(os.path.join(root or _HERE, "corpus_sources.json"))
+
+
+# ── OUTSIDE THE BLOCK (2026-09-22) ─────────────────────────────────────
+# A clean-clone check that day changed the README headline "895" to "896"
+# and this script still answered "README numbers reproduce" — exit 0. It
+# compared only the block between the markers: 52 of the 241 numbers in the
+# README. The repository description ("a CI gate fails if the README
+# disagrees") claimed more than the gate did. Now the figures that CAN be
+# derived from the published files outside the block are checked too, and
+# the coverage is printed instead of implied.
+NUM_RX = re.compile(r"(?<![\w.])\d+(?:[.,]\d+)?(?![\w.])")
+HEAD_RX = re.compile(r"^#\s+(\d[\d,]*)\s", re.M)
+
+
+def claims(root):
+    path = os.path.join(root, "CLAIMS.csv")
+    if not os.path.exists(path):
+        return None
+    with io.open(path, encoding="utf-8", newline="") as fh:
+        return {r["claim"]: r["value"] for r in csv.DictReader(fh)}
+
+
+def outside_checks(txt, n_rows, repos, cl):
+    u"""[(what, ok, detail)] — figures outside the block that the published
+    files determine. A missing CLAIMS.csv is a failure, not a pass."""
+    out = []
+    m = HEAD_RX.search(txt)
+    out.append((u"README headline = ledger rows",
+                bool(m) and int(m.group(1).replace(",", "")) == n_rows,
+                u"headline %s, ledger %d" % (m.group(1) if m else u"—",
+                                             n_rows)))
+    if cl is None:
+        out.append((u"CLAIMS.csv present", False, u"missing"))
+        return out
+    for key, want in ((u"strategies in corpus", n_rows),
+                      (u"repositories swept", repos)):
+        got = cl.get(key)
+        out.append((u"CLAIMS «%s» = %d" % (key, want),
+                    got is not None and got.strip() == str(want),
+                    u"CLAIMS says %s" % got))
+    return out
 
 
 def selftest():
@@ -130,6 +172,12 @@ def selftest():
     mixed[0]["code_md5"] = "zzz"
     ok.append(("mixed code versions are announced", "MIXED" in build(mixed, 3)))
 
+    # ⑥ WIRING (2026-09-22): the unit cases above never ran main(). On a
+    #    copy of the four real published files, main() itself must pass the
+    #    unchanged copy and FAIL each planted lie — including the one lived
+    #    that day, the headline changed 895 -> 896 while CI stayed green.
+    ok.extend(_wiring())
+
     bad = [n for n, v in ok if not v]
     for n, v in ok:
         print(u"  %-42s %s" % (n, u"OK" if v else u"FAILED"))
@@ -137,37 +185,109 @@ def selftest():
     return 1 if bad else 0
 
 
-def main():
-    if "--selftest" in sys.argv:
+def _wiring():
+    import shutil
+    import tempfile
+    need = ("LEDGER.csv", "README.md", "CLAIMS.csv", "corpus_sources.json")
+    if not all(os.path.exists(os.path.join(_HERE, f)) for f in need):
+        return [(u"main() wiring: published files present", False)]
+
+    def run(mutate):
+        d = tempfile.mkdtemp(prefix="vledger_")
+        try:
+            for f in need:
+                shutil.copy(os.path.join(_HERE, f), d)
+            if mutate:
+                mutate(d)
+            buf, old = io.StringIO(), sys.stdout
+            sys.stdout = buf
+            try:
+                return main([], root=d)
+            finally:
+                sys.stdout = old
+        finally:
+            shutil.rmtree(d, ignore_errors=True)
+
+    def edit(name, fn):
+        def m(d):
+            p = os.path.join(d, name)
+            t = io.open(p, encoding="utf-8", newline="").read()
+            io.open(p, "w", encoding="utf-8", newline="").write(fn(t))
+        return m
+
+    def bump_headline(t):
+        m = HEAD_RX.search(t)
+        return t[:m.start(1)] + str(int(m.group(1).replace(",", "")) + 1) + \
+            t[m.end(1):]
+
+    def bump_block(t):
+        a = t.index(BEGIN)
+        m = NUM_RX.search(t, t.index("\n", t.index("\n", a) + 1))
+        return t[:m.start()] + "9" + t[m.start():]
+
+    def bump_claims(t):
+        return t.replace(u"strategies in corpus,", u"strategies in corpus,1", 1)
+
+    return [
+        (u"main(): unchanged published copy passes", run(None) == 0),
+        (u"main(): headline +1 fails (lived 2026-09-22)",
+         run(edit("README.md", bump_headline)) == 1),
+        (u"main(): a number inside the block fails",
+         run(edit("README.md", bump_block)) == 1),
+        (u"main(): CLAIMS strategies wrong fails",
+         run(edit("CLAIMS.csv", bump_claims)) == 1),
+        (u"main(): CLAIMS.csv missing fails",
+         run(lambda d: os.remove(os.path.join(d, "CLAIMS.csv"))) == 1),
+    ]
+
+
+def main(argv=None, root=None):
+    argv = sys.argv[1:] if argv is None else argv
+    if "--selftest" in argv:
         return selftest()
-    csv_path = os.path.join(_HERE, "LEDGER.csv")
-    md_path = os.path.join(_HERE, "README.md")
+    root = root or _HERE
+    csv_path = os.path.join(root, "LEDGER.csv")
+    md_path = os.path.join(root, "README.md")
     if not os.path.exists(csv_path):
         print(u"REFUSED: LEDGER.csv is missing — the published numbers cannot")
         print(u"be checked against anything. That is a failure, not a pass.")
         return 1
 
     rows = rows_from_csv(csv_path)
-    want = build(rows, n_repos()).strip()
+    repos = n_repos(root)
+    want = build(rows, repos).strip()
 
     txt = io.open(md_path, encoding="utf-8").read()
     if BEGIN not in txt or END not in txt:
         print(u"REFUSED: README.md carries no ledger markers")
         return 1
     have = txt.split(BEGIN, 1)[1].split(END, 1)[0].strip()
+    extra = outside_checks(txt, len(rows), repos, claims(root))
 
-    if have == want:
+    n_all = len(NUM_RX.findall(txt))
+    n_block = len(NUM_RX.findall(have))
+    cover = (u"coverage: %d of %d numbers in README.md are checked (the "
+             u"block, the headline, and CLAIMS.csv against the ledger); the "
+             u"other %d are prose and are NOT checked by this script"
+             % (n_block + 1, n_all, n_all - n_block - 1))
+
+    bad_extra = [e for e in extra if not e[1]]
+    if have == want and not bad_extra:
         print(u"README numbers reproduce from LEDGER.csv (%d rows)" % len(rows))
+        print(u"  " + cover)
         return 0
 
-    print(u"MISMATCH: the README block does not reproduce from LEDGER.csv")
-    hl, wl = have.splitlines(), want.splitlines()
-    for i in range(max(len(hl), len(wl))):
-        a = hl[i] if i < len(hl) else u"(no line)"
-        b = wl[i] if i < len(wl) else u"(no line)"
-        if a != b:
-            print(u"  README: %s" % a)
-            print(u"  ledger: %s" % b)
+    if have != want:
+        print(u"MISMATCH: the README block does not reproduce from LEDGER.csv")
+        hl, wl = have.splitlines(), want.splitlines()
+        for i in range(max(len(hl), len(wl))):
+            a = hl[i] if i < len(hl) else u"(no line)"
+            b = wl[i] if i < len(wl) else u"(no line)"
+            if a != b:
+                print(u"  README: %s" % a)
+                print(u"  ledger: %s" % b)
+    for what, _, detail in bad_extra:
+        print(u"MISMATCH outside the block: %s — %s" % (what, detail))
     return 1
 
 

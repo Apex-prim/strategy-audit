@@ -163,7 +163,45 @@ SELFTEST = [
      lambda: _probe()[4] == [("Gone", "o/x")] and _probe()[0]["tn"] == 1),
     ("no false alarm planted -> FP is exactly zero",
      lambda: _probe()[0]["fp"] == 0),
+    # WIRING (2026-09-22): the cases above call calibrate() directly; none
+    # proved that main() reads the ledger file, finds the corpus, and prints
+    # the matrix. These drive main() itself.
+    ("main(): ledger file + corpus -> matrix printed, TP 1, code 0",
+     lambda: _main_on_disk() == (0, True)),
+    ("main(): no corpus -> refused with code 2, not a matrix of zeros",
+     lambda: _main_quiet(["calibrate.py", "--corpus", ""])[0] == 2),
 ]
+
+
+def _main_quiet(argv):
+    buf, old, olde = io.StringIO(), sys.stdout, sys.stderr
+    sys.stdout, sys.stderr = buf, io.StringIO()
+    try:
+        return main(argv), buf.getvalue()
+    finally:
+        sys.stdout, sys.stderr = old, olde
+
+
+def _main_on_disk():
+    import shutil
+    import tempfile
+    d = tempfile.mkdtemp(prefix="calib_main_")
+    try:
+        repo = os.path.join(d, "o_r")
+        os.makedirs(repo)
+        io.open(os.path.join(repo, "Dirty.py"), "w", encoding="utf-8").write(
+            "class S:\n    def populate_entry_trend(self, df, m):\n"
+            "        df['f'] = df['close'].shift(-1)\n        return df\n")
+        led = os.path.join(d, "ledger.csv")
+        with io.open(led, "w", encoding="utf-8", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["strategy", "repo", "file", "lookahead"])
+            w.writerow(["Dirty", "o/r", "repos/o_r/Dirty.py", FOUND])
+        code, out = _main_quiet(["calibrate.py", "--ledger", led,
+                                 "--corpus", d])
+        return code, "1 (TP)" in out
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
 
 
 def selftest():

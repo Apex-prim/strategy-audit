@@ -176,11 +176,44 @@ def selftest():
                "traps.py" in LADDER_FILES and "ledger.py" in LADDER_FILES))
     ok.append((u"правило не старше своей самой свежей части",
                (not known) or rule_time() == max(known)))
+    # ⚠ ПРОВОДКА (2026-09-22): случаи выше звали `verdict` — чистую функцию.
+    # Ни один не доказывал, что `main` читает CLAIMS.csv и отказывает на
+    # завышенном статусе. Ниже `main` зовётся прямо, источники времени и
+    # статуса подменены в globals().
+    ok.extend(_wiring())
     for n, v in ok:
         print(u"  %-44s %s" % (n, u"OK" if v else u"FAILED"))
     bad = [n for n, v in ok if not v]
     print(u"self-test: %d/%d" % (len(ok) - len(bad), len(ok)))
     return 1 if bad else 0
+
+
+def _wiring():
+    g = globals()
+    keep = (g["rule_time"], g["data_time"], g["claimed_class"])
+
+    def run(t_rule, t_data, cls):
+        g["rule_time"] = lambda files=None: t_rule
+        g["data_time"] = lambda: t_data
+        g["claimed_class"] = lambda: cls
+        buf, old = io.StringIO(), sys.stdout
+        sys.stdout = buf
+        try:
+            return main()
+        finally:
+            sys.stdout = old
+            g["rule_time"], g["data_time"], g["claimed_class"] = keep
+
+    return [
+        (u"main: правило моложе, заявлено repair-adjusted → 0",
+         run(2000, 1000, "repair-adjusted") == 0),
+        (u"main: правило моложе, заявлено pre-registered → 1",
+         run(2000, 1000, "pre-registered") == 1),
+        (u"main: времён нет → 1, не «согласовано»",
+         run(None, None, "repair-adjusted") == 1),
+        (u"main: утверждения нет в CLAIMS → 1",
+         run(1000, 2000, None) == 1),
+    ]
 
 
 if __name__ == "__main__":

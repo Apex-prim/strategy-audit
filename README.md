@@ -65,7 +65,10 @@ rebuilds it from the published [LEDGER.csv](LEDGER.csv) and exits non-zero on
 any difference; it runs in the pre-commit hook and in CI. The README once
 carried *"571 strategies, 55 clean"* for a day after the corpus had grown past
 900, and a reader built an assessment on it — so the numbers here now have a
-return code behind them rather than a promise.
+return code behind them rather than a promise. The return code covers this
+block, the headline and [CLAIMS.csv](CLAIMS.csv) — not the prose below; the
+gate prints how many numbers it checked (see
+[CORRECTIONS.md](CORRECTIONS.md), 2026-09-22).
 
 ## Two numbers, and the order they were decided in
 
