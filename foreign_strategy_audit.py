@@ -679,9 +679,73 @@ def selftest():
         else:
             fail += 1
             print(u"  ✗ %s" % name)
+    # ── диверсия 22.09: main напрямую (класс D321); иглы настоящие ──
+    for name, fn, want in REACH:
+        got = fn()
+        if got == want:
+            ok += 1
+        else:
+            fail += 1
+            print(u"  ✗ %s: %r, ждали %r" % (name, got, want))
+
     print(u"САМОТЕСТ foreign_strategy_audit: %d пройдено, %d провалено"
           % (ok, fail))
     return 1 if fail else 0
+
+
+def _under(argv, files=None):
+    u"""`main` на временном корне с подсаженными стратегиями. (код, stdout)."""
+    import contextlib
+    import shutil
+    import tempfile
+    d, buf = tempfile.mkdtemp(prefix="fsa_"), io.StringIO()
+    try:
+        for nm, src in (files or {}).items():
+            io.open(os.path.join(d, nm), "w", encoding="utf-8").write(src)
+        argv = [a.replace("{ROOT}", d) for a in argv]
+        with contextlib.redirect_stdout(buf), \
+                contextlib.redirect_stderr(io.StringIO()):
+            rc = main(["foreign_strategy_audit.py"] + argv)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+    return rc, buf.getvalue()
+
+
+_STRAT = (u"from freqtrade.strategy import IStrategy\n\n\n"
+          u"class Podd(IStrategy):\n"
+          u"    def populate_indicators(self, dataframe, metadata):\n"
+          u"        dataframe['x'] = dataframe['close'].shift(-1)\n"
+          u"        return dataframe\n\n"
+          u"    def populate_entry_trend(self, dataframe, metadata):\n"
+          u"        return dataframe\n")
+
+
+def _r_no_root():
+    return _under([])[0]
+
+
+def _r_lineage_missing():
+    return _under(["--lineage", os.path.join(os.sep, "nonexistent")])[0]
+
+
+def _r_one_lookahead():
+    rc, out = _under(["--root", "{ROOT}"], {"podd.py": _STRAT})
+    return rc, u"стратегий найдено: 1" in out and u"  1 из 1" in out
+
+
+def _r_english_head():
+    rc, out = _under(["--root", "{ROOT}", "--lang", "en"],
+                     {"podd.py": _STRAT})
+    return rc, u"STRATEGY AUDIT" in out
+
+
+REACH = [
+    (u"main·без корня → 2", _r_no_root, 2),
+    (u"main·--lineage нет каталога → 2", _r_lineage_missing, 2),
+    (u"main·одна стратегия с shift(-1) → найдено 1 из 1",
+     _r_one_lookahead, (0, True)),
+    (u"main·--lang en → английская шапка", _r_english_head, (0, True)),
+]
 
 
 def fileset_hash(root):
